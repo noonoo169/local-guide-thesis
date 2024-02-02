@@ -60,11 +60,15 @@ public class AuthController {
 
     @PostMapping ("/register")
 
-    public ResponseEntity<ResponseDTO> registerUser(@RequestBody UserAuthDTO userAuthDTO ){
+    public ResponseEntity<Result> registerUser(@RequestBody UserAuthDTO userAuthDTO ){
         ResponseDTO response;
         if(userService.getAllUser().stream().anyMatch(user -> user.getEmail().equals(userAuthDTO.getEmail()))){
-            response =  new ResponseDTO(HttpStatus.CONFLICT.value(), "Duplicate account", null);
-            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                    new Result(
+                            true,
+                            HttpStatus.CONFLICT.value(),
+                            "Duplicate account")
+            );
         }
         User user = new User();
         user.setEmail(userAuthDTO.getEmail());
@@ -73,10 +77,14 @@ public class AuthController {
                 .filter(role -> role.getName().equals(RolesEnum.TRAVELER))
                 .findFirst().orElseThrow());
         userService.saveUser(user);
-        userAuthDTO.setToken(utilsAuth.generateAccessToken(userAuthDTO.getEmail(), userAuthDTO.getPassword(), authenticationManager,jwtTokenProvider));
-
-        response = new ResponseDTO(HttpStatus.OK.value(), "User registered successfully", userAuthDTO);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        String accessToken = utilsAuth.generateAccessToken(userAuthDTO.getEmail(), userAuthDTO.getPassword(), authenticationManager,jwtTokenProvider);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new Result(
+                        true,
+                        HttpStatus.OK.value(),
+                        "User login successfully",
+                        userToLoginResponseDtoConverter.convert(user, accessToken))
+        );
     }
 
     @PostMapping("/login")
