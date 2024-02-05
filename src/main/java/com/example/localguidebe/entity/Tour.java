@@ -1,6 +1,7 @@
 package com.example.localguidebe.entity;
 
 import com.example.localguidebe.enums.RolesEnum;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -42,8 +43,8 @@ public class Tour {
     private Integer limitTraveler;
     @Column(name = "extra_price")
     private Double extraPrice;
-    @Column(name = "province")
-    private String province;
+//    @Column(name = "province")
+//    private String province;
     @Column(name = "overall_rating")
     private Double overallRating;
     @Column(name = "itinerary" ,columnDefinition = "TEXT")
@@ -52,9 +53,15 @@ public class Tour {
     @JoinColumn(name = "guide_id")
     private User guide;
     //TODO meeting_point_id associate to location
+    @ManyToOne
+    @JoinColumn(name = "province_id")
+    private Location province;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "tour")
     private List<TourStartTime> tourStartTimes = new ArrayList<>();
+    @JsonIgnoreProperties(
+            allowSetters = true,
+            value = {"tours"})
      @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "category_tour",
             joinColumns = @JoinColumn(name = "tour_id", referencedColumnName = "id"),

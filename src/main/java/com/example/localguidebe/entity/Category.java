@@ -1,5 +1,6 @@
 package com.example.localguidebe.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,6 +21,9 @@ public class Category {
     private Long id;
     @Column(name = "name")
     private String name;
+    @JsonIgnoreProperties(
+            allowSetters = true,
+            value = {"categories"})
     @ManyToMany(mappedBy = "categories")
     private Set<Tour> tours;
 }

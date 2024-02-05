@@ -34,5 +34,7 @@ public class Location {
             joinColumns = @JoinColumn(name = "location_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "tour_id", referencedColumnName = "id"))
     private Set<Tour> tours = new HashSet<>();
+    @OneToMany(mappedBy = "province")
+    private Set<Tour> tours1 = new HashSet<>();
 
 }
