@@ -44,8 +44,8 @@ public class Initializer implements CommandLineRunner {
         }
     }
     private void createRootUser() {
-        // Create a user and associate the role with it
-        User checkedUser = userService.findUserByEmail("admin@gmail.com");
+        User checkedUser = userService.findUserByEmail("admin12345@gmail.com");
+        User checkedGuide = userService.findUserByEmail("guide12345@gmail.com");
         if(checkedUser != null){
             checkedUser.setPassword(passwordEncoder.encode("admin12345"));
             userService.saveUser(checkedUser);
@@ -59,6 +59,23 @@ public class Initializer implements CommandLineRunner {
             roles.add(roleService.findByName(RolesEnum.ADMIN));
             user.setRoles(roles);
             userService.saveUser(user);
+
+
+        }
+
+        if(checkedGuide != null){
+            checkedGuide.setPassword(passwordEncoder.encode("guide12345"));
+            userService.saveUser(checkedUser);
+        }
+        else {
+            User user1 = new User();
+            user1.setUsername("guide");
+            user1.setPassword(passwordEncoder.encode("guide12345"));
+            user1.setEmail("guide12345@gmail.com");
+            Set<Role> roles1 = new HashSet<>();
+            roles1.add(roleService.findByName(RolesEnum.GUIDER));
+            user1.setRoles(roles1);
+            userService.saveUser(user1);
         }
     }
 }

@@ -54,6 +54,20 @@ public class User {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
     private List<Image> images = new ArrayList<>();
 
+    @Column(columnDefinition = "TEXT")
+    private String biography;
+
+    @Column(columnDefinition = "TEXT")
+    private String credential;
+
+    @Column()
+    private Double overallRating;
+
+    @OneToMany(mappedBy = "guide")
+    List<LanguageSkill> languageSkills = new ArrayList<>();
+
+
+
     @Override
     public String toString() {
         return "{" +
