@@ -21,9 +21,7 @@ public class TourStartTime {
     private Integer id;
     @Column(name = "start_time")
     private Time startTime;
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name = "tour_id")
     private Tour tour;
-
-
 }
