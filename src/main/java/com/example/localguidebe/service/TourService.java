@@ -2,6 +2,7 @@ package com.example.localguidebe.service;
 
 
 
+import com.example.localguidebe.dto.requestdto.TourRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateTourRequestDTO;
 
 import com.example.localguidebe.dto.TourDTO;
@@ -15,10 +16,9 @@ import java.util.List;
 
 public interface TourService {
     List<TourDTO> getListTour();
-    Tour saveTour(Tour tour);
+    Tour saveTour(TourRequestDTO tourRequestDTO);
 
     Tour updateTour(UpdateTourRequestDTO updateTourRequestDTO);
-
 
     List<TourDTO> searchTour(String nameTour);
     TourDTO getTourById(Long id);
