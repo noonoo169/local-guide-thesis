@@ -1,8 +1,17 @@
 package com.example.localguidebe.service.impl;
 
+
 import com.example.localguidebe.dto.requestdto.UpdateTourRequestDTO;
 import com.example.localguidebe.entity.Category;
 import com.example.localguidebe.entity.Location;
+
+import com.example.localguidebe.converter.TourToTourDtoConverter;
+import com.example.localguidebe.dto.TourDTO;
+
+
+import com.example.localguidebe.converter.TourToTourDtoConverter;
+import com.example.localguidebe.dto.TourDTO;
+
 import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.repository.TourRepository;
 import com.example.localguidebe.repository.TourStartTimeRepository;
@@ -15,13 +24,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+
+import java.util.ArrayList;
+import java.util.List;
+
 import java.util.stream.Collectors;
 
 @Service
 public class TourServiceImpl implements TourService {
+    private TourToTourDtoConverter tourToTourDtoConverter;
+    @Autowired
+    public void setTourToDtoConverter( TourToTourDtoConverter tourToTourDtoConverter){
+        this.tourToTourDtoConverter = tourToTourDtoConverter;
+    }
     private TourRepository tourRepository;
     private final CategoryService categoryService;
     private final TourStartTimeService tourStartTimeService;
@@ -41,8 +60,13 @@ public class TourServiceImpl implements TourService {
     }
 
     @Override
-    public List<Tour> getListTour() {
-        return tourRepository.findAll();
+    public List<TourDTO> getListTour() {
+        List<TourDTO> tourDTOS = new ArrayList<>();
+        List<Tour> tours =tourRepository.findAll();
+        for(Tour tour : tours){
+            tourDTOS.add(  tourToTourDtoConverter.convert(tour));
+        }
+        return tourDTOS ;
     }
 
     @Override
@@ -52,6 +76,7 @@ public class TourServiceImpl implements TourService {
 
     @Transactional
     @Override
+
     public Tour updateTour(UpdateTourRequestDTO updateTourRequestDTO) {
         Optional<Tour> optionalTour = tourRepository.findById(updateTourRequestDTO.id());
         if (optionalTour.isPresent()) {
@@ -73,7 +98,7 @@ public class TourServiceImpl implements TourService {
             }
 
             // Update category
-            if (updateTourRequestDTO.category_ids() !=  null) {
+            if (updateTourRequestDTO.category_ids() != null) {
                 boolean isUpdateCategory = !tour.getCategories().stream().map(Category::getId).sorted().collect(Collectors.toList())
                         .equals(updateTourRequestDTO.category_ids().stream().sorted().collect(Collectors.toList()));
                 if (isUpdateCategory) {
@@ -91,7 +116,8 @@ public class TourServiceImpl implements TourService {
                 tour.getLocations().clear();
                 updateTourRequestDTO.locations().forEach(location -> {
                     if (location.getId() != null) tour.getLocations().add(locationService.findById(location.getId()));
-                    else tour.getLocations().add(new Location(location.getName(), location.getLatitude(), location.getLongitude()));
+                    else
+                        tour.getLocations().add(new Location(location.getName(), location.getLatitude(), location.getLongitude()));
                 });
             }
 
@@ -113,8 +139,33 @@ public class TourServiceImpl implements TourService {
         return null;
     }
 
-    @Override
-    public Tour getTourById(Long id) {
-        return tourRepository.findById(id).orElseThrow();
+    public List<TourDTO> searchTour(String nameTour) {
+          List<Tour> tours = tourRepository.findAll().stream().filter(tour -> tour.getName().contains(nameTour)).collect(Collectors.toList());
+          List<TourDTO> tourDTOS = new ArrayList<>();
+          for(Tour tour : tours){
+              tourDTOS.add(  tourToTourDtoConverter.convert(tour));
+          }
+        return tourDTOS;
     }
+
+    @Override
+    public TourDTO getTourById(Long id) {
+        return tourToTourDtoConverter.convert(tourRepository.findById(id).orElseThrow());
+
+    }
+
+//    @Override
+//    public List<TourDTO> searchTour(String nameTour) {
+//          List<Tour> tours = tourRepository.findAll().stream().filter(tour -> tour.getName().contains(nameTour)).collect(Collectors.toList());
+//          List<TourDTO> tourDTOS = new ArrayList<>();
+//          for(Tour tour : tours){
+//              tourDTOS.add(  tourToTourDtoConverter.convert(tour));
+//          }
+//        return tourDTOS;
+//    }
+//
+//    @Override
+//    public TourDTO getTourById(Long id) {
+//        return tourToTourDtoConverter.convert(tourRepository.findById(id).orElseThrow());
+//    }
 }
