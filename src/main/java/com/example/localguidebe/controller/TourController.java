@@ -96,4 +96,12 @@ public class TourController {
             );
         }
     }
+    @GetMapping("/tours")
+    public ResponseEntity<Result> getListTour(){
+        try {
+            return new ResponseEntity<>(new Result(true, HttpStatus.OK.value(), "Get the list successfully", tourService.getListTour()), HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(new Result(false, HttpStatus.CONFLICT.value(), "get the failure list", null), HttpStatus.CONFLICT);
+        }
+    }
 }
