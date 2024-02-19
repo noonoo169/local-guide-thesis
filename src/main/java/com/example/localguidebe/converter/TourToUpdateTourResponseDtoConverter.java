@@ -12,12 +12,16 @@ public class TourToUpdateTourResponseDtoConverter {
     private final TourStartTimeToTourStartTimeDtoConverter tourStartTimeToTourStartTimeDtoConverter;
     private final ImageToImageDtoConverter imageToImageDtoConverter;
 
+    private final CategoryToCategoryDtoConverter categoryToCategoryDtoConverter;
+
     public TourToUpdateTourResponseDtoConverter(LocationToLocationDto locationToLocationDto,
                                                 TourStartTimeToTourStartTimeDtoConverter tourStartTimeToTourStartTimeDtoConverter,
-                                                ImageToImageDtoConverter imageToImageDtoConverter) {
+                                                ImageToImageDtoConverter imageToImageDtoConverter,
+                                                CategoryToCategoryDtoConverter categoryToCategoryDtoConverter) {
         this.locationToLocationDto = locationToLocationDto;
         this.tourStartTimeToTourStartTimeDtoConverter = tourStartTimeToTourStartTimeDtoConverter;
         this.imageToImageDtoConverter = imageToImageDtoConverter;
+        this.categoryToCategoryDtoConverter = categoryToCategoryDtoConverter;
     }
 
     public UpdateTourResponseDTO convert(Tour source) {
@@ -35,7 +39,7 @@ public class TourToUpdateTourResponseDtoConverter {
                 source.getItinerary(),
                 locationToLocationDto.convert(source.getProvince()),
                 source.getTourStartTimes().stream().map(tourStartTimeToTourStartTimeDtoConverter::convert).toList(),
-                CategoryToCategoryDtoConverter.convertSetCategory(source.getCategories()),
+                source.getCategories() != null ?source.getCategories().stream().map(categoryToCategoryDtoConverter::convertCategory).collect(Collectors.toSet()) : null,
                 source.getImages().stream().map(imageToImageDtoConverter::convert).toList(),
                 source.getLocations().stream().map(locationToLocationDto::convert).collect(Collectors.toSet()),
                 locationToLocationDto.convert(source.getMeetingPoint()));

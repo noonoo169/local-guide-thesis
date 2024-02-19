@@ -1,7 +1,14 @@
 package com.example.localguidebe.controller;
 
 import com.example.localguidebe.converter.TourToTourDtoConverter;
+
 import com.example.localguidebe.converter.TourToUpdateTourResponseDtoConverter;
+
+import com.example.localguidebe.dto.TourDTO;
+
+
+import com.example.localguidebe.dto.TourDTO;
+
 import com.example.localguidebe.dto.requestdto.TourRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateTourRequestDTO;
 import com.example.localguidebe.dto.responsedto.TourResponseDTO;
@@ -32,6 +39,7 @@ public class TourController {
     public void setTourToDtoConverter( TourToTourDtoConverter tourToTourDtoConverter){
         this.tourToTourDtoConverter = tourToTourDtoConverter;
     }
+
     @Autowired
     public void setTourService(TourService tourService){
         this.tourService = tourService;
@@ -50,17 +58,13 @@ public class TourController {
         }
 
     }
-    @GetMapping("/tours")
-    public ResponseEntity<Result> getListTour(){
+
+    @GetMapping("/tour-detail/{id}")
+    public ResponseEntity<Result> getTour(@PathVariable("id") Long id ){
         try {
-            List<TourResponseDTO> tourResponseDTOS = new ArrayList<>();
-            List<Tour> tours =tourService.getListTour();
-            for(Tour tour : tours){
-                tourResponseDTOS.add(  tourToTourDtoConverter.convert(tour));
-            }
-            return new ResponseEntity<>(new Result(true, HttpStatus.OK.value(), "Get the list successfully", tourResponseDTOS), HttpStatus.OK);
+            return new ResponseEntity<>(new Result(true, HttpStatus.OK.value(), "Get the tour successfully", tourService.getTourById(id)), HttpStatus.OK);
         }catch (Exception e){
-            return new ResponseEntity<>(new Result(false, HttpStatus.CONFLICT.value(), "get the failure list", null), HttpStatus.CONFLICT);
+            return new ResponseEntity<>(new Result(false, HttpStatus.CONFLICT.value(), "No tour found", null), HttpStatus.CONFLICT);
         }
     }
 
