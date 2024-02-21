@@ -8,11 +8,11 @@
         <version>3.2.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.example</groupId>
-    <artifactId>local-guide-be</artifactId>
+    <groupId>com.internship</groupId>
+    <artifactId>local-guide</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>local-guide-be</name>
-    <description>local-guide-be</description>
+    <name>local-guide</name>
+    <description>local-guide</description>
     <properties>
         <java.version>17</java.version>
     </properties>
@@ -50,6 +50,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>

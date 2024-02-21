@@ -1,10 +1,8 @@
 package com.example.localguidebe.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,6 +11,7 @@ import java.util.Set;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -21,19 +20,22 @@ public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotNull
     @Column(name = "name")
     private String name;
+    @NotNull
     @Column(name = "latitude")
     private String latitude;
+    @NotNull
     @Column(name = "longitude")
     private String longitude;
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "location")
     private List<Image> images = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "locations")
+    @ManyToMany(mappedBy = "locations",fetch = FetchType.LAZY)
     private Set<Tour> tours = new HashSet<>();
 
-    @OneToMany(mappedBy = "province")
+    @OneToMany(mappedBy = "province",fetch = FetchType.LAZY)
     private Set<Tour> tours1 = new HashSet<>();
 
     @Override

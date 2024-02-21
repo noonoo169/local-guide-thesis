@@ -2,15 +2,13 @@ package com.example.localguidebe.entity;
 
 import com.example.localguidebe.enums.RolesEnum;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Set;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -24,7 +22,7 @@ public class Role {
     @Enumerated(EnumType.STRING)
     private RolesEnum name;
 
-    @ManyToMany(mappedBy = "roles")
+    @ManyToMany(mappedBy = "roles",fetch = FetchType.LAZY)
     private Set<User> users;
 
     public Role(RolesEnum name) {

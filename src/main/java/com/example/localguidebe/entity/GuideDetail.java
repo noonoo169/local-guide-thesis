@@ -1,28 +1,28 @@
 package com.example.localguidebe.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "guide_detail")
 public class GuideDetail {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(columnDefinition = "TEXT")
-    private String biography;
+  @NotNull
+  @Column(columnDefinition = "TEXT")
+  private String biography;
 
-    @Column(columnDefinition = "TEXT")
-    private String credential;
+  @NotNull
+  @Column(columnDefinition = "TEXT")
+  private String credential;
 
-    @Column()
-    private Double overallRating;
+  @Column() private Double overallRating;
 }
