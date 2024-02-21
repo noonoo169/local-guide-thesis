@@ -25,4 +25,6 @@ public interface TourService {
       Double minPrice,
       Double maxPrice,
       List<Long> categoryId);
+     List<TourDTO> deleteTour(Long id);
 }
+
