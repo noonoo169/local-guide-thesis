@@ -4,6 +4,7 @@ import com.example.localguidebe.converter.TourToTourDtoConverter;
 
 import com.example.localguidebe.converter.TourToUpdateTourResponseDtoConverter;
 
+import com.example.localguidebe.dto.CategoryDTO;
 import com.example.localguidebe.dto.TourDTO;
 
 
@@ -21,6 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/tour-management")
@@ -102,14 +106,17 @@ public class TourController {
         }
     }
     @GetMapping("/tours/search")
-    public ResponseEntity<Result> searchTour( @RequestParam(required = false, defaultValue = "0") Integer page,
-                                              @RequestParam(required = false, defaultValue = "5") Integer limit,
-                                              @RequestParam(required = false, defaultValue = "overallRating") String sortBy,
-                                              @RequestParam(required = false, defaultValue = "desc") String order,
-                                              @RequestParam(required = false, defaultValue = "") String searchName,
-                                              @RequestParam(required = false, defaultValue = "0.0") Double minPrice,
-                                              @RequestParam(required = false, defaultValue = "1000000") Double maxPrice,
-                                              @RequestParam(required = false,defaultValue = "")Long categoryId){
+    public ResponseEntity<Result> searchTour(@RequestParam(required = false, defaultValue = "0") Integer page,
+                                             @RequestParam(required = false, defaultValue = "5") Integer limit,
+                                             @RequestParam(required = false, defaultValue = "overallRating") String sortBy,
+                                             @RequestParam(required = false, defaultValue = "desc") String order,
+                                             @RequestParam(required = false, defaultValue = "") String searchName,
+                                             @RequestParam(required = false, defaultValue = "0.0") Double minPrice,
+                                             @RequestParam(required = false, defaultValue = "10000000") Double maxPrice,
+                                             @RequestParam(required = false,defaultValue = "") List<Long> categoryId){
+        if(categoryId.size() == 0 ){
+            categoryId.addAll(categoryService.getCategories().stream().map(CategoryDTO::getId).collect(Collectors.toList()));
+        }
         try {
             return new ResponseEntity<>(new Result(true, HttpStatus.OK.value(), "Get the tour successfully", tourService.getTours(page, limit, sortBy, order, searchName,minPrice,maxPrice,categoryId)), HttpStatus.OK);
         }catch (Exception e){
