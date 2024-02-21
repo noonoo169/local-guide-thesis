@@ -4,9 +4,9 @@ import com.example.localguidebe.enums.BookingStatusEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
-
 import java.time.LocalDateTime;
+import lombok.*;
+import org.hibernate.annotations.SQLDelete;
 
 @Getter
 @Setter
@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@SQLDelete(sql = "UPDATE booking SET is_deleted=true WHERE id = ?")
 @Table(name = "booking")
 public class Booking {
   @Id
@@ -38,6 +39,9 @@ public class Booking {
   @Column(name = "status")
   @Enumerated(EnumType.STRING)
   private BookingStatusEnum status;
+
+  @Column(columnDefinition = "boolean default false")
+  private boolean isDeleted;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "cart_id")
