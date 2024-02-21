@@ -67,8 +67,8 @@ public class Tour {
   @Column(name = "itinerary", columnDefinition = "TEXT")
   private String itinerary;
 
-  @Column(name = "is_deleted")
-  private Boolean isDeleted;
+  @Column(name = "is_deleted",columnDefinition = "boolean default false")
+  private Boolean isDeleted = Boolean.FALSE;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "guide_id")
