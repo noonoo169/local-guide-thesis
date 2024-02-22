@@ -6,6 +6,7 @@ import com.example.localguidebe.dto.CategoryDTO;
 import com.example.localguidebe.dto.requestdto.TourRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateTourRequestDTO;
 import com.example.localguidebe.entity.Tour;
+import com.example.localguidebe.security.service.CustomUserDetails;
 import com.example.localguidebe.service.CategoryService;
 import com.example.localguidebe.service.TourService;
 import com.example.localguidebe.system.Result;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -163,6 +165,31 @@ public class TourController {
     } catch (Exception e) {
       return new ResponseEntity<>(
           new Result(false, HttpStatus.CONFLICT.value(), "Tour deletion failed", null),
+          HttpStatus.CONFLICT);
+    }
+  }
+
+  @GetMapping("/guide")
+  //  TODO: Use PreAuthorize annotation later for authorization guider
+  //  @PreAuthorize("hasAnyAuthority('GUIDER')")
+  public ResponseEntity<Result> getToursOfGuide(Authentication authentication) {
+    try {
+      if (authentication == null || !authentication.isAuthenticated()) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(new Result(false, HttpStatus.UNAUTHORIZED.value(), "Let's login"));
+      }
+      CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+      return new ResponseEntity<>(
+          new Result(
+              true,
+              HttpStatus.OK.value(),
+              "Get the list successfully",
+              tourService.getToursOfGuide(customUserDetails.getEmail()).stream()
+                  .map(tourToTourDtoConverter::convert)),
+          HttpStatus.OK);
+    } catch (Exception e) {
+      return new ResponseEntity<>(
+          new Result(false, HttpStatus.CONFLICT.value(), "Get the failure list", null),
           HttpStatus.CONFLICT);
     }
   }
