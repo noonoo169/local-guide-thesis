@@ -1,5 +1,6 @@
 package com.example.localguidebe.service;
 
+import com.example.localguidebe.dto.responsedto.SearchSuggestionResponseDTO;
 import com.example.localguidebe.entity.Role;
 import com.example.localguidebe.entity.User;
 import com.example.localguidebe.enums.RolesEnum;
@@ -19,4 +20,6 @@ public interface UserService {
                          String order,
                          Double ratingFilter,
                          String searchName);
+
+    SearchSuggestionResponseDTO getGuidesAndGuideAddresses(String searchValue);
 }

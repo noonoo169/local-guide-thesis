@@ -3,6 +3,7 @@ package com.example.localguidebe.service;
 import com.example.localguidebe.dto.TourDTO;
 import com.example.localguidebe.dto.requestdto.TourRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateTourRequestDTO;
+import com.example.localguidebe.dto.responsedto.SearchSuggestionResponseDTO;
 import com.example.localguidebe.dto.responsedto.SearchTourDTO;
 import com.example.localguidebe.entity.Tour;
 import java.util.List;
@@ -29,4 +30,6 @@ public interface TourService {
   List<TourDTO> deleteTour(Long id);
 
   List<Tour> getToursOfGuide(String email);
+
+  SearchSuggestionResponseDTO getTourAndTourAddresses(String searchValue);
 }
