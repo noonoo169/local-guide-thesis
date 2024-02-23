@@ -96,4 +96,7 @@ public class User {
         + address
         + "}";
   }
+  public List<Image> getImagesOfObject() {
+    return this.getImages().stream().filter(image -> image.getAssociateName().equals("user")).toList();
+  }
 }

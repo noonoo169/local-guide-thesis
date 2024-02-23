@@ -18,4 +18,6 @@ import java.util.Set;
 public interface UserRepository extends JpaRepository<User, Integer> {
     User findUserByEmail(String email);
     Page<User> findAll(Specification<User> specification, Pageable pageable);
+
+    List<User> findByRoles_Name(RolesEnum roles_name);
 }
