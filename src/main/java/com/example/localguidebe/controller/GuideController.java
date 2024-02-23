@@ -46,6 +46,7 @@ public class GuideController {
                 "All guide",
                 new SearchGuideDTO(
                     guides.stream().map(userToGuideDtoConverter::convert).toList(),
-                    guides.getTotalPages())));
+                    guides.getTotalPages(),
+                    guides.getTotalElements())));
   }
 }
