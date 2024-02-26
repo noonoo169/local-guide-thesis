@@ -237,14 +237,14 @@ public class TourServiceImpl implements TourService {
       Integer limit,
       String sortBy,
       String order,
-      String searchName,
+      String searchKey,
       Double minPrice,
       Double maxPrice,
       List<Long> categoryId) {
     Sort sort = order.equals("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
     Pageable paging = PageRequest.of(page, limit, sort);
     Page<Tour> tourPage =
-        tourRepository.findTours(searchName, minPrice, maxPrice, categoryId, paging);
+        tourRepository.findTours(searchKey, minPrice, maxPrice, categoryId, paging);
     List<TourDTO> tourDTOS =
         tourPage.get().map(tourToTourDtoConverter::convert).collect(Collectors.toList());
     return new SearchTourDTO(tourDTOS, tourPage.getTotalPages(), (int) tourPage.getTotalElements());

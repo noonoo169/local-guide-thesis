@@ -10,6 +10,7 @@ import com.example.localguidebe.security.service.CustomUserDetails;
 import com.example.localguidebe.service.CategoryService;
 import com.example.localguidebe.service.TourService;
 import com.example.localguidebe.system.Result;
+import com.example.localguidebe.utils.AddressUtils;
 import com.example.localguidebe.utils.AuthUtils;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -131,7 +132,7 @@ public class TourController {
       @RequestParam(required = false, defaultValue = "5") Integer limit,
       @RequestParam(required = false, defaultValue = "overallRating") String sortBy,
       @RequestParam(required = false, defaultValue = "desc") String order,
-      @RequestParam(required = false, defaultValue = "") String searchName,
+      @RequestParam(required = false, defaultValue = "") String searchValue,
       @RequestParam(required = false, defaultValue = "0.0") Double minPrice,
       @RequestParam(required = false, defaultValue = "10000000") Double maxPrice,
       @RequestParam(required = false, defaultValue = "") List<Long> categoryId) {
@@ -141,6 +142,7 @@ public class TourController {
               .map(CategoryDTO::getId)
               .collect(Collectors.toList()));
     }
+
     try {
       return new ResponseEntity<>(
           new Result(
@@ -148,7 +150,7 @@ public class TourController {
               HttpStatus.OK.value(),
               "Get the tour successfully",
               tourService.getTours(
-                  page, limit, sortBy, order, searchName, minPrice, maxPrice, categoryId)),
+                  page, limit, sortBy, order, AddressUtils.removeVietnameseAccents(searchValue), minPrice, maxPrice, categoryId)),
           HttpStatus.OK);
     } catch (Exception e) {
       return new ResponseEntity<>(
