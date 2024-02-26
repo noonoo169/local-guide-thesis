@@ -13,4 +13,5 @@ public record GuideDTO(
     String biography,
     String credential,
     Double overallRating,
-    List<LanguageSkillDTO> languageSkill) {}
+    List<LanguageSkillDTO> languageSkill,
+    List<ImageDTO> images) {}

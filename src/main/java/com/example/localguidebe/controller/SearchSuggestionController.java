@@ -31,19 +31,17 @@ public class SearchSuggestionController {
               HttpStatus.OK.value(),
               "Value founded",
               userService.getGuidesAndGuideAddresses(searchValue)),
-          HttpStatus.CONFLICT);
-    }
-    else if(searchType.equals("tour")){
+          HttpStatus.OK);
+    } else if (searchType.equals("tour")) {
       return new ResponseEntity<>(
-              new Result(
-                      true,
-                      HttpStatus.OK.value(),
-                      "Value founded",
-                      tourService.getTourAndTourAddresses(searchValue)),
-              HttpStatus.CONFLICT);
+          new Result(
+              true,
+              HttpStatus.OK.value(),
+              "Value founded",
+              tourService.getTourAndTourAddresses(searchValue)),
+          HttpStatus.OK);
     }
     return new ResponseEntity<>(
-        new Result(true, HttpStatus.NO_CONTENT.value(), "Not found", null),
-        HttpStatus.NO_CONTENT);
+        new Result(true, HttpStatus.NO_CONTENT.value(), "Not found", null), HttpStatus.NO_CONTENT);
   }
 }
