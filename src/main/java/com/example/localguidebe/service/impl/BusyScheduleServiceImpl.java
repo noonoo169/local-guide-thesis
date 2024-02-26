@@ -30,7 +30,7 @@ public class BusyScheduleServiceImpl implements BusyScheduleService {
 
 
     @Override
-    public List<BusyScheduleDTO> addBusySchedule(List<LocalDateTime> busyDates, String email) {
+    public List<BusyScheduleDTO> InsertAndUpdateBusyDates(List<LocalDateTime> busyDates, String email) {
         List<BusySchedule> busySchedules = new ArrayList<>();
         User guide = userRepository.findUserByEmail(email);
 
@@ -40,6 +40,7 @@ public class BusyScheduleServiceImpl implements BusyScheduleService {
             busySchedule.setGuide(guide);
             busySchedules.add(busySchedule);
         });
+        busyScheduleRepository.deleteAll();
         busyScheduleRepository.saveAll(busySchedules);
 
         return busyScheduleRepository.findAllByGuideId(guide.getId()).stream().map(busyScheduleToBusyScheduleDtoConverter::convert).collect(Collectors.toList());
