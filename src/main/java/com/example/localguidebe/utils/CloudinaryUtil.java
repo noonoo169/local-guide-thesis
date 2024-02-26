@@ -21,7 +21,7 @@ public class CloudinaryUtil {
   private static final Logger logger = LoggerFactory.getLogger(CloudinaryUtil.class);
   @Resource private Cloudinary cloudinary;
 
-  public String  uploadFile(String base64String, FolderName folderName) throws IOException {
+  public String uploadFile(String base64String, FolderName folderName) throws IOException {
     if (base64String.startsWith("data:")) {
       base64String = base64String.substring(base64String.indexOf(",") + 1);
     }
@@ -75,8 +75,7 @@ public class CloudinaryUtil {
           }
 
           @Override
-          public void transferTo(java.io.File dest) throws IOException, IllegalStateException {
-          }
+          public void transferTo(java.io.File dest) throws IOException, IllegalStateException {}
         };
 
     try {
@@ -102,14 +101,13 @@ public class CloudinaryUtil {
     return null;
   }
 
-  public String deleteFile(String url) {
+  public boolean deleteFile(String url) {
     try {
       String publicId = getPublicIdFile(url);
       cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
-      return "Delete file succeeded.";
+      return true;
     } catch (Exception e) {
-      logger.error("Cannot upload image now - {}", e.getMessage());
-      return "Cannot delete file now.";
+      return false;
     }
   }
 }

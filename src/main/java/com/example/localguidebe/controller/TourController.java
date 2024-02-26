@@ -6,9 +6,11 @@ import com.example.localguidebe.dto.CategoryDTO;
 import com.example.localguidebe.dto.requestdto.TourRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateTourRequestDTO;
 import com.example.localguidebe.entity.Tour;
+import com.example.localguidebe.entity.User;
 import com.example.localguidebe.security.service.CustomUserDetails;
 import com.example.localguidebe.service.CategoryService;
 import com.example.localguidebe.service.TourService;
+import com.example.localguidebe.service.UserService;
 import com.example.localguidebe.system.Result;
 import com.example.localguidebe.utils.AddressUtils;
 import com.example.localguidebe.utils.AuthUtils;
@@ -28,9 +30,13 @@ public class TourController {
   private CategoryService categoryService;
   private TourToTourDtoConverter tourToTourDtoConverter;
   private TourToUpdateTourResponseDtoConverter tourToUpdateTourResponseDtoConverter;
+  private UserService userService;
 
-  public TourController(TourToUpdateTourResponseDtoConverter tourToUpdateTourResponseDtoConverter) {
+  public TourController(
+      TourToUpdateTourResponseDtoConverter tourToUpdateTourResponseDtoConverter,
+      UserService userService) {
     this.tourToUpdateTourResponseDtoConverter = tourToUpdateTourResponseDtoConverter;
+    this.userService = userService;
   }
 
   @Autowired
@@ -60,7 +66,10 @@ public class TourController {
                     true,
                     HttpStatus.OK.value(),
                     "tour added successfully",
-                    tourToTourDtoConverter.convert(tourService.saveTour(tourRequestDTO,((CustomUserDetails) authentication.getPrincipal()).getEmail()))),
+                    tourToTourDtoConverter.convert(
+                        tourService.saveTour(
+                            tourRequestDTO,
+                            ((CustomUserDetails) authentication.getPrincipal()).getEmail()))),
                 HttpStatus.OK);
           } catch (Exception e) {
             return new ResponseEntity<>(
@@ -88,28 +97,45 @@ public class TourController {
   }
 
   @PutMapping("")
-  public ResponseEntity<Result> update(@RequestBody UpdateTourRequestDTO updateTourRequestDTO) {
-    try {
-      Tour tour = tourService.updateTour(updateTourRequestDTO);
-      if (tour == null) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(
-                new Result(
-                    false,
-                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                    "Update tour information failed"));
-      }
-      return ResponseEntity.status(HttpStatus.OK)
-          .body(
-              new Result(
-                  true,
-                  HttpStatus.OK.value(),
-                  "Update tour information successfully",
-                  tourToUpdateTourResponseDtoConverter.convert(tour)));
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body(new Result(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-    }
+  public ResponseEntity<Result> update(
+      Authentication authentication, @RequestBody UpdateTourRequestDTO updateTourRequestDTO) {
+    return AuthUtils.checkAuthentication(
+        authentication,
+        () -> {
+          try {
+            User user =
+                userService.findUserByEmail(
+                    ((CustomUserDetails) authentication.getPrincipal()).getEmail());
+            if (user.getTours().stream()
+                .noneMatch(tour -> tour.getId().equals(updateTourRequestDTO.id()))) {
+              return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+                  .body(
+                      new Result(
+                          false,
+                          HttpStatus.NOT_ACCEPTABLE.value(),
+                          "You can't not update this tour"));
+            }
+            Tour tour = tourService.updateTour(updateTourRequestDTO);
+            if (tour == null) {
+              return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                  .body(
+                      new Result(
+                          false,
+                          HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                          "Update tour information failed"));
+            }
+            return ResponseEntity.status(HttpStatus.OK)
+                .body(
+                    new Result(
+                        true,
+                        HttpStatus.OK.value(),
+                        "Update tour information successfully",
+                        tourToUpdateTourResponseDtoConverter.convert(tour)));
+          } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new Result(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+          }
+        });
   }
 
   @GetMapping("")
@@ -150,7 +176,14 @@ public class TourController {
               HttpStatus.OK.value(),
               "Get the tour successfully",
               tourService.getTours(
-                  page, limit, sortBy, order, AddressUtils.removeVietnameseAccents(searchValue), minPrice, maxPrice, categoryId)),
+                  page,
+                  limit,
+                  sortBy,
+                  order,
+                  AddressUtils.removeVietnameseAccents(searchValue),
+                  minPrice,
+                  maxPrice,
+                  categoryId)),
           HttpStatus.OK);
     } catch (Exception e) {
       return new ResponseEntity<>(
@@ -158,7 +191,6 @@ public class TourController {
           HttpStatus.CONFLICT);
     }
   }
-
 
   @DeleteMapping("/{id}")
   public ResponseEntity<Result> deleteTour(@PathVariable("id") Long id) {
