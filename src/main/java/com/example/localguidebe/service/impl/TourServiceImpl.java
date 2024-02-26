@@ -9,16 +9,33 @@ import com.example.localguidebe.dto.responsedto.ResultInSearchSuggestionDTO;
 import com.example.localguidebe.dto.responsedto.SearchSuggestionResponseDTO;
 import com.example.localguidebe.dto.responsedto.SearchTourDTO;
 import com.example.localguidebe.entity.*;
+import com.example.localguidebe.enums.AssociateName;
+import com.example.localguidebe.enums.FolderName;
+import com.example.localguidebe.repository.ImageRepository;
 import com.example.localguidebe.repository.TourRepository;
+
+
 import com.example.localguidebe.service.CategoryService;
 import com.example.localguidebe.service.LocationService;
 import com.example.localguidebe.service.TourService;
 import com.example.localguidebe.service.TourStartTimeService;
 import com.example.localguidebe.utils.AddressUtils;
 import java.util.Comparator;
+
+import com.example.localguidebe.service.*;
+
+import java.io.IOException;
+
+
+import com.example.localguidebe.service.*;
+
+import java.io.IOException;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.example.localguidebe.utils.CloudinaryUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -37,22 +54,32 @@ public class TourServiceImpl implements TourService {
   public void setTourToDtoConverter(TourToTourDtoConverter tourToTourDtoConverter) {
     this.tourToTourDtoConverter = tourToTourDtoConverter;
   }
+  private final ImageRepository imageRepository;
 
   private TourRepository tourRepository;
   private final CategoryService categoryService;
   private final TourStartTimeService tourStartTimeService;
   private final LocationService locationService;
+  private final UserService userService;
+  private final CloudinaryUtil cloudinaryUtil;
+
 
   @Autowired
   public TourServiceImpl(
       ToResultInSearchSuggestionDtoConverter toResultInSearchSuggestionDtoConverter,
       CategoryService categoryService,
       TourStartTimeService tourStartTimeService,
-      LocationService locationService) {
+
+      LocationService locationService ,UserService userService,CloudinaryUtil cloudinaryUtil,ImageRepository imageRepository) {
     this.toResultInSearchSuggestionDtoConverter = toResultInSearchSuggestionDtoConverter;
+
+
     this.categoryService = categoryService;
     this.tourStartTimeService = tourStartTimeService;
     this.locationService = locationService;
+    this.userService = userService;
+    this.cloudinaryUtil = cloudinaryUtil;
+    this.imageRepository = imageRepository;
   }
 
   @Autowired
@@ -69,14 +96,33 @@ public class TourServiceImpl implements TourService {
   }
 
   @Override
-  public Tour saveTour(TourRequestDTO tourRequestDTO) {
+  public Tour saveTour(TourRequestDTO tourRequestDTO, String email) {
     Tour newTour = new Tour();
-    BeanUtils.copyProperties(tourRequestDTO, newTour, "categories");
+    User guide = userService.findUserByEmail(email);
+
+    BeanUtils.copyProperties(tourRequestDTO, newTour, "categories","images");
     tourRequestDTO.getCategories().stream()
-        .forEach(
-            category ->
-                newTour.getCategories().add(categoryService.getCategoryById(category.getId())));
-    return tourRepository.save(newTour);
+            .forEach(
+                    category -> {
+                      newTour.getCategories().add(categoryService.getCategoryById(category.getId()));
+                    });
+    if (guide != null) {
+      newTour.setGuide(guide);
+    }
+    Tour tour = tourRepository.save(newTour);
+    tourRequestDTO.getImages().stream().forEach(image->{
+      Image imageTour = new Image();
+      try {
+        imageTour.setImageLink(cloudinaryUtil.uploadFile(image, FolderName.tour));
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+      imageTour.setAssociateId(tour.getId());
+      imageTour.setAssociateName(AssociateName.TOUR);
+      imageRepository.save(imageTour);
+
+    });
+    return  tourRepository.save(tour);
   }
 
   @Transactional
@@ -205,6 +251,15 @@ public class TourServiceImpl implements TourService {
   }
 
   @Override
+  public SearchTourDTO getToursByNameAndAddress(Integer page, Integer limit, String sortBy, String order, List<String> searchNames, List<String> addresses, Double minPrice, Double maxPrice, List<Long> categoryId) {
+    Sort sort = order.equals("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+    Pageable paging = PageRequest.of(page, limit, sort);
+    Page<Tour> tourPage =
+            tourRepository.findToursByNameAndAddress(searchNames, minPrice, maxPrice, categoryId, paging,addresses);
+    return null;
+  }
+
+  @Override
   public List<TourDTO> deleteTour(Long id) {
     Tour tour = tourRepository.findById(id).orElseThrow();
     tour.setIsDeleted(true);
@@ -227,7 +282,7 @@ public class TourServiceImpl implements TourService {
     List<Tour> tours = tourRepository.findAll();
     List<String> addressesFiltered =
         tours.stream()
-            .map(tour -> AddressUtils.removeVietnameseAccents(tour.getProvince()))
+            .map(tour -> AddressUtils.removeVietnameseAccents(tour.getAddress()))
             .distinct()
             .filter(
                 address ->

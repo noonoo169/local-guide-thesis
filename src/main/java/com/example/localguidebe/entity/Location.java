@@ -24,20 +24,20 @@ public class Location {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @NotNull
+
   @Column(name = "name")
   private String name;
 
-  @NotNull
+
   @Column(name = "latitude")
   private String latitude;
 
-  @NotNull
+
   @Column(name = "longitude")
   private String longitude;
 
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "location")
-  private List<Image> images = new ArrayList<>();
+//  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "location")
+//  private List<Image> images = new ArrayList<>();
 
   @ManyToMany(mappedBy = "locations", fetch = FetchType.LAZY)
   private Set<Tour> tours = new HashSet<>();

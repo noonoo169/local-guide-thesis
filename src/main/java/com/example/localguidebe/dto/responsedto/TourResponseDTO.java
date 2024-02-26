@@ -32,7 +32,7 @@ public class TourResponseDTO {
     private Set<CategoryDTO> categories = new HashSet<>();
 //    private List<Review> reviews = new ArrayList<>();
 //    private List<Booking> bookings = new ArrayList<>();
-//    private List<Image> images = new ArrayList<>();
+    private List<Image> images = new ArrayList<>();
 //    private Set<Location> locations;
 //    private Location location;
 }
