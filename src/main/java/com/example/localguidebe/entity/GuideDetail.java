@@ -16,11 +16,11 @@ public class GuideDetail {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @NotNull
+
   @Column(columnDefinition = "TEXT")
   private String biography;
 
-  @NotNull
+
   @Column(columnDefinition = "TEXT")
   private String credential;
 

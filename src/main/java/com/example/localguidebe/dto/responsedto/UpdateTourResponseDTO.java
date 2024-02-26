@@ -26,7 +26,7 @@ public record UpdateTourResponseDTO(
         String province,
         List<TourStartTimeDTO> tourStartTimes,
         Set<CategoryDTO> categories,
-        List<ImageDTO> images,
+//        List<ImageDTO> images,
         Set<LocationDTO> locations,
         LocationDTO meetingPoint
 ) {

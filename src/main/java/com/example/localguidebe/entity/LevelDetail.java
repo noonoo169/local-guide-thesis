@@ -17,9 +17,9 @@ public class LevelDetail {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @NotNull @Column private String level;
+ @Column private String level;
 
-  @NotNull
+
   @Column(columnDefinition = "TEXT")
   private String description;
 

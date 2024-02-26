@@ -20,4 +20,6 @@ public interface TourRepository extends JpaRepository<Tour, Long> {
       @Param("maxPrice") Double maxPrice,
       @Param("categoryId") List<Long> categoryId,
       Pageable pageable);
+  @Query("SELECT tour from Tour tour JOIN tour.categories category WHERE tour.pricePerTraveler >= :minPrice AND tour.pricePerTraveler <= :maxPrice AND category.id IN :categoryId AND (tour.name IN :searchNames OR tour.address IN :addresses)")
+  Page<Tour> findToursByNameAndAddress(@Param("searchNames") List<String> searchNames , @Param("minPrice") Double minPrice , Double maxPrice, List<Long> categoryId, Pageable pageable,List<String> addresses);
 }

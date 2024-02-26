@@ -16,7 +16,7 @@ public class BusySchedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
+
     @Column(name = "busy_date")
     private LocalDateTime busyDate;
 
