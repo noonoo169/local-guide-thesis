@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 public record LocationDTO (
         Long id,
         String name,
-        String latitude,
-        String longitude
+        String address,
+        Double latitude,
+        Double longitude
 ){}

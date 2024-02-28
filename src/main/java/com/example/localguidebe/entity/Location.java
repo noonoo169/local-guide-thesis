@@ -30,12 +30,14 @@ public class Location {
 
 
   @Column(name = "latitude")
-  private String latitude;
+  private Double latitude;
 
 
   @Column(name = "longitude")
-  private String longitude;
+  private Double longitude;
 
+  @Column(name = "address")
+  private String address;
   
 
 //  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "location")
@@ -60,7 +62,7 @@ public class Location {
     return getId().equals(that.getId());
   }
 
-  public Location(String name, String latitude, String longitude) {
+  public Location(String name, Double latitude, Double longitude) {
     this.name = name;
     this.latitude = latitude;
     this.longitude = longitude;

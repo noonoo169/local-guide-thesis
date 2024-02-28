@@ -1,5 +1,6 @@
 package com.example.localguidebe.dto.requestdto;
 
+import com.example.localguidebe.dto.LocationDTO;
 import com.example.localguidebe.entity.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
@@ -37,6 +38,6 @@ public class TourRequestDTO {
     private List<Review> reviews = new ArrayList<>();
     private List<Booking> bookings = new ArrayList<>();
     private List<String> images = new ArrayList<>();
-    private Set<Location> locations;
+    private Set<LocationDTO> locations;
     private Location location;
 }
