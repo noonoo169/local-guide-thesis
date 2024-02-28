@@ -36,6 +36,8 @@ public class Location {
   @Column(name = "longitude")
   private String longitude;
 
+  
+
 //  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "location")
 //  private List<Image> images = new ArrayList<>();
 
