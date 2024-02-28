@@ -74,7 +74,7 @@ public class User {
 
   @Column() private Double overallRating;
 
-  @OneToMany(mappedBy = "guide")
+  @OneToMany( cascade = CascadeType.ALL, mappedBy = "guide")
   List<LanguageSkill> languageSkills = new ArrayList<>();
 
   @Override
