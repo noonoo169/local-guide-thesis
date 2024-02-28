@@ -1,11 +1,7 @@
 package com.example.localguidebe.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-
 import java.sql.Time;
-import java.time.LocalDateTime;
-
 import lombok.*;
 
 @Getter
@@ -19,7 +15,6 @@ public class TourStartTime {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
-
 
   @Column(name = "start_time")
   private Time startTime;

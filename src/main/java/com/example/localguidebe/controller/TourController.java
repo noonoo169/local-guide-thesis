@@ -14,6 +14,7 @@ import com.example.localguidebe.service.UserService;
 import com.example.localguidebe.system.Result;
 import com.example.localguidebe.utils.AddressUtils;
 import com.example.localguidebe.utils.AuthUtils;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +30,8 @@ public class TourController {
   private TourService tourService;
   private CategoryService categoryService;
   private TourToTourDtoConverter tourToTourDtoConverter;
-  private TourToUpdateTourResponseDtoConverter tourToUpdateTourResponseDtoConverter;
-  private UserService userService;
+  private final TourToUpdateTourResponseDtoConverter tourToUpdateTourResponseDtoConverter;
+  private final UserService userService;
 
   public TourController(
       TourToUpdateTourResponseDtoConverter tourToUpdateTourResponseDtoConverter,
@@ -233,5 +234,17 @@ public class TourController {
           new Result(false, HttpStatus.CONFLICT.value(), "Get the failure list", null),
           HttpStatus.CONFLICT);
     }
+  }
+
+  @GetMapping("/{id}/tour-start-time-available")
+  public ResponseEntity<Result> getTourStartTimeAvailable(
+      @PathVariable Long id, @RequestParam() LocalDate localDate) {
+    return new ResponseEntity<>(
+        new Result(
+            true,
+            HttpStatus.OK.value(),
+            "Get the list successfully",
+            tourService.getTourStartTimeAvailable(id, localDate)),
+        HttpStatus.OK);
   }
 }
