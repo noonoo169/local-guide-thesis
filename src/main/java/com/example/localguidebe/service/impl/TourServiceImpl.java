@@ -3,6 +3,7 @@ package com.example.localguidebe.service.impl;
 import com.example.localguidebe.converter.ToResultInSearchSuggestionDtoConverter;
 import com.example.localguidebe.converter.TourToTourDtoConverter;
 import com.example.localguidebe.dto.TourDTO;
+import com.example.localguidebe.dto.requestdto.InfoLocationDTO;
 import com.example.localguidebe.dto.requestdto.TourRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateTourRequestDTO;
 import com.example.localguidebe.dto.responsedto.ResultInSearchSuggestionDTO;
@@ -11,7 +12,12 @@ import com.example.localguidebe.dto.responsedto.SearchTourDTO;
 import com.example.localguidebe.entity.*;
 import com.example.localguidebe.enums.AssociateName;
 import com.example.localguidebe.enums.FolderName;
+
 import com.example.localguidebe.repository.*;
+
+import com.example.localguidebe.repository.ImageRepository;
+import com.example.localguidebe.repository.TourRepository;
+
 import com.example.localguidebe.service.*;
 import com.example.localguidebe.service.CategoryService;
 import com.example.localguidebe.service.LocationService;
@@ -19,9 +25,19 @@ import com.example.localguidebe.service.TourService;
 import com.example.localguidebe.service.TourStartTimeService;
 import com.example.localguidebe.utils.AddressUtils;
 import com.example.localguidebe.utils.CloudinaryUtil;
+
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
+
+
+import com.google.gson.Gson;
+import java.io.IOException;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+
 import java.util.stream.Collectors;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +60,11 @@ public class TourServiceImpl implements TourService {
   private final LocationService locationService;
   private final UserService userService;
   private final CloudinaryUtil cloudinaryUtil;
+  private final GeoCodingService geoCodingService;
+
   private final BookingRepository bookingRepository;
+
+
 
   @Autowired
   public TourServiceImpl(
@@ -58,9 +78,11 @@ public class TourServiceImpl implements TourService {
       ImageRepository imageRepository,
       BookingRepository bookingRepository,
       TourToTourDtoConverter tourToTourDtoConverter,
-      BookingRepository bookingRepository1) {
-    this.toResultInSearchSuggestionDtoConverter = toResultInSearchSuggestionDtoConverter;
+      GeoCodingService geoCodingService
+    ) {
     this.tourStartTimeRepository = tourStartTimeRepository;
+    this.toResultInSearchSuggestionDtoConverter = toResultInSearchSuggestionDtoConverter;
+    this.geoCodingService = geoCodingService;
     this.categoryService = categoryService;
     this.tourStartTimeService = tourStartTimeService;
     this.locationService = locationService;
@@ -68,7 +90,7 @@ public class TourServiceImpl implements TourService {
     this.cloudinaryUtil = cloudinaryUtil;
     this.imageRepository = imageRepository;
     this.tourToTourDtoConverter = tourToTourDtoConverter;
-    this.bookingRepository = bookingRepository1;
+    this.bookingRepository = bookingRepository;
   }
 
   @Autowired
@@ -88,8 +110,29 @@ public class TourServiceImpl implements TourService {
   public Tour saveTour(TourRequestDTO tourRequestDTO, String email) {
     Tour newTour = new Tour();
     User guide = userService.findUserByEmail(email);
-
-    BeanUtils.copyProperties(tourRequestDTO, newTour, "categories", "images");
+    Gson gson = new Gson();
+    BeanUtils.copyProperties(tourRequestDTO, newTour, "categories", "images", "locations");
+    if (tourRequestDTO.getLocations().size() != 0) {
+      tourRequestDTO
+          .getLocations()
+          .forEach(
+              locationDTO -> {
+                InfoLocationDTO infoLocationDTO =
+                    gson.fromJson(
+                        geoCodingService.getAddress(
+                            locationDTO.latitude(), locationDTO.longitude()),
+                        InfoLocationDTO.class);
+                newTour
+                    .getLocations()
+                    .add(
+                        Location.builder()
+                            .address(infoLocationDTO.getDisplay_name())
+                            .name(infoLocationDTO.getName())
+                            .latitude(locationDTO.latitude())
+                            .longitude(locationDTO.longitude())
+                            .build());
+              });
+    }
     tourRequestDTO.getCategories().stream()
         .forEach(
             category -> {

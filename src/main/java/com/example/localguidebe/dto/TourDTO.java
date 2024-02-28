@@ -61,7 +61,7 @@ public class TourDTO {
 //
     private List<Image> images = new ArrayList<>();
 //
-//    private Set<Location> locations;
+    private Set<LocationDTO> locations;
 //
 //    private Location location;
 }
