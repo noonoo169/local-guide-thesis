@@ -38,7 +38,7 @@ public class SearchSuggestionController {
               true,
               HttpStatus.OK.value(),
               "Value founded",
-              tourService.getTourAndTourAddresses(searchValue)),
+              tourService.getTourAndTourLocations(searchValue)),
           HttpStatus.OK);
     }
     return new ResponseEntity<>(
