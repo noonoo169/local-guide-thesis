@@ -4,6 +4,7 @@ import com.example.localguidebe.entity.Booking;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -18,4 +19,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
       "SELECT FUNCTION('time', b.startDate) FROM Booking b WHERE b.tour.id = :tourId AND FUNCTION('date', b.startDate) = :startDate")
   List<String> findStartDateTimesByTourIdAndStartDate(
       @Param("tourId") Long tourId, @Param("startDate") LocalDate startDate);
+
+  @Modifying
+  @Query("update Booking b set b.status = 'PAID' where b.id = :bookingId")
+  void setBookingStatusToPaid(@Param("bookingId") Long bookingId);
 }

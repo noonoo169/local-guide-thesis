@@ -2,27 +2,23 @@ package com.example.localguidebe.converter;
 
 import com.example.localguidebe.dto.responsedto.TourInBookingResponseDTO;
 import com.example.localguidebe.entity.Tour;
-import java.util.stream.Collectors;
+import com.example.localguidebe.enums.AssociateName;
+import com.example.localguidebe.service.ImageService;
 import org.springframework.stereotype.Component;
 
 @Component
 public class TourToTourInBookingResponseDtoConverter {
-  private final ImageToImageDtoConverter imageToImageDtoConverter;
+  private final ImageService imageService;
 
-  public TourToTourInBookingResponseDtoConverter(
-      ImageToImageDtoConverter imageToImageDtoConverter) {
-    this.imageToImageDtoConverter = imageToImageDtoConverter;
+  public TourToTourInBookingResponseDtoConverter(ImageService imageService) {
+    this.imageService = imageService;
   }
 
   public TourInBookingResponseDTO convert(Tour source) {
     return new TourInBookingResponseDTO(
         source.getId(),
         source.getName(),
-        source.getOverallRating());
-//        source.getImages() != null
-//            ? source.getImages().stream()
-//                .map(imageToImageDtoConverter::convertImageDTO)
-//                .collect(Collectors.toList())
-//            : null);
+        source.getOverallRating(),
+        imageService.getImageByAssociateIddAndAssociateName(source.getId(), AssociateName.TOUR));
   }
 }

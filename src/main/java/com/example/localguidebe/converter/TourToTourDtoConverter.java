@@ -2,11 +2,9 @@ package com.example.localguidebe.converter;
 
 import com.example.localguidebe.dto.TourDTO;
 import com.example.localguidebe.entity.Tour;
-import java.util.stream.Collectors;
-
 import com.example.localguidebe.enums.AssociateName;
-import com.example.localguidebe.repository.ImageRepository;
 import com.example.localguidebe.service.ImageService;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,12 +16,14 @@ public class TourToTourDtoConverter {
   private final CategoryToCategoryDtoConverter categoryToCategoryDtoConverter;
   private final ImageService imageService;
   private final LocationToLocationDtoConverter locationToLocationDtoConverter;
+
   @Autowired
   public TourToTourDtoConverter(
       ImageToImageDtoConverter imageToImageDtoConverter,
       UserToUserDtoConverter userToUserDtoConverter,
       CategoryToCategoryDtoConverter categoryToCategoryDtoConverter,
-      ImageService imageService,LocationToLocationDtoConverter locationToLocationDtoConverter) {
+      ImageService imageService,
+      LocationToLocationDtoConverter locationToLocationDtoConverter) {
     this.imageToImageDtoConverter = imageToImageDtoConverter;
     this.userToUserDtoConverter = userToUserDtoConverter;
     this.categoryToCategoryDtoConverter = categoryToCategoryDtoConverter;
@@ -44,7 +44,7 @@ public class TourToTourDtoConverter {
         tour.getPricePerTraveler(),
         tour.getLimitTraveler(),
         tour.getExtraPrice(),
-        tour.getOverallRating()!= null?tour.getOverallRating():0.0,
+        tour.getOverallRating() != null ? tour.getOverallRating() : 0.0,
         tour.getItinerary(),
         tour.getIsDeleted(),
         tour.getAddress(),
@@ -55,8 +55,8 @@ public class TourToTourDtoConverter {
                 .collect(Collectors.toSet())
             : null,
         imageService.getImageByAssociateIddAndAssociateName(tour.getId(), AssociateName.TOUR),
-            tour.getLocations().stream().map(locationToLocationDtoConverter::convert).collect(Collectors.toSet())
-    );
-
+        tour.getLocations().stream()
+            .map(locationToLocationDtoConverter::convert)
+            .collect(Collectors.toSet()));
   }
 }
