@@ -13,13 +13,14 @@ import org.springframework.stereotype.Repository;
 public interface TourRepository extends JpaRepository<Tour, Long> {
 
   @Query(
-      "SELECT tour FROM Tour tour JOIN tour.categories category WHERE( LOWER(tour.name) LIKE %:searchKey% OR LOWER(tour.address) LIKE %:searchKey%) AND tour.pricePerTraveler >= :minPrice AND tour.pricePerTraveler <= :maxPrice AND category.id IN :categoryId")
+      "SELECT tour FROM Tour tour JOIN tour.categories category JOIN tour.locations locations WHERE( LOWER(tour.name) LIKE %:searchKey% OR LOWER(locations.address) LIKE %:searchKey%) AND tour.pricePerTraveler >= :minPrice AND tour.pricePerTraveler <= :maxPrice AND category.id IN :categoryId")
   Page<Tour> findTours(
       @Param("searchKey") String searchKey,
       @Param("minPrice") Double minPrice,
       @Param("maxPrice") Double maxPrice,
       @Param("categoryId") List<Long> categoryId,
       Pageable pageable);
+
   @Query("SELECT tour from Tour tour JOIN tour.categories category WHERE tour.pricePerTraveler >= :minPrice AND tour.pricePerTraveler <= :maxPrice AND category.id IN :categoryId AND (tour.name IN :searchNames OR tour.address IN :addresses)")
   Page<Tour> findToursByNameAndAddress(@Param("searchNames") List<String> searchNames , @Param("minPrice") Double minPrice , Double maxPrice, List<Long> categoryId, Pageable pageable,List<String> addresses);
 }

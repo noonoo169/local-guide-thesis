@@ -75,7 +75,6 @@ public class AddressController {
       districtName = AddressUtils.removeVietnameseAccents(districtName);
       List<String> wards = new ArrayList<>();
       wards.addAll(wardService.getWardByDistrict(districtName));
-
       return new ResponseEntity<>(
           new Result(false, HttpStatus.OK.value(), "Search for wards successfully", wards),
           HttpStatus.OK);
