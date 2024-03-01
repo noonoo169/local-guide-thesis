@@ -2,6 +2,7 @@ package com.example.localguidebe.controller;
 
 import com.example.localguidebe.converter.CartToCartDtoConverter;
 import com.example.localguidebe.dto.CartDTO;
+import com.example.localguidebe.dto.TourDTO;
 import com.example.localguidebe.dto.requestdto.AddBookingRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateBookingDTO;
 import com.example.localguidebe.entity.Cart;
