@@ -88,6 +88,15 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  public boolean isTravelerCanAddReviewForGuide(User traveler, Long guideId) {
+    return traveler.getInvoices().stream()
+        .anyMatch(
+            invoice ->
+                invoice.getBookings().stream()
+                    .anyMatch(booking -> booking.getTour().getGuide().getId().equals(guideId)));
+  }
+
+  @Override
   public SearchSuggestionResponseDTO getGuidesAndGuideAddresses(String searchValue) {
     List<User> guiders = userRepository.findByRoles_Name(RolesEnum.GUIDER);
     List<String> addressesFiltered =
