@@ -1,5 +1,6 @@
 package com.example.localguidebe.controller;
 
+import com.example.localguidebe.dto.TourDTO;
 import com.example.localguidebe.security.service.CustomUserDetails;
 import com.example.localguidebe.service.BusyScheduleService;
 import com.example.localguidebe.system.Result;
@@ -63,9 +64,22 @@ public class SchedulesController {
                     }
                 });
     }
-//    @DeleteMapping("/busy")
-//    public ResponseEntity<Result> removeBusyDates(){
-//
-//    }
+    @GetMapping("/busy/tour")
+    public ResponseEntity<Result> getBusyDateByTour(@RequestBody TourDTO tourDTO){
+        try {
+            return new ResponseEntity<>(
+                    new Result(
+                            false,
+                            HttpStatus.OK.value(),
+                            "Successfully get the tour guide's busy schedule",
+                            busyScheduleService.getBusyDateByTour(tourDTO)),
+                    HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(
+                    new Result(false, HttpStatus.CONFLICT.value(), "Failed to get the tour guide's busy schedule", null),
+                    HttpStatus.CONFLICT);
+        }
+
+    }
 
 }
