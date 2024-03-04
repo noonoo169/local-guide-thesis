@@ -61,11 +61,11 @@ public class VNPayResource {
         logger.info("Giao dịch thành công");
         response.sendRedirect(
             frontendHost
-                + "/payment-succeeded/"
+                + "/booking-success/"
                 + invoiceService.createBookingInInvoice(bookingIds, email, priceTotal).getId());
       } else {
         logger.error("Giao dịch thất bại");
-        response.sendRedirect(frontendHost + "/payment-failed");
+        response.sendRedirect(frontendHost + "/booking-fail");
       }
     }
   }
