@@ -123,7 +123,7 @@ public class ReviewController {
   // TODO: Add param for filter by rating and sort
   public ResponseEntity<Result> getReviewsForGuide(@PathVariable("guideId") Long guideId) {
     List<Review> reviews = reviewService.getReviewsOfGuide(guideId);
-    if (reviews == null) {
+    if (reviews.isEmpty()) {
       return ResponseEntity.status(HttpStatus.NO_CONTENT)
           .body(
               new Result(
@@ -211,6 +211,25 @@ public class ReviewController {
         });
   }
 
+  @DeleteMapping("guide-reviews/{reviewId}")
+  public ResponseEntity<Result> deleteReviewForGuide(
+      Authentication authentication, @PathVariable("reviewId") Long reviewId) {
+    return AuthUtils.checkAuthentication(
+        authentication,
+        () -> {
+          String travelerEmail = ((CustomUserDetails) authentication.getPrincipal()).getEmail();
+          User traveler = userService.findUserByEmail(travelerEmail);
+          if (!reviewService.deleteReviewForGuide(traveler, reviewId)) {
+            return ResponseEntity.status(HttpStatus.OK)
+                .body(
+                    new Result(
+                        false, HttpStatus.OK.value(), "You can't not delete this review review"));
+          }
+          return ResponseEntity.status(HttpStatus.OK)
+              .body(new Result(true, HttpStatus.OK.value(), "Delete review successful."));
+        });
+  }
+
   @PutMapping("guide-reviews/{reviewId}")
   public ResponseEntity<Result> editReviewForGuide(
       @PathVariable("reviewId") Long reviewId,
@@ -223,7 +242,9 @@ public class ReviewController {
           User traveler = userService.findUserByEmail(travelerEmail);
           if (!reviewService.updateReviewForGuide(reviewRequestDTO, traveler, reviewId)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new Result(false, HttpStatus.CONFLICT.value(), "You can't not update this review"));
+                .body(
+                    new Result(
+                        false, HttpStatus.CONFLICT.value(), "You can't not update this review"));
           }
           return ResponseEntity.status(HttpStatus.OK)
               .body(new Result(true, HttpStatus.OK.value(), "Update review successful."));
