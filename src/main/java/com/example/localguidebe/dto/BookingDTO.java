@@ -11,4 +11,5 @@ public record BookingDTO(
     Integer numberTraveler,
     Double price,
     BookingStatusEnum status,
-    TourInBookingResponseDTO tour) {}
+    TourInBookingResponseDTO tour,
+    GuideDTO guide) {}
