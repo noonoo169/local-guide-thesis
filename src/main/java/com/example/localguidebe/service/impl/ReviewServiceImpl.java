@@ -1,9 +1,13 @@
 package com.example.localguidebe.service.impl;
 
+import com.example.localguidebe.converter.TourToTourDtoConverter;
+import com.example.localguidebe.dto.TourDTO;
 import com.example.localguidebe.dto.requestdto.ReviewRequestDTO;
 import com.example.localguidebe.entity.Review;
+import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.entity.User;
 import com.example.localguidebe.repository.ReviewRepository;
+import com.example.localguidebe.repository.TourRepository;
 import com.example.localguidebe.repository.UserRepository;
 import com.example.localguidebe.service.ReviewService;
 import java.time.LocalDateTime;
@@ -14,9 +18,18 @@ public class ReviewServiceImpl implements ReviewService {
   private final ReviewRepository reviewRepository;
   private final UserRepository userRepository;
 
-  public ReviewServiceImpl(ReviewRepository reviewRepository, UserRepository userRepository) {
+  private final TourRepository tourRepository;
+  private TourToTourDtoConverter tourToTourDtoConverter;
+
+  public ReviewServiceImpl(
+      ReviewRepository reviewRepository,
+      UserRepository userRepository,
+      TourRepository tourRepository,
+      TourToTourDtoConverter tourToTourDtoConverter) {
     this.reviewRepository = reviewRepository;
     this.userRepository = userRepository;
+    this.tourRepository = tourRepository;
+    this.tourToTourDtoConverter = tourToTourDtoConverter;
   }
 
   @Override
@@ -31,5 +44,31 @@ public class ReviewServiceImpl implements ReviewService {
             .createdAt(LocalDateTime.now())
             .build();
     return reviewRepository.save(review);
+  }
+
+  @Override
+  public TourDTO addReviewForTour(ReviewRequestDTO reviewRequestDTO, Long tourId, String email) {
+    User traveler = userRepository.findUserByEmail(email);
+
+    Tour tour = tourRepository.findById(tourId).orElseThrow();
+
+    Review newReview =
+        Review.builder()
+            .tour(tourRepository.findById(tourId).orElseThrow())
+            .comment(reviewRequestDTO.comment())
+            .rating(reviewRequestDTO.rating())
+            .createdAt(LocalDateTime.now())
+            .traveler(traveler)
+            .build();
+    tour.getReviews().add(newReview);
+    tour.setOverallRating(
+        tour.getReviews().stream()
+            .filter(review -> review.getRating() > 0)
+            .map(Review::getRating)
+            .mapToInt(Integer::intValue)
+            .average()
+            .orElse(0.0));
+
+    return tourToTourDtoConverter.convert(tourRepository.save(tour));
   }
 }

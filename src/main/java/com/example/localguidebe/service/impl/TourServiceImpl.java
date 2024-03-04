@@ -11,6 +11,7 @@ import com.example.localguidebe.dto.responsedto.SearchSuggestionResponseDTO;
 import com.example.localguidebe.dto.responsedto.SearchTourDTO;
 import com.example.localguidebe.entity.*;
 import com.example.localguidebe.enums.AssociateName;
+import com.example.localguidebe.enums.BookingStatusEnum;
 import com.example.localguidebe.enums.FolderName;
 import com.example.localguidebe.repository.*;
 import com.example.localguidebe.repository.ImageRepository;
@@ -331,5 +332,15 @@ public class TourServiceImpl implements TourService {
     List<String> tourStartTimesAvailable = new ArrayList<>(tourStartTimes);
     tourStartTimesAvailable.removeAll(startDateTimesInBooKing);
     return tourStartTimesAvailable;
+  }
+
+  @Override
+  public boolean checkBookingByTraveler(Long tourId, String email) {
+    User traveler = userService.findUserByEmail(email);
+    return bookingRepository.findAll().stream()
+        .anyMatch(
+            booking ->
+                booking.getTour().getId() == tourId
+                    && booking.getCart().getTraveler().getId() == traveler.getId() && booking.getStatus().equals(BookingStatusEnum.PAID));
   }
 }
