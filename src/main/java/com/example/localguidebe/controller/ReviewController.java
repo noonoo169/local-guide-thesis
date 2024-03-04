@@ -94,4 +94,24 @@ public class ReviewController {
           }
         });
   }
+  @GetMapping("tour-reviews/{tourId}")
+    public ResponseEntity<Result> getReviewForTour(@PathVariable("tourId") Long tourId){
+      try {
+          return new ResponseEntity<>(
+                  new Result(
+                          false,
+                          HttpStatus.OK.value(),
+                          "Get the list of reviews of successful tours",
+                          reviewService.getReviewForTour(tourId)),
+                  HttpStatus.OK);
+      } catch (Exception e) {
+          return new ResponseEntity<>(
+                  new Result(false, HttpStatus.CONFLICT.value(), "Get the review list of failed tours", null),
+                  HttpStatus.CONFLICT);
+      }
+
+
+  }
+
+
 }
