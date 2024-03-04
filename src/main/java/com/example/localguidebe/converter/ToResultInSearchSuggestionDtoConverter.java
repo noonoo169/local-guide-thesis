@@ -28,7 +28,7 @@ public class ToResultInSearchSuggestionDtoConverter {
       images =
           imageService.getImageByAssociateIddAndAssociateName(user.getId(), AssociateName.USER);
       return new ResultInSearchSuggestionDTO(
-          user.getId(), user.getUsername(), images.isEmpty() ? null : images.get(0).getImageLink());
+          user.getId(), user.getFullName(), images.isEmpty() ? null : images.get(0).getImageLink());
     }
     return new ResultInSearchSuggestionDTO(null, null, null);
   }
