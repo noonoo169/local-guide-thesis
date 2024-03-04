@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class ReviewServiceImpl implements ReviewService {
@@ -131,6 +132,15 @@ public class ReviewServiceImpl implements ReviewService {
     review.setRating(reviewRequestDTO.rating());
     review.setComment(reviewRequestDTO.comment());
     reviewRepository.saveAndFlush(review);
+    return true;
+  }
+
+  @Transactional
+  @Override
+  public boolean deleteReviewForGuide(User traveler, Long reviewId) {
+    if (traveler.getReviewsOfTraveler().stream()
+        .noneMatch(review -> review.getId().equals(reviewId))) return false;
+    reviewRepository.deleteById(reviewId);
     return true;
   }
 }
