@@ -13,4 +13,6 @@ public interface ReviewService {
   TourDTO addReviewForTour(ReviewRequestDTO reviewRequestDTO, Long tourId, String email);
 
   List<ReviewResponseDTO> getReviewForTour(Long tourId);
+
+  List<Review> getReviewsOfGuide(Long guideId);
 }
