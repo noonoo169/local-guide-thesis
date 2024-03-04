@@ -2,10 +2,11 @@ package com.example.localguidebe.service.impl;
 
 import com.example.localguidebe.converter.BusyScheduleToBusyScheduleDtoConverter;
 import com.example.localguidebe.dto.BusyScheduleDTO;
-import com.example.localguidebe.dto.TourDTO;
 import com.example.localguidebe.entity.BusySchedule;
+import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.entity.User;
 import com.example.localguidebe.repository.BusyScheduleRepository;
+import com.example.localguidebe.repository.TourRepository;
 import com.example.localguidebe.repository.UserRepository;
 import com.example.localguidebe.service.BusyScheduleService;
 import java.time.LocalDate;
@@ -21,14 +22,18 @@ public class BusyScheduleServiceImpl implements BusyScheduleService {
   private final BusyScheduleToBusyScheduleDtoConverter busyScheduleToBusyScheduleDtoConverter;
   private UserRepository userRepository;
 
+  private TourRepository tourRepository;
+
   @Autowired
   public BusyScheduleServiceImpl(
       BusyScheduleRepository busyScheduleRepository,
       UserRepository userRepository,
-      BusyScheduleToBusyScheduleDtoConverter busyScheduleToBusyScheduleDtoConverter) {
+      BusyScheduleToBusyScheduleDtoConverter busyScheduleToBusyScheduleDtoConverter,
+      TourRepository tourRepository) {
     this.busyScheduleRepository = busyScheduleRepository;
     this.userRepository = userRepository;
     this.busyScheduleToBusyScheduleDtoConverter = busyScheduleToBusyScheduleDtoConverter;
+    this.tourRepository = tourRepository;
   }
 
   @Override
@@ -61,23 +66,25 @@ public class BusyScheduleServiceImpl implements BusyScheduleService {
   }
 
   @Override
-  public Set<LocalDate> getBusyDateByTour(TourDTO tourDTO) {
-    //Update busy schedule according to tour for users to choose
-    Integer cout = 1;
+  public Set<LocalDate> getBusyDateByTour(Long tourId) {
+    // Update busy schedule according to tour for users to choose
+    Integer count = 1;
+    Tour tour = tourRepository.findById(tourId).orElseThrow();
+
     List<LocalDate> busyDates =
-        getBusyScheduleByGuide(tourDTO.getGuide().email()).stream()
+        getBusyScheduleByGuide(tour.getGuide().getEmail()).stream()
             .map(BusyScheduleDTO::busyDate)
             .map(dateTime -> dateTime.toLocalDate())
             .collect(Collectors.toList());
     Set<LocalDate> updatedBusyDates = new HashSet<>();
-    //Schedule updates are available by duration of tour
+    // Schedule updates are available by duration of tour
     updatedBusyDates.addAll(busyDates);
-    if (tourDTO.getUnit().equals("day(s)")) {
-      while (cout < tourDTO.getDuration()) {
+    if (tour.getUnit().equals("day(s)")) {
+      while (count < tour.getDuration()) {
         for (LocalDate busyDate : busyDates) {
-          updatedBusyDates.add(busyDate.minusDays(cout));
+          updatedBusyDates.add(busyDate.minusDays(count));
         }
-        cout++;
+        count++;
       }
     }
     return updatedBusyDates;

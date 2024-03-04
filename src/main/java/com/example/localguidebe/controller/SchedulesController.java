@@ -64,15 +64,15 @@ public class SchedulesController {
                     }
                 });
     }
-    @GetMapping("/busy/tour")
-    public ResponseEntity<Result> getBusyDateByTour(@RequestBody TourDTO tourDTO){
+    @GetMapping("/busy/tour/{tourId}")
+    public ResponseEntity<Result> getBusyDateByTour(@PathVariable("tourId") Long tourId){
         try {
             return new ResponseEntity<>(
                     new Result(
                             false,
                             HttpStatus.OK.value(),
                             "Successfully get the tour guide's busy schedule",
-                            busyScheduleService.getBusyDateByTour(tourDTO)),
+                            busyScheduleService.getBusyDateByTour(tourId)),
                     HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(
