@@ -23,9 +23,9 @@ public class ReviewServiceImpl implements ReviewService {
   private final UserRepository userRepository;
 
   private final TourRepository tourRepository;
-  private TourToTourDtoConverter tourToTourDtoConverter;
+  private final TourToTourDtoConverter tourToTourDtoConverter;
 
-  private ReviewToReviewResponseDto reviewToReviewResponseDto;
+  private final ReviewToReviewResponseDto reviewToReviewResponseDto;
 
   public ReviewServiceImpl(
       ReviewRepository reviewRepository,
@@ -71,8 +71,8 @@ public class ReviewServiceImpl implements ReviewService {
     tour.getReviews().add(newReview);
     tour.setOverallRating(
         tour.getReviews().stream()
-            .filter(review -> review.getRating() > 0)
             .map(Review::getRating)
+            .filter(rating -> rating > 0)
             .mapToInt(Integer::intValue)
             .average()
             .orElse(0.0));
@@ -90,5 +90,24 @@ public class ReviewServiceImpl implements ReviewService {
 
   public List<Review> getReviewsOfGuide(Long guideId) {
     return reviewRepository.getReviewsByGuideId(guideId);
+  }
+
+  @Override
+  public List<ReviewResponseDTO> editReviewForTour(
+      Long reviewId, ReviewRequestDTO reviewRequestDTO) {
+    Review review = reviewRepository.findById(reviewId).orElseThrow();
+    review.setRating(reviewRequestDTO.rating());
+    review.setComment(reviewRequestDTO.comment());
+    reviewRepository.save(review);
+    return reviewRepository.findAll().stream()
+        .map(reviewToReviewResponseDto::convert)
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  public boolean checkReviewByTraveler(Long reviewId, String email) {
+    return reviewRepository.findAll().stream()
+        .anyMatch(
+            review -> review.getTraveler().getEmail().equals(email) && review.getId() == reviewId);
   }
 }
