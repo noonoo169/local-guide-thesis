@@ -14,6 +14,8 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,6 +43,11 @@ public class UserServiceImpl implements UserService {
   @Override
   public User findUserByEmail(String email) {
     return userRepository.findUserByEmail(email);
+  }
+
+  @Override
+  public Optional<User> findById(Long id) {
+    return userRepository.findById(id);
   }
 
   @Override
