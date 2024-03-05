@@ -210,4 +210,23 @@ public class ReviewController {
           }
         });
   }
+
+  @PutMapping("guide-reviews/{reviewId}")
+  public ResponseEntity<Result> editReviewForGuide(
+      @PathVariable("reviewId") Long reviewId,
+      Authentication authentication,
+      @RequestBody ReviewRequestDTO reviewRequestDTO) {
+    return AuthUtils.checkAuthentication(
+        authentication,
+        () -> {
+          String travelerEmail = ((CustomUserDetails) authentication.getPrincipal()).getEmail();
+          User traveler = userService.findUserByEmail(travelerEmail);
+          if (!reviewService.updateReviewForGuide(reviewRequestDTO, traveler, reviewId)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new Result(false, HttpStatus.CONFLICT.value(), "You can't not update this review"));
+          }
+          return ResponseEntity.status(HttpStatus.OK)
+              .body(new Result(true, HttpStatus.OK.value(), "Update review successful."));
+        });
+  }
 }

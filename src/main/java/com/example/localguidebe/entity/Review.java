@@ -49,6 +49,7 @@ public class Review {
   private User traveler;
 
   @PostPersist
+  @PostUpdate
   public void updateGuideOverallRating() {
     Double newOverallRating =
         BigDecimal.valueOf(
