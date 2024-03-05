@@ -6,7 +6,7 @@ import java.util.List;
 public record GuideDTO(
     Long id,
     String email,
-    String username,
+    String fullName,
     LocalDateTime dateOfBirth,
     String phone,
     String address,

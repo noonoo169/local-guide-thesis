@@ -3,10 +3,14 @@ package com.example.localguidebe.service;
 import com.example.localguidebe.dto.responsedto.SearchSuggestionResponseDTO;
 import com.example.localguidebe.entity.User;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 
 public interface UserService {
   User findUserByEmail(String email);
+
+  Optional<User> findById(Long id);
 
   User saveUser(User user);
 
