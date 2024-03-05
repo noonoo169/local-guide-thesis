@@ -13,14 +13,12 @@ public interface ReviewService {
   TourDTO addReviewForTour(ReviewRequestDTO reviewRequestDTO, Long tourId, String email);
 
   List<ReviewResponseDTO> getReviewForTour(Long tourId);
-  
+
   List<Review> getReviewsOfGuide(Long guideId);
 
   List<ReviewResponseDTO> editReviewForTour(Long reviewId, ReviewRequestDTO reviewRequestDTO);
 
   boolean checkReviewByTraveler(Long reviewId, String email);
 
-
-
-
+  List<ReviewResponseDTO> deleteReviewForTour(Long reviewId);
 }
