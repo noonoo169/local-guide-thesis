@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
                 (root, query, criteriaBuilder) ->
                     criteriaBuilder.or(
                         criteriaBuilder.like(
-                            criteriaBuilder.lower(root.get("username")),
+                            criteriaBuilder.lower(root.get("fullName")),
                             "%" + searchValue.toLowerCase() + "%"),
                         criteriaBuilder.like(
                             criteriaBuilder.lower(root.get("address")),
