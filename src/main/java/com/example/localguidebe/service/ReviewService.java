@@ -21,4 +21,6 @@ public interface ReviewService {
   boolean checkReviewByTraveler(Long reviewId, String email);
 
   List<ReviewResponseDTO> deleteReviewForTour(Long reviewId);
+
+  boolean updateReviewForGuide(ReviewRequestDTO reviewRequestDTO, User traveler, Long reviewId);
 }
