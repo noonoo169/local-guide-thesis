@@ -16,30 +16,37 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.example.localguidebe.service.TourService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Component
+@Service
 public class ReviewServiceImpl implements ReviewService {
   private final ReviewRepository reviewRepository;
   private final UserRepository userRepository;
 
   private final TourRepository tourRepository;
   private final TourToTourDtoConverter tourToTourDtoConverter;
+  private final TourService tourService;
 
   private final ReviewToReviewResponseDto reviewToReviewResponseDto;
-
+@Autowired
   public ReviewServiceImpl(
       ReviewRepository reviewRepository,
       UserRepository userRepository,
       TourRepository tourRepository,
       TourToTourDtoConverter tourToTourDtoConverter,
-      ReviewToReviewResponseDto reviewToReviewResponseDto) {
+      ReviewToReviewResponseDto reviewToReviewResponseDto,
+      TourService tourService) {
     this.reviewRepository = reviewRepository;
     this.userRepository = userRepository;
     this.tourRepository = tourRepository;
     this.tourToTourDtoConverter = tourToTourDtoConverter;
     this.reviewToReviewResponseDto = reviewToReviewResponseDto;
+    this.tourService = tourService;
   }
 
   @Override
@@ -59,9 +66,7 @@ public class ReviewServiceImpl implements ReviewService {
   @Override
   public List<ReviewResponseDTO> addReviewForTour(ReviewRequestDTO reviewRequestDTO, Long tourId, String email) {
     User traveler = userRepository.findUserByEmail(email);
-
     Tour tour = tourRepository.findById(tourId).orElseThrow();
-
     Review newReview =
         Review.builder()
             .tour(tourRepository.findById(tourId).orElseThrow())
@@ -71,13 +76,7 @@ public class ReviewServiceImpl implements ReviewService {
             .traveler(traveler)
             .build();
     tour.getReviews().add(newReview);
-    tour.setOverallRating(
-        tour.getReviews().stream()
-            .map(Review::getRating)
-            .filter(rating -> rating > 0)
-            .mapToInt(Integer::intValue)
-            .average()
-            .orElse(0.0));
+    tourService.updateRatingForTour(tour);
     tourRepository.save(tour);
 
     return  tour.getReviews().stream()
@@ -104,6 +103,7 @@ public class ReviewServiceImpl implements ReviewService {
     review.setRating(reviewRequestDTO.rating());
     review.setComment(reviewRequestDTO.comment());
     reviewRepository.save(review);
+    tourService.updateRatingForTour(tourRepository.findTourByReviewsId(reviewId).orElseThrow());
     return reviewRepository.findAll().stream()
         .map(reviewToReviewResponseDto::convert)
         .collect(Collectors.toList());
@@ -118,7 +118,9 @@ public class ReviewServiceImpl implements ReviewService {
 
   @Override
   public List<ReviewResponseDTO> deleteReviewForTour(Long reviewId) {
+    Tour tour = tourRepository.findTourByReviewsId(reviewId).orElseThrow();
     reviewRepository.deleteById(reviewId);
+    tourService.updateRatingForTour(tour);
     return reviewRepository.findAll().stream()
         .map(reviewToReviewResponseDto::convert)
         .collect(Collectors.toList());

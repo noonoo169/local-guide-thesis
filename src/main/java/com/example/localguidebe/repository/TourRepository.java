@@ -2,6 +2,8 @@ package com.example.localguidebe.repository;
 
 import com.example.localguidebe.entity.Tour;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,4 +25,6 @@ public interface TourRepository extends JpaRepository<Tour, Long> {
 
   @Query("SELECT tour from Tour tour JOIN tour.categories category WHERE tour.pricePerTraveler >= :minPrice AND tour.pricePerTraveler <= :maxPrice AND category.id IN :categoryId AND (tour.name IN :searchNames OR tour.address IN :addresses)")
   Page<Tour> findToursByNameAndAddress(@Param("searchNames") List<String> searchNames , @Param("minPrice") Double minPrice , Double maxPrice, List<Long> categoryId, Pageable pageable,List<String> addresses);
+  @Query("SELECT tour FROM Tour tour JOIN tour.reviews review where review.id = :reviewId")
+  Optional<Tour> findTourByReviewsId(@Param("reviewId") Long reviewId );
 }

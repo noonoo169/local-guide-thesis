@@ -37,4 +37,6 @@ public interface TourService {
   List<String> getTourStartTimeAvailable(Long tourId, LocalDate localDate);
 
   boolean checkBookingByTraveler(Long tourId, String email);
+
+  void updateRatingForTour(Tour tour);
 }

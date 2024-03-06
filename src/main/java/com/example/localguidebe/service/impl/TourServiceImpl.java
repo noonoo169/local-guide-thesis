@@ -345,4 +345,16 @@ public class TourServiceImpl implements TourService {
                     && booking.getCart().getTraveler().getId() == traveler.getId()
                     && booking.getStatus().equals(BookingStatusEnum.PAID));
   }
+
+  @Override
+  public void updateRatingForTour(Tour tour) {
+    tour.setOverallRating(
+        tour.getReviews().stream()
+            .map(Review::getRating)
+            .filter(rating -> rating > 0)
+            .mapToInt(Integer::intValue)
+            .average()
+            .orElse(0.0));
+    tourRepository.save(tour);
+  }
 }
