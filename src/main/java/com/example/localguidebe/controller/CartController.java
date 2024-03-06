@@ -2,7 +2,6 @@ package com.example.localguidebe.controller;
 
 import com.example.localguidebe.converter.CartToCartDtoConverter;
 import com.example.localguidebe.dto.CartDTO;
-import com.example.localguidebe.dto.TourDTO;
 import com.example.localguidebe.dto.requestdto.AddBookingRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateBookingDTO;
 import com.example.localguidebe.entity.Cart;
@@ -10,7 +9,6 @@ import com.example.localguidebe.security.service.CustomUserDetails;
 import com.example.localguidebe.service.CartService;
 import com.example.localguidebe.system.Result;
 import com.example.localguidebe.utils.AuthUtils;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -105,7 +103,7 @@ public class CartController {
 
   @PostMapping("")
   public ResponseEntity<Result> addBookingToCart(
-      Authentication authentication,@RequestBody AddBookingRequestDTO addBookingRequestDTO) {
+      Authentication authentication, @RequestBody AddBookingRequestDTO addBookingRequestDTO) {
     return AuthUtils.checkAuthentication(
         authentication,
         () -> {
@@ -115,7 +113,8 @@ public class CartController {
                   addBookingRequestDTO);
           if (addCart != null) {
             return new ResponseEntity<>(
-                new Result(false, HttpStatus.OK.value(), "successfully added tour to cart", addCart),
+                new Result(
+                    false, HttpStatus.OK.value(), "successfully added tour to cart", addCart),
                 HttpStatus.OK);
           } else {
 

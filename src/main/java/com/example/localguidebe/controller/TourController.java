@@ -15,7 +15,6 @@ import com.example.localguidebe.service.UserService;
 import com.example.localguidebe.system.Result;
 import com.example.localguidebe.utils.AddressUtils;
 import com.example.localguidebe.utils.AuthUtils;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -217,23 +216,15 @@ public class TourController {
     }
   }
 
-  @GetMapping("/guide")
-  //  TODO: Use PreAuthorize annotation later for authorization guider
-  //  @PreAuthorize("hasAnyAuthority('GUIDER')")
-  public ResponseEntity<Result> getToursOfGuide(Authentication authentication) {
+  @GetMapping("/guide/{id}")
+  public ResponseEntity<Result> getToursOfGuide(@PathVariable("id") Long guideId) {
     try {
-      if (authentication == null || !authentication.isAuthenticated()) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-            .body(new Result(false, HttpStatus.UNAUTHORIZED.value(), "Let's login"));
-      }
-      CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
       return new ResponseEntity<>(
           new Result(
               true,
               HttpStatus.OK.value(),
               "Get the list successfully",
-              tourService.getToursOfGuide(customUserDetails.getEmail()).stream()
-                  .map(tourToTourDtoConverter::convert)),
+              tourService.getToursOfGuide(guideId).stream().map(tourToTourDtoConverter::convert)),
           HttpStatus.OK);
     } catch (Exception e) {
       return new ResponseEntity<>(

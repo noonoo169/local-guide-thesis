@@ -292,10 +292,10 @@ public class TourServiceImpl implements TourService {
   }
 
   @Override
-  public List<Tour> getToursOfGuide(String email) {
+  public List<Tour> getToursOfGuide(Long guideId) {
     return tourRepository.findAll().stream()
         .filter(
-            tour -> tour.getIsDeleted().equals(false) && tour.getGuide().getEmail().equals(email))
+            tour -> tour.getIsDeleted().equals(false) && tour.getGuide().getId().equals(guideId))
         .collect(Collectors.toList());
   }
 
@@ -341,8 +341,7 @@ public class TourServiceImpl implements TourService {
         .anyMatch(
             booking ->
                 booking.getTour().getId() == tourId
-                    && booking.getCart().getTraveler().getId() == traveler.getId() && booking.getStatus().equals(BookingStatusEnum.PAID));
+                    && booking.getCart().getTraveler().getId() == traveler.getId()
+                    && booking.getStatus().equals(BookingStatusEnum.PAID));
   }
-
-
 }
