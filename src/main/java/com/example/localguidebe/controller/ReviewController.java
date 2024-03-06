@@ -85,7 +85,7 @@ public class ReviewController {
                   new Result(
                       true,
                       HttpStatus.OK.value(),
-                      "Added busy day list successfully",
+                      "Added review for tour successfully",
                       reviewService.addReviewForTour(
                           reviewRequestDTO,
                           tourId,
