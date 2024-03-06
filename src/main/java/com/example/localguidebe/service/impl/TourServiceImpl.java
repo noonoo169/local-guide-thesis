@@ -310,6 +310,7 @@ public class TourServiceImpl implements TourService {
                     AddressUtils.removeVietnameseAccents(address)
                         .toLowerCase()
                         .contains(AddressUtils.removeVietnameseAccents(searchValue).toLowerCase()))
+            .distinct()
             .toList();
     List<ResultInSearchSuggestionDTO> guidersFiltered =
         tours.stream()
