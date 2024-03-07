@@ -96,9 +96,6 @@ public class Tour {
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "tour")
   private List<Booking> bookings = new ArrayList<>();
 
-//  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "tour")
-//  private List<Image> images = new ArrayList<>();
-
   @ManyToOne
   @JoinColumn(name = "meeting_point_id")
   private Location meetingPoint;
@@ -109,7 +106,7 @@ public class Tour {
       joinColumns = @JoinColumn(name = "tour_id", referencedColumnName = "id"),
       inverseJoinColumns = @JoinColumn(name = "location_id", referencedColumnName = "id"))
   private Set<Location> locations = new HashSet<>();
-//  public List<Image> getImagesOfObject() {
-//    return this.get().stream().filter(image -> image.getAssociateName().equals(AssociateName.TOUR)).toList();
-//  }
+
+  @Column(name = "is_for_specific_traveler", columnDefinition = "boolean default false")
+  private Boolean isForSpecificTraveler = Boolean.FALSE;
 }
