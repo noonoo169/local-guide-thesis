@@ -33,7 +33,12 @@ public class InvoiceServiceImpl implements InvoiceService {
 
   @Override
   @Transactional
-  public Invoice createBookingInInvoice(List<Long> bookingIds, String email, Double priceTotal) {
+  public Invoice createBookingInInvoice(
+      List<Long> bookingIds,
+      String email,
+      Double priceTotal,
+      Double priceInVND,
+      Double usdVndRate) {
     Cart cart = cartService.getCartByEmail(email);
     if (cart == null) return null;
     List<Booking> bookings =
@@ -42,6 +47,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     Invoice invoice =
         Invoice.builder()
             .priceTotal(priceTotal)
+            .vndPrice(priceInVND)
+            .conversionRate(usdVndRate)
             .createAt(LocalDateTime.now())
             .traveler(cart.getTraveler())
             .build();

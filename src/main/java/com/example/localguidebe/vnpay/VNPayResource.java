@@ -73,17 +73,19 @@ public class VNPayResource {
     String email = queryParams.get("email");
     List<Long> bookingIds =
         Arrays.stream(queryParams.get("bookingId").split(",")).map(Long::valueOf).toList();
-    Double price = Double.parseDouble(queryParams.get("vnp_Amount")) / 100;
+    Double priceInVND = Double.parseDouble(queryParams.get("vnp_Amount")) / 100;
     Double usdVndRate = Double.parseDouble(queryParams.get("usd_vnd_Rate"));
-    Double priceTotal =
-        BigDecimal.valueOf(price / usdVndRate).setScale(0, RoundingMode.HALF_UP).doubleValue();
+    Double priceInUSD =
+        BigDecimal.valueOf(priceInVND / usdVndRate).setScale(0, RoundingMode.HALF_UP).doubleValue();
     if (!bookingIds.isEmpty() && email != null) {
       if ("00".equals(vnp_ResponseCode)) {
         logger.info("Giao dịch thành công");
         response.sendRedirect(
             frontendHost
                 + "/booking-success/"
-                + invoiceService.createBookingInInvoice(bookingIds, email, priceTotal).getId());
+                + invoiceService
+                    .createBookingInInvoice(bookingIds, email, priceInUSD, priceInVND, usdVndRate)
+                    .getId());
       } else {
         logger.error("Giao dịch thất bại");
         response.sendRedirect(frontendHost + "/booking-fail");
@@ -111,8 +113,6 @@ public class VNPayResource {
                   .setScale(0, RoundingMode.HALF_UP)
                   .multiply(BigDecimal.valueOf(100));
 
-          String bankCode = "NCB";
-
           String vnp_TxnRef = Config.getRandomNumber(8);
           String vnp_IpAddr = "127.0.0.1";
 
@@ -126,7 +126,8 @@ public class VNPayResource {
           vnp_Params.put("vnp_Amount", String.valueOf(amount));
           vnp_Params.put("vnp_CurrCode", "VND");
 
-          vnp_Params.put("vnp_BankCode", bankCode);
+          String bankCode = "NCB";
+          //          vnp_Params.put("vnp_BankCode", bankCode);
           vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
           vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + vnp_TxnRef);
           vnp_Params.put("vnp_OrderType", orderType);
