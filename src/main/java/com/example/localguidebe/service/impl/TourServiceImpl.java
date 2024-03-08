@@ -32,6 +32,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -43,6 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TourServiceImpl implements TourService {
+  Logger logger = LoggerFactory.getLogger(TourServiceImpl.class);
   private final TourToTourDtoConverter tourToTourDtoConverter;
   private final ToResultInSearchSuggestionDtoConverter toResultInSearchSuggestionDtoConverter;
   private final TourStartTimeRepository tourStartTimeRepository;
@@ -54,7 +57,6 @@ public class TourServiceImpl implements TourService {
   private final UserService userService;
   private final CloudinaryUtil cloudinaryUtil;
   private final GeoCodingService geoCodingService;
-
   private final BookingRepository bookingRepository;
   private final Gson gson = new Gson();
 
@@ -103,15 +105,15 @@ public class TourServiceImpl implements TourService {
     User guide = userService.findUserByEmail(email);
     Gson gson = new Gson();
     BeanUtils.copyProperties(tourRequestDTO, newTour, "categories", "images", "locations");
-  // add tour start time
+    // add tour start time
     tourRequestDTO
         .getStartTimes()
         .forEach(
-                getStartTime ->
+            getStartTime ->
                 newTour
                     .getTourStartTimes()
                     .add(TourStartTime.builder().startTime(getStartTime).build()));
-  // add location for tour
+
     if (tourRequestDTO.getLocations().size() != 0) {
       tourRequestDTO
           .getLocations()
@@ -133,15 +135,18 @@ public class TourServiceImpl implements TourService {
                             .build());
               });
     }
-    //add guider for tour
-    tourRequestDTO.getCategories()
+    // add guider for tour
+    tourRequestDTO
+        .getCategories()
         .forEach(
-            category -> newTour.getCategories().add(categoryService.getCategoryById(category.getId())));
+            category ->
+                newTour.getCategories().add(categoryService.getCategoryById(category.getId())));
     if (guide != null) {
       newTour.setGuide(guide);
     }
     Tour tour = tourRepository.save(newTour);
-    tourRequestDTO.getImages()
+    tourRequestDTO
+        .getImages()
         .forEach(
             image -> {
               Image imageTour = new Image();
@@ -178,6 +183,7 @@ public class TourServiceImpl implements TourService {
                   tourStartTime.setTour(tour);
                   tour.getTourStartTimes().add(tourStartTime);
                 });
+        logger.info("updated tour start time");
       }
 
       // Update category
@@ -196,7 +202,10 @@ public class TourServiceImpl implements TourService {
           updateTourRequestDTO
               .category_ids()
               .forEach(
-                  categoryId -> tour.getCategories().add(categoryService.getCategoryById(categoryId)));
+                  categoryId ->
+                      tour.getCategories().add(categoryService.getCategoryById(categoryId)));
+
+          logger.info("updated category");
         }
       }
 
@@ -219,14 +228,15 @@ public class TourServiceImpl implements TourService {
           imageTour.setAssociateId(tour.getId());
           imageTour.setAssociateName(AssociateName.TOUR);
           imageRepository.save(imageTour);
+          logger.info("added new image");
         }
 
         if (i < tourImages.size()
             && !updateTourRequestDTO.image_ids().contains(tourImages.get(i).getId().toString())) {
-          if (cloudinaryUtil.deleteFile(tourImages.get(i).getImageLink())) {
+          if (cloudinaryUtil.deleteFile(tourImages.get(i).getImageLink(), FolderName.tour)) {
             imageRepository.deleteById(tourImages.get(i).getId());
+            logger.info("deleted image");
           }
-
         }
       }
 
@@ -247,18 +257,7 @@ public class TourServiceImpl implements TourService {
                                 location.getLatitude(),
                                 location.getLongitude()));
                 });
-      }
-
-      // Update meetingPoint
-      if (updateTourRequestDTO.meetingPoint() != null
-          && updateTourRequestDTO.meetingPoint().getId() == null) {
-        Location newMeetingPoint =
-            new Location(
-                updateTourRequestDTO.meetingPoint().getName(),
-                updateTourRequestDTO.meetingPoint().getLatitude(),
-                updateTourRequestDTO.meetingPoint().getLongitude());
-        locationService.save(newMeetingPoint);
-        tour.setMeetingPoint(newMeetingPoint);
+        logger.info("updated location");
       }
       return tourRepository.save(tour);
     }
@@ -368,12 +367,15 @@ public class TourServiceImpl implements TourService {
 
   @Override
   public List<String> getLocationName(List<LocationDTO> locationDTOS) {
-    List<String> locationName  = new ArrayList<>();
-    locationDTOS.stream().forEach(location -> locationName.add(gson.fromJson(
-            geoCodingService.getAddress(
-                    location.latitude(), location.longitude()),
-            InfoLocationDTO.class).getName())
-    );
+    List<String> locationName = new ArrayList<>();
+    locationDTOS.stream()
+        .forEach(
+            location ->
+                locationName.add(
+                    gson.fromJson(
+                            geoCodingService.getAddress(location.latitude(), location.longitude()),
+                            InfoLocationDTO.class)
+                        .getName()));
     return locationName;
   }
 }

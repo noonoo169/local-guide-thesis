@@ -90,20 +90,10 @@ public class CloudinaryUtil {
     }
   }
 
-  private static String getPublicIdFile(String url) {
-    int lastSlashIndex = url.lastIndexOf('/');
-    if (lastSlashIndex >= 0) {
-      int secondLastSlashIndex = url.lastIndexOf('/', lastSlashIndex - 1);
-      if (secondLastSlashIndex >= 0) {
-        return url.substring(secondLastSlashIndex + 1);
-      }
-    }
-    return null;
-  }
-
-  public boolean deleteFile(String url) {
+  public boolean deleteFile(String url, FolderName folderName) {
     try {
-      String publicId = getPublicIdFile(url);
+      String folder = folderName.name().toLowerCase() + "/";
+      String publicId = url.substring(url.indexOf(folder), url.lastIndexOf("."));
       cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
       return true;
     } catch (Exception e) {
