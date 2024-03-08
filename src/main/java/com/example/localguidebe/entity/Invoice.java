@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -22,6 +20,12 @@ public class Invoice {
 
   @Column(name = "price_total")
   private Double priceTotal;
+
+  @Column(name = "vnd_price")
+  private Double vndPrice;
+
+  @Column(name = "conversion_rate")
+  private Double conversionRate;
 
   @Column(name = "create_at")
   private LocalDateTime createAt;
