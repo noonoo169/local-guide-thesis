@@ -89,4 +89,32 @@ public class SchedulesController {
           HttpStatus.CONFLICT);
     }
   }
+
+  @GetMapping("/busy/guide")
+  public ResponseEntity<Result> getBusySchedulesAndPreBookedSchedules(
+      Authentication authentication) {
+    return AuthUtils.checkAuthentication(
+        authentication,
+        () -> {
+          try {
+            return new ResponseEntity<>(
+                new Result(
+                    true,
+                    HttpStatus.OK.value(),
+                    "Get a list of busy schedules and pre booked schedules successfully",
+                    busyScheduleService.getBusySchedulesAndPreBookedSchedules(
+                        ((CustomUserDetails) authentication.getPrincipal()).getEmail())),
+                HttpStatus.OK);
+          } catch (Exception e) {
+            return new ResponseEntity<>(
+                new Result(
+                    false,
+                    HttpStatus.CONFLICT.value(),
+                    "Get a list of of busy schedules and pre booked schedules",
+                    null),
+                HttpStatus.CONFLICT);
+          }
+        });
+     }
+
 }
