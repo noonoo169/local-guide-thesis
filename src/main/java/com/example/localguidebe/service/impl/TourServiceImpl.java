@@ -105,12 +105,12 @@ public class TourServiceImpl implements TourService {
     BeanUtils.copyProperties(tourRequestDTO, newTour, "categories", "images", "locations");
   // add tour start time
     tourRequestDTO
-        .getTourStartTimeDTOS()
+        .getStartTimes()
         .forEach(
-            tourStartTimeDTO ->
+                getStartTime ->
                 newTour
                     .getTourStartTimes()
-                    .add(TourStartTime.builder().startTime(tourStartTimeDTO.startTime()).build()));
+                    .add(TourStartTime.builder().startTime(getStartTime).build()));
   // add location for tour
     if (tourRequestDTO.getLocations().size() != 0) {
       tourRequestDTO

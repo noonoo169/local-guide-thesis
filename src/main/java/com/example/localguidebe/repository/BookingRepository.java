@@ -27,4 +27,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
   @Modifying
   @Query("update Booking b set b.isDeleted = true where b.id = :id")
   void deleteBookingById(@Param("id") Long id);
+
+  @Query("SELECT b FROM Booking b JOIN b.tour t JOIN t.guide g WHERE g.email = :email")
+  List<Booking> getAllBookingByGuider(@Param("email") String email);
+
 }
