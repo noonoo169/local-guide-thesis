@@ -1,5 +1,6 @@
 package com.example.localguidebe.service;
 
+import com.example.localguidebe.dto.LocationDTO;
 import com.example.localguidebe.dto.TourDTO;
 import com.example.localguidebe.dto.requestdto.TourRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateTourRequestDTO;
@@ -39,4 +40,6 @@ public interface TourService {
   boolean checkBookingByTraveler(Long tourId, String email);
 
   void updateRatingForTour(Tour tour);
+
+  List<String> getLocationName(List<LocationDTO> locationDTOS);
 }

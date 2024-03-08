@@ -1,8 +1,7 @@
 package com.example.localguidebe.controller;
 
-import com.example.localguidebe.service.DistrictService;
-import com.example.localguidebe.service.ProvinceService;
-import com.example.localguidebe.service.WardService;
+import com.example.localguidebe.dto.LocationDTO;
+import com.example.localguidebe.service.*;
 import com.example.localguidebe.system.Result;
 import com.example.localguidebe.utils.AddressUtils;
 import java.util.ArrayList;
@@ -10,10 +9,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/addresses")
@@ -23,12 +19,19 @@ public class AddressController {
 
   private ProvinceService provinceService;
 
+  private TourService tourService;
+
+
   @Autowired
   public void AddressController(
-      DistrictService districtService, WardService wardService, ProvinceService provinceService) {
+      DistrictService districtService,
+      WardService wardService,
+      ProvinceService provinceService,
+      TourService tourService) {
     this.districtService = districtService;
     this.wardService = wardService;
     this.provinceService = provinceService;
+    this.tourService = tourService;
   }
 
   @GetMapping("/provinces")
@@ -81,6 +84,24 @@ public class AddressController {
     } catch (Exception e) {
       return new ResponseEntity<>(
           new Result(false, HttpStatus.CONFLICT.value(), "Ward not found", null),
+          HttpStatus.CONFLICT);
+    }
+  }
+
+  @PostMapping("/name")
+  public ResponseEntity<Result> getNameByLocation(@RequestBody List<LocationDTO> locations) {
+
+    try {
+      return new ResponseEntity<>(
+          new Result(
+              false,
+              HttpStatus.OK.value(),
+              "get name of location successfully",
+              tourService.getLocationName(locations)),
+          HttpStatus.OK);
+    } catch (Exception e) {
+      return new ResponseEntity<>(
+          new Result(false, HttpStatus.CONFLICT.value(), "Coordinate name not found", null),
           HttpStatus.CONFLICT);
     }
   }
