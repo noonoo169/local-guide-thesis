@@ -1,5 +1,6 @@
 package com.example.localguidebe.service.impl;
 
+import com.example.localguidebe.converter.ReviewToReviewResponseDto;
 import com.example.localguidebe.converter.ToResultInSearchSuggestionDtoConverter;
 import com.example.localguidebe.converter.TourToTourDtoConverter;
 import com.example.localguidebe.dto.LocationDTO;
@@ -8,6 +9,7 @@ import com.example.localguidebe.dto.requestdto.InfoLocationDTO;
 import com.example.localguidebe.dto.requestdto.TourRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateTourRequestDTO;
 import com.example.localguidebe.dto.responsedto.ResultInSearchSuggestionDTO;
+import com.example.localguidebe.dto.responsedto.ReviewResponseDTO;
 import com.example.localguidebe.dto.responsedto.SearchSuggestionResponseDTO;
 import com.example.localguidebe.dto.responsedto.SearchTourDTO;
 import com.example.localguidebe.entity.*;
@@ -58,6 +60,7 @@ public class TourServiceImpl implements TourService {
   private final CloudinaryUtil cloudinaryUtil;
   private final GeoCodingService geoCodingService;
   private final BookingRepository bookingRepository;
+  private final ReviewToReviewResponseDto reviewToReviewResponseDto;
   private final Gson gson = new Gson();
 
   @Autowired
@@ -72,7 +75,8 @@ public class TourServiceImpl implements TourService {
       ImageRepository imageRepository,
       BookingRepository bookingRepository,
       TourToTourDtoConverter tourToTourDtoConverter,
-      GeoCodingService geoCodingService) {
+      GeoCodingService geoCodingService,
+      ReviewToReviewResponseDto reviewToReviewResponseDto) {
     this.tourStartTimeRepository = tourStartTimeRepository;
     this.toResultInSearchSuggestionDtoConverter = toResultInSearchSuggestionDtoConverter;
     this.geoCodingService = geoCodingService;
@@ -84,6 +88,7 @@ public class TourServiceImpl implements TourService {
     this.imageRepository = imageRepository;
     this.tourToTourDtoConverter = tourToTourDtoConverter;
     this.bookingRepository = bookingRepository;
+    this.reviewToReviewResponseDto = reviewToReviewResponseDto;
   }
 
   @Autowired
@@ -377,5 +382,15 @@ public class TourServiceImpl implements TourService {
                             InfoLocationDTO.class)
                         .getName()));
     return locationName;
+  }
+
+  @Override
+  public List<ReviewResponseDTO> filterReviewForTour(List<Integer> ratings, Long tourId,String sortBy) {
+    if (ratings.size() == 0) {
+      ratings = Arrays.asList(1, 2, 3, 4, 5);
+    }
+    return tourRepository.filterReviewForTour(ratings, tourId,sortBy).stream()
+        .map(reviewToReviewResponseDto::convert)
+        .collect(Collectors.toList());
   }
 }

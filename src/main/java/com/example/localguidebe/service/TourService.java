@@ -4,6 +4,7 @@ import com.example.localguidebe.dto.LocationDTO;
 import com.example.localguidebe.dto.TourDTO;
 import com.example.localguidebe.dto.requestdto.TourRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateTourRequestDTO;
+import com.example.localguidebe.dto.responsedto.ReviewResponseDTO;
 import com.example.localguidebe.dto.responsedto.SearchSuggestionResponseDTO;
 import com.example.localguidebe.dto.responsedto.SearchTourDTO;
 import com.example.localguidebe.entity.Tour;
@@ -42,4 +43,6 @@ public interface TourService {
   void updateRatingForTour(Tour tour);
 
   List<String> getLocationName(List<LocationDTO> locationDTOS);
+
+  List<ReviewResponseDTO> filterReviewForTour(List<Integer> ratings, Long tourId,String sortBy);
 }
