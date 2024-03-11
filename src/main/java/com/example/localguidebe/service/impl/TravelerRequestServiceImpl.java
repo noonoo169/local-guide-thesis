@@ -9,6 +9,8 @@ import com.example.localguidebe.service.TravelerRequestService;
 import com.example.localguidebe.service.UserService;
 import org.springframework.stereotype.Service;
 
+import java.util.stream.Collectors;
+
 @Service
 public class TravelerRequestServiceImpl implements TravelerRequestService {
   private final TravelerRequestRepository travelerRequestRepository;
@@ -32,7 +34,7 @@ public class TravelerRequestServiceImpl implements TravelerRequestService {
             .destination(addTravelerRequestDTO.destination())
             .maxPrice(addTravelerRequestDTO.maxPrice())
             .message(addTravelerRequestDTO.message())
-            .transportation(addTravelerRequestDTO.transportation())
+            .transportation(String.join(", ", addTravelerRequestDTO.transportation()))
             .unit(addTravelerRequestDTO.unit())
             .duration(addTravelerRequestDTO.duration())
             .status(TravelerRequestStatus.PENDING)
