@@ -1,5 +1,6 @@
 package com.example.localguidebe.repository;
 
+import com.example.localguidebe.entity.Review;
 import com.example.localguidebe.entity.Tour;
 import java.util.List;
 import java.util.Optional;
@@ -27,4 +28,6 @@ public interface TourRepository extends JpaRepository<Tour, Long> {
   Page<Tour> findToursByNameAndAddress(@Param("searchNames") List<String> searchNames , @Param("minPrice") Double minPrice , Double maxPrice, List<Long> categoryId, Pageable pageable,List<String> addresses);
   @Query("SELECT tour FROM Tour tour JOIN tour.reviews review where review.id = :reviewId")
   Optional<Tour> findTourByReviewsId(@Param("reviewId") Long reviewId );
+  @Query("SELECT review FROM Tour tour JOIN tour.reviews review WHERE tour.id = :tourId AND review.rating IN :ratings ORDER BY CASE WHEN :sortBy = 'Most recent' THEN review.createdAt END DESC ,CASE WHEN :sortBy ='Highest rated' THEN review.rating END DESC ,CASE WHEN :sortBy = 'Lowest rated' THEN review.rating END ASC ")
+  List<Review> filterReviewForTour( @Param("ratings") List<Integer> ratings,@Param("tourId") Long tourId,@Param("sortBy") String sortBy);
 }
