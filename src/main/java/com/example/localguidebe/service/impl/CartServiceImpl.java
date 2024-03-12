@@ -1,6 +1,6 @@
 package com.example.localguidebe.service.impl;
 
-import com.example.localguidebe.converter.AddBookingRequestDtoToBookingDtoConverter;
+import com.example.localguidebe.converter.AddBookingRequestDtoToBookingConverter;
 import com.example.localguidebe.converter.CartToCartDtoConverter;
 import com.example.localguidebe.dto.CartDTO;
 import com.example.localguidebe.dto.requestdto.AddBookingRequestDTO;
@@ -31,7 +31,7 @@ public class CartServiceImpl implements CartService {
   private final BookingRepository bookingRepository;
 
   private final UserRepository userRepository;
-  private final AddBookingRequestDtoToBookingDtoConverter addBookingRequestDtoToBookingDtoConverter;
+  private final AddBookingRequestDtoToBookingConverter addBookingRequestDtoToBookingDtoConverter;
   private final CartToCartDtoConverter cartToCartDtoConverter;
   private final BusyScheduleService busyScheduleService;
 
@@ -42,7 +42,7 @@ public class CartServiceImpl implements CartService {
       CartRepository cartRepository,
       BookingRepository bookingRepository,
       UserRepository userRepository,
-      AddBookingRequestDtoToBookingDtoConverter addBookingRequestDtoToBookingDtoConverter,
+      AddBookingRequestDtoToBookingConverter addBookingRequestDtoToBookingDtoConverter,
       CartToCartDtoConverter cartToCartDtoConverter,
       BusyScheduleService busyScheduleService,
       TourRepository tourRepository) {
