@@ -6,10 +6,10 @@ import com.example.localguidebe.repository.TourRepository;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AddBookingRequestDtoToBookingDtoConverter {
+public class AddBookingRequestDtoToBookingConverter {
   private final TourRepository tourRepository;
 
-  public AddBookingRequestDtoToBookingDtoConverter(TourRepository tourRepository) {
+  public AddBookingRequestDtoToBookingConverter(TourRepository tourRepository) {
     this.tourRepository = tourRepository;
   }
 
