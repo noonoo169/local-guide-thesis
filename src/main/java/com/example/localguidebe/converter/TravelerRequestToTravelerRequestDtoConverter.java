@@ -2,6 +2,7 @@ package com.example.localguidebe.converter;
 
 import com.example.localguidebe.dto.TravelerRequestDTO;
 import com.example.localguidebe.entity.TravelerRequest;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,7 +20,7 @@ public class TravelerRequestToTravelerRequestDtoConverter {
   public TravelerRequestDTO convert(TravelerRequest source) {
     return new TravelerRequestDTO(
         source.getId(),
-        source.getTransportation(),
+        List.of(source.getTransportation().split(", ")),
         source.getDuration(),
         source.getUnit(),
         source.getMaxPrice(),

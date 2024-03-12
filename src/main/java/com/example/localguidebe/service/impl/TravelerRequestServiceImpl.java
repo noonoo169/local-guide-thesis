@@ -7,9 +7,8 @@ import com.example.localguidebe.enums.TravelerRequestStatus;
 import com.example.localguidebe.repository.TravelerRequestRepository;
 import com.example.localguidebe.service.TravelerRequestService;
 import com.example.localguidebe.service.UserService;
+import java.util.List;
 import org.springframework.stereotype.Service;
-
-import java.util.stream.Collectors;
 
 @Service
 public class TravelerRequestServiceImpl implements TravelerRequestService {
@@ -43,5 +42,10 @@ public class TravelerRequestServiceImpl implements TravelerRequestService {
             .build();
 
     return travelerRequestRepository.save(travelerRequest);
+  }
+
+  @Override
+  public List<TravelerRequest> getTravelerRequests(String email) {
+    return travelerRequestRepository.getTravelerRequests(email);
   }
 }
