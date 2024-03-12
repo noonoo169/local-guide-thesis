@@ -1,8 +1,10 @@
 package com.example.localguidebe.dto;
 
+import java.util.List;
+
 public record TravelerRequestDTO(
     Long id,
-    String transportation,
+    List<String> transportation,
     Integer duration,
     String unit,
     Double maxPrice,

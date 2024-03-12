@@ -7,13 +7,11 @@ import com.example.localguidebe.security.service.CustomUserDetails;
 import com.example.localguidebe.service.TravelerRequestService;
 import com.example.localguidebe.system.Result;
 import com.example.localguidebe.utils.AuthUtils;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/traveler-requests")
@@ -56,4 +54,25 @@ public class TravelerRequestController {
                       travelerRequestToTravelerRequestDtoConverter.convert(travelerRequest)));
         });
   }
+
+  @GetMapping("")
+  public ResponseEntity<Result> getTravelerRequests(Authentication authentication) {
+    return AuthUtils.checkAuthentication(
+        authentication,
+        () -> {
+          String email = ((CustomUserDetails) authentication.getPrincipal()).getEmail();
+          List<TravelerRequest> travelerRequests =
+              travelerRequestService.getTravelerRequests(email);
+          return ResponseEntity.status(HttpStatus.OK)
+              .body(
+                  new Result(
+                      true,
+                      HttpStatus.OK.value(),
+                      "Your request will be processed soon.",
+                      travelerRequests.stream()
+                          .map(travelerRequestToTravelerRequestDtoConverter::convert)
+                          .toList()));
+        });
+  }
+  ;
 }
