@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.*;
+import org.hibernate.annotations.Fetch;
 
 @Entity
 @Getter
@@ -77,6 +78,12 @@ public class User {
 
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "guide")
   private List<TravelerRequest> travelerRequestsOfGuide = new ArrayList<>();
+
+  @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL,mappedBy = "sender")
+  List<Notification> notificationSender = new ArrayList<>();
+
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "receiver")
+  List<Notification> notificationReceiver = new ArrayList<>();
 
   @Override
   public String toString() {
