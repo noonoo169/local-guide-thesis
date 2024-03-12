@@ -26,6 +26,7 @@ public class TravelerRequestToTravelerRequestDtoConverter {
         source.getMaxPrice(),
         source.getDestination(),
         source.getMessage(),
+        source.getStatus(),
         userToGuideDtoConverter.convert(source.getGuide()),
         userToUserDtoConverter.convert(source.getTraveler()),
         source.getTour() == null ? null : source.getTour().getId());
