@@ -1,17 +1,13 @@
-package com.example.localguidebe.dto;
+package com.example.localguidebe.dto.requestdto;
 
 import com.example.localguidebe.enums.TravelerRequestStatus;
 import java.util.List;
 
-public record TravelerRequestDTO(
-    Long id,
+public record UpdateTravelerRequestDTO(
     List<String> transportation,
     Integer duration,
     String unit,
     Double maxPrice,
     String destination,
     String message,
-    TravelerRequestStatus status,
-    GuideDTO guide,
-    UserDTO traveler,
-    Long tourId) {}
+    TravelerRequestStatus status) {}
