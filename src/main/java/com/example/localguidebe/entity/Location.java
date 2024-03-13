@@ -1,7 +1,6 @@
 package com.example.localguidebe.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -24,14 +23,11 @@ public class Location {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-
   @Column(name = "name")
   private String name;
 
-
   @Column(name = "latitude")
   private Double latitude;
-
 
   @Column(name = "longitude")
   private Double longitude;
@@ -40,7 +36,7 @@ public class Location {
   private String address;
 
   @ManyToMany(mappedBy = "locations", fetch = FetchType.LAZY)
-  private Set<Tour> tours = new HashSet<>();
+  private List<Tour> tours = new ArrayList<>();
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "meetingPoint")
   private Set<Tour> toursOfMeetingPoint = new HashSet<>();

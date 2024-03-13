@@ -105,7 +105,7 @@ public class Tour {
       name = "location_tour",
       joinColumns = @JoinColumn(name = "tour_id", referencedColumnName = "id"),
       inverseJoinColumns = @JoinColumn(name = "location_id", referencedColumnName = "id"))
-  private Set<Location> locations = new HashSet<>();
+  private List<Location> locations = new ArrayList<>();
 
   @Column(name = "is_for_specific_traveler", columnDefinition = "boolean default false")
   private Boolean isForSpecificTraveler = Boolean.FALSE;

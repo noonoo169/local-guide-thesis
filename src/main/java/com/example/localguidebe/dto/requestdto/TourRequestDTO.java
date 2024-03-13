@@ -36,6 +36,6 @@ public class TourRequestDTO {
   private List<Review> reviews = new ArrayList<>();
   private List<Booking> bookings = new ArrayList<>();
   private List<String> images = new ArrayList<>();
-  private Set<LocationDTO> locations;
+  private List<LocationDTO> locations ;
   private Location location;
 }
