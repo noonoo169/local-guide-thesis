@@ -3,6 +3,7 @@ package com.example.localguidebe.controller;
 import com.example.localguidebe.converter.TourToTourDtoConverter;
 import com.example.localguidebe.converter.TourToUpdateTourResponseDtoConverter;
 import com.example.localguidebe.dto.CategoryDTO;
+import com.example.localguidebe.dto.TourDTO;
 import com.example.localguidebe.dto.requestdto.TourRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateTourRequestDTO;
 import com.example.localguidebe.entity.Tour;
@@ -10,6 +11,7 @@ import com.example.localguidebe.entity.User;
 import com.example.localguidebe.security.service.CustomUserDetails;
 import com.example.localguidebe.service.CategoryService;
 import com.example.localguidebe.service.TourService;
+import com.example.localguidebe.service.TravelerRequestService;
 import com.example.localguidebe.service.UserService;
 import com.example.localguidebe.system.Result;
 import com.example.localguidebe.utils.AddressUtils;
@@ -33,11 +35,15 @@ public class TourController {
   private final TourToUpdateTourResponseDtoConverter tourToUpdateTourResponseDtoConverter;
   private final UserService userService;
 
+  private final TravelerRequestService travelerRequestService;
+
   public TourController(
       TourToUpdateTourResponseDtoConverter tourToUpdateTourResponseDtoConverter,
-      UserService userService) {
+      UserService userService,
+      TravelerRequestService travelerRequestService) {
     this.tourToUpdateTourResponseDtoConverter = tourToUpdateTourResponseDtoConverter;
     this.userService = userService;
+    this.travelerRequestService = travelerRequestService;
   }
 
   @Autowired
@@ -235,5 +241,43 @@ public class TourController {
             "Get the list successfully",
             tourService.getTourStartTimeAvailable(id, localDate)),
         HttpStatus.OK);
+  }
+
+  @PostMapping("/{requestId}")
+  public ResponseEntity<Result> addTourByTravelerRequest(
+      Authentication authentication,
+      @RequestBody TourRequestDTO tourRequestDTO,
+      @PathVariable("requestId") Long requestId) {
+
+    return AuthUtils.checkAuthentication(
+        authentication,
+        () -> {
+          try {
+            TourDTO tourDTO =
+                tourToTourDtoConverter.convert(
+                    tourService.saveTour(
+                        tourRequestDTO,
+                        ((CustomUserDetails) authentication.getPrincipal()).getEmail()));
+            if (tourDTO != null) {
+              travelerRequestService.updateStatusAndTourForTravelerRequest(
+                  requestId, tourDTO.getId());
+            }
+            return new ResponseEntity<>(
+                new Result(
+                    true,
+                    HttpStatus.OK.value(),
+                    "tour added for traveler request successfully",
+                    tourDTO),
+                HttpStatus.OK);
+          } catch (Exception e) {
+            return new ResponseEntity<>(
+                new Result(
+                    false,
+                    HttpStatus.CONFLICT.value(),
+                    "Adding tour for traveler request failed",
+                    null),
+                HttpStatus.CONFLICT);
+          }
+        });
   }
 }
