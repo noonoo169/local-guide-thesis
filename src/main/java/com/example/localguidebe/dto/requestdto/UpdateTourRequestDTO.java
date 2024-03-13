@@ -22,6 +22,6 @@ public record UpdateTourRequestDTO(
     Integer guide_id,
     List<TourStartTime> tourStartTimes,
     List<Long> category_ids,
-    List<String> image_ids,
+    List<Object> images,
     List<Location> locations,
     Location meetingPoint) {}

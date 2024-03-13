@@ -117,7 +117,7 @@ public class TourServiceImpl implements TourService {
             getStartTime ->
                 newTour
                     .getTourStartTimes()
-                    .add(TourStartTime.builder().startTime(getStartTime).build()));
+                    .add(TourStartTime.builder().startTime(getStartTime).tour(newTour).build()));
 
     if (tourRequestDTO.getLocations().size() != 0) {
       tourRequestDTO
@@ -174,41 +174,41 @@ public class TourServiceImpl implements TourService {
     if (optionalTour.isPresent()) {
       Tour tour = optionalTour.get();
       BeanUtils.copyProperties(
-          updateTourRequestDTO, tour, "categories", "tourStartTimes", "meetingPoint", "locations");
+              updateTourRequestDTO, tour, "categories", "tourStartTimes", "meetingPoint", "locations");
 
       // Update tour start time
       if (updateTourRequestDTO.tourStartTimes() != null) {
         tour.getTourStartTimes()
-            .forEach(tourStartTime -> tourStartTimeService.deleteById(tourStartTime.getId()));
+                .forEach(tourStartTime -> tourStartTimeService.deleteById(tourStartTime.getId()));
         tour.getTourStartTimes().clear();
         updateTourRequestDTO
-            .tourStartTimes()
-            .forEach(
-                tourStartTime -> {
-                  tourStartTime.setTour(tour);
-                  tour.getTourStartTimes().add(tourStartTime);
-                });
+                .tourStartTimes()
+                .forEach(
+                        tourStartTime -> {
+                          tourStartTime.setTour(tour);
+                          tour.getTourStartTimes().add(tourStartTime);
+                        });
         logger.info("updated tour start time");
       }
 
       // Update category
       if (updateTourRequestDTO.category_ids() != null) {
         boolean isUpdateCategory =
-            !tour.getCategories().stream()
-                .map(Category::getId)
-                .sorted()
-                .toList()
-                .equals(
-                    updateTourRequestDTO.category_ids().stream()
+                !tour.getCategories().stream()
+                        .map(Category::getId)
                         .sorted()
-                        .collect(Collectors.toList()));
+                        .toList()
+                        .equals(
+                                updateTourRequestDTO.category_ids().stream()
+                                        .sorted()
+                                        .collect(Collectors.toList()));
         if (isUpdateCategory) {
           tour.getCategories().clear();
           updateTourRequestDTO
-              .category_ids()
-              .forEach(
-                  categoryId ->
-                      tour.getCategories().add(categoryService.getCategoryById(categoryId)));
+                  .category_ids()
+                  .forEach(
+                          categoryId ->
+                                  tour.getCategories().add(categoryService.getCategoryById(categoryId)));
 
           logger.info("updated category");
         }
@@ -216,17 +216,17 @@ public class TourServiceImpl implements TourService {
 
       // Update images
       List<Image> tourImages =
-          imageRepository.getImageByAssociateIddAndAssociateName(
-              updateTourRequestDTO.id(), AssociateName.TOUR);
-      int maxSize = Math.max(tourImages.size(), updateTourRequestDTO.image_ids().size());
+              imageRepository.getImageByAssociateIddAndAssociateName(
+                      updateTourRequestDTO.id(), AssociateName.TOUR);
+      int maxSize = Math.max(tourImages.size(), updateTourRequestDTO.images().size());
       for (int i = 0; i < maxSize; i++) {
-        if (i < updateTourRequestDTO.image_ids().size()
-            && updateTourRequestDTO.image_ids().get(i).startsWith("data:")) {
+        if (i < updateTourRequestDTO.images().size()
+                // If object is Base64 String
+                && !(updateTourRequestDTO.images().get(i) instanceof Image)) {
           Image imageTour = new Image();
+          String imageBase64 = (String) updateTourRequestDTO.images().get(i);
           try {
-            imageTour.setImageLink(
-                cloudinaryUtil.uploadFile(
-                    updateTourRequestDTO.image_ids().get(i), FolderName.tour));
+            imageTour.setImageLink(cloudinaryUtil.uploadFile(imageBase64, FolderName.tour));
           } catch (IOException e) {
             throw new RuntimeException(e);
           }
@@ -236,11 +236,14 @@ public class TourServiceImpl implements TourService {
           logger.info("added new image");
         }
 
-        if (i < tourImages.size()
-            && !updateTourRequestDTO.image_ids().contains(tourImages.get(i).getId().toString())) {
-          if (cloudinaryUtil.deleteFile(tourImages.get(i).getImageLink(), FolderName.tour)) {
-            imageRepository.deleteById(tourImages.get(i).getId());
-            logger.info("deleted image");
+        // If object is Image
+        if (i < tourImages.size() && updateTourRequestDTO.images().get(i) instanceof Image image) {
+          // If image is deleted
+          if (!updateTourRequestDTO.images().contains(image.getId().toString())) {
+            if (cloudinaryUtil.deleteFile(tourImages.get(i).getImageLink(), FolderName.tour)) {
+              imageRepository.deleteById(tourImages.get(i).getId());
+              logger.info("deleted image");
+            }
           }
         }
       }
@@ -249,19 +252,19 @@ public class TourServiceImpl implements TourService {
       if (updateTourRequestDTO.locations() != null) {
         tour.getLocations().clear();
         updateTourRequestDTO
-            .locations()
-            .forEach(
-                location -> {
-                  if (location.getId() != null)
-                    tour.getLocations().add(locationService.findById(location.getId()));
-                  else
-                    tour.getLocations()
-                        .add(
-                            new Location(
-                                location.getName(),
-                                location.getLatitude(),
-                                location.getLongitude()));
-                });
+                .locations()
+                .forEach(
+                        location -> {
+                          if (location.getId() != null)
+                            tour.getLocations().add(locationService.findById(location.getId()));
+                          else
+                            tour.getLocations()
+                                    .add(
+                                            new Location(
+                                                    location.getName(),
+                                                    location.getLatitude(),
+                                                    location.getLongitude()));
+                        });
         logger.info("updated location");
       }
       return tourRepository.save(tour);
