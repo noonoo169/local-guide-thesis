@@ -17,4 +17,6 @@ public interface TravelerRequestService {
 
   TravelerRequest updateTravelRequestStatus(
       String email, UpdateTravelerRequestDTO updateTravelerRequestDTO, Long travelerRequestId);
+
+  void updateStatusAndTourForTravelerRequest(Long requestId, Long tourId);
 }
