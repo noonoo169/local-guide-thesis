@@ -24,5 +24,5 @@ public record UpdateTourResponseDTO(
     List<TourStartTimeDTO> tourStartTimes,
     Set<CategoryDTO> categories,
     List<ImageDTO> images,
-    Set<LocationDTO> locations,
+    List<LocationDTO> locations,
     LocationDTO meetingPoint) {}

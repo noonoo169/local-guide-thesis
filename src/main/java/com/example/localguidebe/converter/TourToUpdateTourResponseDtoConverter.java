@@ -58,7 +58,7 @@ public class TourToUpdateTourResponseDtoConverter {
             .toList(),
         source.getLocations().stream()
             .map(locationToLocationDto::convert)
-            .collect(Collectors.toSet()),
+            .collect(Collectors.toList()),
         locationToLocationDto.convert(source.getMeetingPoint()));
   }
 }
