@@ -1,9 +1,9 @@
 package com.example.localguidebe.service.impl;
 
 import com.example.localguidebe.converter.ToResultInSearchSuggestionDtoConverter;
+import com.example.localguidebe.dto.requestdto.UpdatePersonalInformationDTO;
 import com.example.localguidebe.dto.responsedto.ResultInSearchSuggestionDTO;
 import com.example.localguidebe.dto.responsedto.SearchSuggestionResponseDTO;
-import com.example.localguidebe.entity.Review;
 import com.example.localguidebe.entity.Role;
 import com.example.localguidebe.entity.User;
 import com.example.localguidebe.enums.RolesEnum;
@@ -15,7 +15,7 @@ import jakarta.persistence.criteria.JoinType;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -102,6 +102,15 @@ public class UserServiceImpl implements UserService {
             invoice ->
                 invoice.getBookings().stream()
                     .anyMatch(booking -> booking.getTour().getGuide().getId().equals(guideId)));
+  }
+
+  @Override
+  public User updatePersonalInformation(
+      String email, UpdatePersonalInformationDTO updatePersonalInformationDTO) {
+    User user = findUserByEmail(email);
+    if (user == null) return null;
+    BeanUtils.copyProperties(updatePersonalInformationDTO, user);
+    return userRepository.save(user);
   }
 
   @Override

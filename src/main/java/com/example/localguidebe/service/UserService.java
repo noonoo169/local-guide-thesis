@@ -1,10 +1,10 @@
 package com.example.localguidebe.service;
 
+import com.example.localguidebe.dto.requestdto.UpdatePersonalInformationDTO;
 import com.example.localguidebe.dto.responsedto.SearchSuggestionResponseDTO;
 import com.example.localguidebe.entity.User;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.data.domain.Page;
 
 public interface UserService {
@@ -27,4 +27,7 @@ public interface UserService {
       String searchValue);
 
   boolean isTravelerCanAddReviewForGuide(User traveler, Long guideId);
+
+  User updatePersonalInformation(
+      String email, UpdatePersonalInformationDTO updatePersonalInformationDTO);
 }
