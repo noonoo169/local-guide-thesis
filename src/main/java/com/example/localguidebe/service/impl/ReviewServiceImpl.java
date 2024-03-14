@@ -2,7 +2,6 @@ package com.example.localguidebe.service.impl;
 
 import com.example.localguidebe.converter.ReviewToReviewResponseDto;
 import com.example.localguidebe.converter.TourToTourDtoConverter;
-import com.example.localguidebe.dto.TourDTO;
 import com.example.localguidebe.dto.requestdto.ReviewRequestDTO;
 import com.example.localguidebe.dto.responsedto.ReviewResponseDTO;
 import com.example.localguidebe.entity.Review;
@@ -12,14 +11,13 @@ import com.example.localguidebe.repository.ReviewRepository;
 import com.example.localguidebe.repository.TourRepository;
 import com.example.localguidebe.repository.UserRepository;
 import com.example.localguidebe.service.ReviewService;
+import com.example.localguidebe.service.TourService;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import com.example.localguidebe.service.TourService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +31,8 @@ public class ReviewServiceImpl implements ReviewService {
   private final TourService tourService;
 
   private final ReviewToReviewResponseDto reviewToReviewResponseDto;
-@Autowired
+
+  @Autowired
   public ReviewServiceImpl(
       ReviewRepository reviewRepository,
       UserRepository userRepository,
@@ -64,7 +63,8 @@ public class ReviewServiceImpl implements ReviewService {
   }
 
   @Override
-  public List<ReviewResponseDTO> addReviewForTour(ReviewRequestDTO reviewRequestDTO, Long tourId, String email) {
+  public List<ReviewResponseDTO> addReviewForTour(
+      ReviewRequestDTO reviewRequestDTO, Long tourId, String email) {
     User traveler = userRepository.findUserByEmail(email);
     Tour tour = tourRepository.findById(tourId).orElseThrow();
     Review newReview =
@@ -79,9 +79,9 @@ public class ReviewServiceImpl implements ReviewService {
     tourService.updateRatingForTour(tour);
     tourRepository.save(tour);
 
-    return  tour.getReviews().stream()
-            .map(reviewToReviewResponseDto::convert)
-            .collect(Collectors.toList());
+    return tour.getReviews().stream()
+        .map(reviewToReviewResponseDto::convert)
+        .collect(Collectors.toList());
   }
 
   @Override
@@ -92,8 +92,12 @@ public class ReviewServiceImpl implements ReviewService {
         .collect(Collectors.toList());
   }
 
-  public List<Review> getReviewsOfGuide(Long guideId) {
-    return reviewRepository.getReviewsByGuideId(guideId);
+  @Override
+  public List<Review> getReviewsOfGuide(Long guideId, List<Integer> ratings, String sortBy) {
+    if (ratings.isEmpty()) {
+      ratings = Arrays.asList(1, 2, 3, 4, 5);
+    }
+    return reviewRepository.getReviewsByGuide(guideId, ratings, sortBy);
   }
 
   @Override
