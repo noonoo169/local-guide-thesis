@@ -3,12 +3,11 @@ package com.example.localguidebe.entity;
 import com.example.localguidebe.enums.NotificationTypeEnum;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+
+import lombok.*;
 
 @Builder
+@Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
