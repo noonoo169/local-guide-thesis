@@ -29,12 +29,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class CartServiceImpl implements CartService {
   private final CartRepository cartRepository;
   private final BookingRepository bookingRepository;
-
   private final UserRepository userRepository;
   private final AddBookingRequestDtoToBookingConverter addBookingRequestDtoToBookingDtoConverter;
   private final CartToCartDtoConverter cartToCartDtoConverter;
   private final BusyScheduleService busyScheduleService;
-
   private final TourRepository tourRepository;
 
   @Autowired

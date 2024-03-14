@@ -34,7 +34,6 @@ public class TourController {
   private TourToTourDtoConverter tourToTourDtoConverter;
   private final TourToUpdateTourResponseDtoConverter tourToUpdateTourResponseDtoConverter;
   private final UserService userService;
-
   private final TravelerRequestService travelerRequestService;
 
   public TourController(

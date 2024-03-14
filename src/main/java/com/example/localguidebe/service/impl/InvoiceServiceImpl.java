@@ -1,12 +1,13 @@
 package com.example.localguidebe.service.impl;
 
-import com.example.localguidebe.entity.Booking;
-import com.example.localguidebe.entity.Cart;
-import com.example.localguidebe.entity.Invoice;
+import com.example.localguidebe.entity.*;
+import com.example.localguidebe.enums.NotificationTypeEnum;
 import com.example.localguidebe.repository.BookingRepository;
 import com.example.localguidebe.repository.InvoiceRepository;
 import com.example.localguidebe.service.CartService;
 import com.example.localguidebe.service.InvoiceService;
+import com.example.localguidebe.service.NotificationService;
+import com.example.localguidebe.system.NotificationMessage;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,15 +21,18 @@ public class InvoiceServiceImpl implements InvoiceService {
   private final CartService cartService;
   private final BookingRepository bookingRepository;
   private final InvoiceRepository invoiceRepository;
+  private final NotificationService notificationService;
 
   @Autowired
   public InvoiceServiceImpl(
       CartService cartService,
       BookingRepository bookingRepository,
-      InvoiceRepository invoiceRepository) {
+      InvoiceRepository invoiceRepository,
+      NotificationService notificationService) {
     this.cartService = cartService;
     this.bookingRepository = bookingRepository;
     this.invoiceRepository = invoiceRepository;
+    this.notificationService = notificationService;
   }
 
   @Override
@@ -40,6 +44,7 @@ public class InvoiceServiceImpl implements InvoiceService {
       Double priceInVND,
       Double usdVndRate) {
     Cart cart = cartService.getCartByEmail(email);
+
     if (cart == null) return null;
     List<Booking> bookings =
         new ArrayList<>(
@@ -55,6 +60,21 @@ public class InvoiceServiceImpl implements InvoiceService {
     bookings.forEach(
         booking -> {
           booking.setInvoice(invoice);
+          // notification send to guide
+          notificationService.addNotification(
+              booking.getTour().getGuide().getId(),
+              cart.getTraveler().getId(),
+              booking.getId(),
+              NotificationTypeEnum.RECEIVED_BOOKING,
+              NotificationMessage.RECEIVED_BOOKING + cart.getTraveler().getFullName());
+
+          // notification send to traveler
+          notificationService.addNotification(
+              cart.getTraveler().getId(),
+              null,
+              booking.getId(),
+              NotificationTypeEnum.BOOKED_TOUR,
+              NotificationMessage.BOOKED_TOUR);
         });
     invoice.setBookings(bookings);
     bookingIds.forEach(bookingRepository::setBookingStatusToPaid);
