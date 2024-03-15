@@ -11,7 +11,6 @@ import com.example.localguidebe.utils.AuthUtils;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,12 +39,12 @@ public class TravelerRequestController {
           TravelerRequest travelerRequest =
               travelerRequestService.addTravelerRequest(email, addTravelerRequestDTO);
           if (travelerRequest == null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
                 .body(
                     new Result(
                         false,
-                        HttpStatus.CONFLICT.value(),
-                        "You can't not add request for this guide"));
+                        HttpStatus.NOT_ACCEPTABLE.value(),
+                        "You have a PENDING request for this guide, consider removing the previous before add."));
           }
           return ResponseEntity.status(HttpStatus.OK)
               .body(
@@ -110,7 +109,6 @@ public class TravelerRequestController {
   }
 
   @PatchMapping("/{travelerRequestId}")
-  // TODO: Authorize for only Guide can call this
   public ResponseEntity<Result> updateTravelRequestStatus(
       Authentication authentication,
       @RequestBody UpdateTravelerRequestDTO updateTravelerRequestDTO,
