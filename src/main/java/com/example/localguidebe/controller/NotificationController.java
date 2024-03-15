@@ -1,9 +1,11 @@
 package com.example.localguidebe.controller;
 
+import com.example.localguidebe.dto.NotificationDTO;
 import com.example.localguidebe.security.service.CustomUserDetails;
 import com.example.localguidebe.service.NotificationService;
 import com.example.localguidebe.system.Result;
 import com.example.localguidebe.utils.AuthUtils;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -28,13 +30,19 @@ public class NotificationController {
         () -> {
           try {
             String email = ((CustomUserDetails) authentication.getPrincipal()).getEmail();
+            List<NotificationDTO> notificationDTOs =
+                notificationService.getNotifications(page, limit, email);
+            if (notificationDTOs.isEmpty()) {
+              return ResponseEntity.status(HttpStatus.OK)
+                  .body(new Result(true, HttpStatus.OK.value(), "Notifications not found"));
+            }
             return ResponseEntity.status(HttpStatus.OK)
                 .body(
                     new Result(
                         true,
                         HttpStatus.OK.value(),
                         "Get notifications successfully",
-                        notificationService.getNotifications(page, limit, email)));
+                        notificationDTOs));
           } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(
