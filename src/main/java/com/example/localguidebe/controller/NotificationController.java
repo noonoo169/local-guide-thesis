@@ -7,10 +7,7 @@ import com.example.localguidebe.utils.AuthUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/notifications")
@@ -47,5 +44,27 @@ public class NotificationController {
                         "Get notifications successfully"));
           }
         });
+  }
+
+  @PatchMapping("{id}")
+  public ResponseEntity<Result> updateIsReadNotification(@PathVariable("id") Long notificationId) {
+    try {
+      boolean isUpdated = notificationService.updateIsReadNotification(notificationId);
+      if (!isUpdated) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(new Result(true, HttpStatus.NOT_FOUND.value(), "The notification not exist"));
+      }
+      return ResponseEntity.status(HttpStatus.OK)
+          .body(
+              new Result(
+                  true, HttpStatus.OK.value(), "The notification has been updated successfully"));
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(
+              new Result(
+                  true,
+                  HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                  "The notification has been updated unsuccessfully."));
+    }
   }
 }
