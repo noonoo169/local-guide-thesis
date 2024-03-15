@@ -25,8 +25,11 @@ public class TravelerRequest {
   @Column(name = "unit")
   private String unit;
 
-  @Column(name = "max_price")
-  private Double maxPrice;
+  @Column(name = "max_price_per_person")
+  private Double maxPricePerPerson;
+
+  @Column(name = "number_of_travelers")
+  private Integer numberOfTravelers;
 
   @Column(name = "destination")
   private String destination;

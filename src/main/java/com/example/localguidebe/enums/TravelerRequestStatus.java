@@ -5,5 +5,6 @@ public enum TravelerRequestStatus {
   ACCEPTED,
   DENIED,
   DONE,
-  DELETED
+  CANCELED,
+  DRAFT
 }
