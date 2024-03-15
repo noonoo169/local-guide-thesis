@@ -2,16 +2,16 @@ package com.example.localguidebe.service.impl;
 
 import com.example.localguidebe.converter.BusyScheduleToBusyScheduleDtoConverter;
 import com.example.localguidebe.dto.BusyScheduleDTO;
-import com.example.localguidebe.dto.responsedto.BusyScheduleOfGuiderResponseDTO;
-import com.example.localguidebe.entity.Booking;
 import com.example.localguidebe.entity.BusySchedule;
 import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.entity.User;
+import com.example.localguidebe.enums.TypeBusyDayEnum;
 import com.example.localguidebe.repository.BookingRepository;
 import com.example.localguidebe.repository.BusyScheduleRepository;
 import com.example.localguidebe.repository.TourRepository;
 import com.example.localguidebe.repository.UserRepository;
 import com.example.localguidebe.service.BusyScheduleService;
+import com.example.localguidebe.service.TourService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -21,12 +21,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class BusyScheduleServiceImpl implements BusyScheduleService {
-  private BusyScheduleRepository busyScheduleRepository;
+  private final BusyScheduleRepository busyScheduleRepository;
   private final BusyScheduleToBusyScheduleDtoConverter busyScheduleToBusyScheduleDtoConverter;
-  private UserRepository userRepository;
+  private final UserRepository userRepository;
 
-  private TourRepository tourRepository;
-  private BookingRepository bookingRepository;
+  private final TourRepository tourRepository;
+  private final BookingRepository bookingRepository;
+
+  private final TourService tourService;
 
   @Autowired
   public BusyScheduleServiceImpl(
@@ -34,12 +36,14 @@ public class BusyScheduleServiceImpl implements BusyScheduleService {
       UserRepository userRepository,
       BusyScheduleToBusyScheduleDtoConverter busyScheduleToBusyScheduleDtoConverter,
       TourRepository tourRepository,
-      BookingRepository bookingRepository) {
+      BookingRepository bookingRepository,
+      TourService tourService) {
     this.busyScheduleRepository = busyScheduleRepository;
     this.userRepository = userRepository;
     this.busyScheduleToBusyScheduleDtoConverter = busyScheduleToBusyScheduleDtoConverter;
     this.tourRepository = tourRepository;
     this.bookingRepository = bookingRepository;
+    this.tourService = tourService;
   }
 
   @Override
@@ -53,9 +57,10 @@ public class BusyScheduleServiceImpl implements BusyScheduleService {
           BusySchedule busySchedule = new BusySchedule();
           busySchedule.setBusyDate(busyDate);
           busySchedule.setGuide(guide);
+          busySchedule.setTypeBusyDay(TypeBusyDayEnum.DATE_SELECTED_BY_GUIDE);
           busySchedules.add(busySchedule);
         });
-    busyScheduleRepository.deleteAll();
+    busyScheduleRepository.deleteAll(busyScheduleRepository.getBusySchedules());
     busyScheduleRepository.saveAll(busySchedules);
 
     return busyScheduleRepository.findAllByGuideId(guide.getId()).stream()
@@ -73,54 +78,50 @@ public class BusyScheduleServiceImpl implements BusyScheduleService {
 
   @Override
   public Set<LocalDate> getBusyDateByTour(Long tourId) {
-    // Update busy schedule according to tour for users to choose
-    Integer count = 1;
     Tour tour = tourRepository.findById(tourId).orElseThrow();
+    String guideEmail = tour.getGuide().getEmail();
 
+    List<BusyScheduleDTO> busySchedules = getBusyScheduleByGuide(guideEmail);
     List<LocalDate> busyDates =
-        getBusyScheduleByGuide(tour.getGuide().getEmail()).stream()
+        busySchedules.stream()
             .map(BusyScheduleDTO::busyDate)
-            .map(dateTime -> dateTime.toLocalDate())
+            .map(LocalDateTime::toLocalDate)
             .collect(Collectors.toList());
-    Set<LocalDate> updatedBusyDates = new HashSet<>();
-    // Schedule updates are available by duration of tour
-    updatedBusyDates.addAll(busyDates);
+
+    List<LocalDate> busyDatesByHours =
+        busySchedules.stream()
+            .filter(
+                schedule -> schedule.typeBusyDayEnum().equals(TypeBusyDayEnum.BOOKED_DAY_BY_HOURS))
+            .map(BusyScheduleDTO::busyDate)
+            .map(LocalDateTime::toLocalDate)
+            .collect(Collectors.toList());
+
+    Set<LocalDate> updatedBusyDates = new HashSet<>(busyDates);
+
     if (tour.getUnit().equals("day(s)")) {
-      while (count < tour.getDuration()) {
+      for (int count = 1; count < tour.getDuration(); count++) {
         for (LocalDate busyDate : busyDates) {
           updatedBusyDates.add(busyDate.minusDays(count));
         }
-        count++;
       }
+    } else {
+      if (!busyDatesByHours.isEmpty()) {
+        busyDates.removeAll(busyDatesByHours);
+      }
+      updatedBusyDates.addAll(busyDates);
+      busyDatesByHours.stream()
+          .filter(
+              busyDatesByHour ->
+                  tourService.getTourStartTimeAvailable(tourId, busyDatesByHour).isEmpty())
+          .forEach(updatedBusyDates::add);
     }
     return updatedBusyDates;
   }
 
   @Override
-  public BusyScheduleOfGuiderResponseDTO getBusySchedulesAndPreBookedSchedules(String email) {
-    BusyScheduleOfGuiderResponseDTO busyScheduleOfGuiderResponseDTO =
-        new BusyScheduleOfGuiderResponseDTO();
-    int count = 1;
-    List<Booking> bookings = bookingRepository.getAllBookingByGuider(email);
-    for (Booking booking : bookings) {
-      busyScheduleOfGuiderResponseDTO.getBusyDayByBooking().add(booking.getStartDate());
-      if (booking.getTour().getUnit() == "day(s)") {
-        while (count < booking.getTour().getDuration()) {
-          busyScheduleOfGuiderResponseDTO
-              .getBusyDayByBooking()
-              .add(booking.getStartDate().plusDays(count));
-          count++;
-        }
-      }
-      count = 1;
-    }
-    busyScheduleOfGuiderResponseDTO.setBusyDayOfGuider(
-        getBusyScheduleByGuide(email).stream()
-            .map(BusyScheduleDTO::busyDate)
-            .collect(Collectors.toList()));
-    busyScheduleOfGuiderResponseDTO
-        .getBusyDayOfGuider()
-        .removeAll(busyScheduleOfGuiderResponseDTO.getBusyDayByBooking());
-    return busyScheduleOfGuiderResponseDTO;
+  public List<BusyScheduleDTO> getBusySchedulesAndPreBookedSchedules(String email) {
+    return busyScheduleRepository.findAll().stream()
+        .map(busyScheduleToBusyScheduleDtoConverter::convert)
+        .collect(Collectors.toList());
   }
 }
