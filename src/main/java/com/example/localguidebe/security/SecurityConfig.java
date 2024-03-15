@@ -23,8 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfig {
 
-  //    @Autowired
-  private final JwtAuthEntryPoint authEntryPoint;
+  @Autowired private final JwtAuthEntryPoint authEntryPoint;
 
   @Autowired private JwtAuthenticationFilter jwtAuthenticationFilter;
 
