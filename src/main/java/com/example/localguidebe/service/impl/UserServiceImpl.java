@@ -123,8 +123,6 @@ public class UserServiceImpl implements UserService {
                 })
             .map(review -> review.getGuide().getId())
             .toList();
-    logger.info("guideIdsInReview: " + guideIdsInReview);
-
     return guideIdsInBooking.size() > guideIdsInReview.size();
   }
 

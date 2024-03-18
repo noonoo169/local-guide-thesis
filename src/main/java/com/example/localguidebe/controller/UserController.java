@@ -66,11 +66,11 @@ public class UserController {
           String travelerEmail = ((CustomUserDetails) authentication.getPrincipal()).getEmail();
           User traveler = userService.findUserByEmail(travelerEmail);
           if (!userService.isTravelerCanAddReviewForGuide(traveler, guideId)) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+            return ResponseEntity.status(HttpStatus.OK)
                 .body(
                     new Result(
                         false,
-                        HttpStatus.NOT_ACCEPTABLE.value(),
+                        HttpStatus.OK.value(),
                         "You can't add review for this guide",
                         new IsCanReviewResponseDTO(false)));
           } else
