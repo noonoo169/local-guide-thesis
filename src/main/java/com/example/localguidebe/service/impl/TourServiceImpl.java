@@ -65,6 +65,8 @@ public class TourServiceImpl implements TourService {
   private final ReviewToReviewResponseDto reviewToReviewResponseDto;
   private final Gson gson = new Gson();
   private final NotificationService notificationService;
+  private final CartRepository cartRepository;
+  private final ReviewRepository reviewRepository;
 
   @Autowired
   public TourServiceImpl(
@@ -80,7 +82,9 @@ public class TourServiceImpl implements TourService {
       TourToTourDtoConverter tourToTourDtoConverter,
       GeoCodingService geoCodingService,
       ReviewToReviewResponseDto reviewToReviewResponseDto,
-      NotificationService notificationService) {
+      NotificationService notificationService,
+      CartRepository cartRepository,
+      ReviewRepository reviewRepository) {
     this.tourStartTimeRepository = tourStartTimeRepository;
     this.toResultInSearchSuggestionDtoConverter = toResultInSearchSuggestionDtoConverter;
     this.geoCodingService = geoCodingService;
@@ -94,6 +98,8 @@ public class TourServiceImpl implements TourService {
     this.bookingRepository = bookingRepository;
     this.reviewToReviewResponseDto = reviewToReviewResponseDto;
     this.notificationService = notificationService;
+    this.cartRepository = cartRepository;
+    this.reviewRepository = reviewRepository;
   }
 
   @Autowired
@@ -371,6 +377,16 @@ public class TourServiceImpl implements TourService {
                 Objects.equals(booking.getTour().getId(), tourId)
                     && Objects.equals(booking.getCart().getTraveler().getId(), traveler.getId())
                     && booking.getStatus().equals(BookingStatusEnum.PAID));
+  }
+
+  @Override
+  public boolean checkExistingReviewsByTraveler(Long travelerId, Long tourId) {
+    int SuccessBookingNumber = cartRepository.getSuccessBookingNumber(tourId, travelerId);
+    int ReviewNumber = reviewRepository.getReviewNumber(travelerId, tourId);
+    if (SuccessBookingNumber <= ReviewNumber) {
+      return false;
+    }
+    return true;
   }
 
   @Override
