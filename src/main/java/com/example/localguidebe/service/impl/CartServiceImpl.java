@@ -15,7 +15,6 @@ import com.example.localguidebe.repository.BookingRepository;
 import com.example.localguidebe.repository.CartRepository;
 import com.example.localguidebe.repository.TourRepository;
 import com.example.localguidebe.repository.UserRepository;
-import com.example.localguidebe.service.BusyScheduleService;
 import com.example.localguidebe.service.CartService;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,6 @@ public class CartServiceImpl implements CartService {
   private final UserRepository userRepository;
   private final AddBookingRequestDtoToBookingConverter addBookingRequestDtoToBookingDtoConverter;
   private final CartToCartDtoConverter cartToCartDtoConverter;
-  private final BusyScheduleService busyScheduleService;
   private final TourRepository tourRepository;
 
   @Autowired
@@ -39,14 +37,12 @@ public class CartServiceImpl implements CartService {
       UserRepository userRepository,
       AddBookingRequestDtoToBookingConverter addBookingRequestDtoToBookingDtoConverter,
       CartToCartDtoConverter cartToCartDtoConverter,
-      BusyScheduleService busyScheduleService,
       TourRepository tourRepository) {
     this.cartRepository = cartRepository;
     this.bookingRepository = bookingRepository;
     this.userRepository = userRepository;
     this.addBookingRequestDtoToBookingDtoConverter = addBookingRequestDtoToBookingDtoConverter;
     this.cartToCartDtoConverter = cartToCartDtoConverter;
-    this.busyScheduleService = busyScheduleService;
     this.tourRepository = tourRepository;
   }
 
