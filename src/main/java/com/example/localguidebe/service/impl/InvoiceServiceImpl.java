@@ -1,5 +1,6 @@
 package com.example.localguidebe.service.impl;
 
+import com.example.localguidebe.converter.NotificationToNotificationDtoConverter;
 import com.example.localguidebe.entity.*;
 import com.example.localguidebe.enums.NotificationTypeEnum;
 import com.example.localguidebe.repository.BookingRepository;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,17 +24,23 @@ public class InvoiceServiceImpl implements InvoiceService {
   private final BookingRepository bookingRepository;
   private final InvoiceRepository invoiceRepository;
   private final NotificationService notificationService;
+  private final SimpMessagingTemplate messagingTemplate;
+  private final NotificationToNotificationDtoConverter notificationToNotificationDtoConverter;
 
   @Autowired
   public InvoiceServiceImpl(
       CartService cartService,
       BookingRepository bookingRepository,
       InvoiceRepository invoiceRepository,
-      NotificationService notificationService) {
+      NotificationService notificationService,
+      SimpMessagingTemplate messagingTemplate,
+      NotificationToNotificationDtoConverter notificationToNotificationDtoConverter) {
     this.cartService = cartService;
     this.bookingRepository = bookingRepository;
     this.invoiceRepository = invoiceRepository;
     this.notificationService = notificationService;
+    this.messagingTemplate = messagingTemplate;
+    this.notificationToNotificationDtoConverter = notificationToNotificationDtoConverter;
   }
 
   @Override
@@ -61,20 +69,30 @@ public class InvoiceServiceImpl implements InvoiceService {
         booking -> {
           booking.setInvoice(invoice);
           // notification send to guide
-          notificationService.addNotification(
-              booking.getTour().getGuide().getId(),
-              cart.getTraveler().getId(),
-              booking.getId(),
-              NotificationTypeEnum.RECEIVED_BOOKING,
-              NotificationMessage.RECEIVED_BOOKING + cart.getTraveler().getFullName());
+          Notification guideNotification =
+              notificationService.addNotification(
+                  booking.getTour().getGuide().getId(),
+                  cart.getTraveler().getId(),
+                  booking.getId(),
+                  NotificationTypeEnum.RECEIVED_BOOKING,
+                  NotificationMessage.RECEIVED_BOOKING + cart.getTraveler().getFullName());
+
+          messagingTemplate.convertAndSend(
+              "/topic/" + booking.getTour().getGuide().getEmail(),
+              notificationToNotificationDtoConverter.convert(guideNotification));
 
           // notification send to traveler
-          notificationService.addNotification(
-              cart.getTraveler().getId(),
-              null,
-              booking.getId(),
-              NotificationTypeEnum.BOOKED_TOUR,
-              NotificationMessage.BOOKED_TOUR);
+          Notification travelerNotification =
+              notificationService.addNotification(
+                  cart.getTraveler().getId(),
+                  null,
+                  booking.getId(),
+                  NotificationTypeEnum.BOOKED_TOUR,
+                  NotificationMessage.BOOKED_TOUR);
+
+          messagingTemplate.convertAndSend(
+              "/topic/" + cart.getTraveler().getEmail(),
+              notificationToNotificationDtoConverter.convert(travelerNotification));
         });
     invoice.setBookings(bookings);
     bookingIds.forEach(bookingRepository::setBookingStatusToPaid);

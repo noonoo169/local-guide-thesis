@@ -1,9 +1,11 @@
 package com.example.localguidebe.service.impl;
 
+import com.example.localguidebe.converter.NotificationToNotificationDtoConverter;
 import com.example.localguidebe.converter.ReviewToReviewResponseDto;
 import com.example.localguidebe.converter.TourToTourDtoConverter;
 import com.example.localguidebe.dto.requestdto.ReviewRequestDTO;
 import com.example.localguidebe.dto.responsedto.ReviewResponseDTO;
+import com.example.localguidebe.entity.Notification;
 import com.example.localguidebe.entity.Review;
 import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.entity.User;
@@ -14,23 +16,23 @@ import com.example.localguidebe.repository.UserRepository;
 import com.example.localguidebe.service.NotificationService;
 import com.example.localguidebe.service.ReviewService;
 import com.example.localguidebe.service.TourService;
-
 import com.example.localguidebe.system.NotificationMessage;
-
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ReviewServiceImpl implements ReviewService {
+  private final SimpMessagingTemplate messagingTemplate;
+  private final NotificationToNotificationDtoConverter notificationToNotificationDtoConverter;
   private final ReviewRepository reviewRepository;
   private final UserRepository userRepository;
-
   private final TourRepository tourRepository;
   private final TourToTourDtoConverter tourToTourDtoConverter;
   private final TourService tourService;
@@ -39,6 +41,8 @@ public class ReviewServiceImpl implements ReviewService {
 
   @Autowired
   public ReviewServiceImpl(
+      SimpMessagingTemplate messagingTemplate,
+      NotificationToNotificationDtoConverter notificationToNotificationDtoConverter,
       ReviewRepository reviewRepository,
       UserRepository userRepository,
       TourRepository tourRepository,
@@ -46,6 +50,8 @@ public class ReviewServiceImpl implements ReviewService {
       ReviewToReviewResponseDto reviewToReviewResponseDto,
       TourService tourService,
       NotificationService notificationService) {
+    this.messagingTemplate = messagingTemplate;
+    this.notificationToNotificationDtoConverter = notificationToNotificationDtoConverter;
     this.reviewRepository = reviewRepository;
     this.userRepository = userRepository;
     this.tourRepository = tourRepository;
@@ -67,13 +73,17 @@ public class ReviewServiceImpl implements ReviewService {
             .createdAt(LocalDateTime.now())
             .build();
     Review newReview = reviewRepository.save(review);
-    //notification send to guider
-    notificationService.addNotification(
-        guideId,
-        traveler.getId(),
-        guideId,
-        NotificationTypeEnum.ADD_REVIEW_FOR_GUIDE,
-        traveler.getFullName() + NotificationMessage.ADD_REVIEW_FOR_GUIDE);
+    // notification send to guider
+    Notification notification =
+        notificationService.addNotification(
+            guideId,
+            traveler.getId(),
+            guideId,
+            NotificationTypeEnum.ADD_REVIEW_FOR_GUIDE,
+            traveler.getFullName() + NotificationMessage.ADD_REVIEW_FOR_GUIDE);
+    assert guide != null;
+    messagingTemplate.convertAndSend(
+        "/topic/" + guide.getEmail(), notificationToNotificationDtoConverter.convert(notification));
     return newReview;
   }
 
@@ -94,13 +104,18 @@ public class ReviewServiceImpl implements ReviewService {
     tourService.updateRatingForTour(tour);
     tourRepository.save(tour);
 
-    //notification send to guider
-    notificationService.addNotification(
-        tour.getGuide().getId(),
-        traveler.getId(),
-        tourId,
-        NotificationTypeEnum.ADD_REVIEW_FOR_TOUR,
-        traveler.getFullName() + NotificationMessage.ADD_REVIEW_FOR_TOUR);
+    // notification send to guider
+    Notification notification =
+        notificationService.addNotification(
+            tour.getGuide().getId(),
+            traveler.getId(),
+            tourId,
+            NotificationTypeEnum.ADD_REVIEW_FOR_TOUR,
+            traveler.getFullName() + NotificationMessage.ADD_REVIEW_FOR_TOUR);
+
+    messagingTemplate.convertAndSend(
+        "/topic/" + tour.getGuide().getEmail(),
+        notificationToNotificationDtoConverter.convert(notification));
 
     return tour.getReviews().stream()
         .map(reviewToReviewResponseDto::convert)
