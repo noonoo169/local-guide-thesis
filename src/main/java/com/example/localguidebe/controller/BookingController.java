@@ -42,4 +42,21 @@ public class BookingController {
           }
         });
   }
+
+  @GetMapping("/province")
+  public ResponseEntity<Result> findTotalBookingsByCityProvince() {
+    try {
+      return new ResponseEntity<>(
+          new Result(
+              true,
+              HttpStatus.OK.value(),
+              "Successfully get the popular province",
+              bookingService.FindForSuggestedTours()),
+          HttpStatus.OK);
+    } catch (Exception e) {
+      return new ResponseEntity<>(
+          new Result(false, HttpStatus.CONFLICT.value(), "failed get popular province", null),
+          HttpStatus.CONFLICT);
+    }
+  }
 }
