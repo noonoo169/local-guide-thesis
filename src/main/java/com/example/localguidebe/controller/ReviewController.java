@@ -49,7 +49,7 @@ public class ReviewController {
             return ResponseEntity.status(HttpStatus.OK)
                 .body(
                     new Result(
-                        false, HttpStatus.OK.value(), "You can't not add review for this guide"));
+                        false, HttpStatus.OK.value(), "You can't add review for this guide"));
           }
           return ResponseEntity.status(HttpStatus.OK)
               .body(

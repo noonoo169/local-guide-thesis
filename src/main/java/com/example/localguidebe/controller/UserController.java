@@ -2,6 +2,7 @@ package com.example.localguidebe.controller;
 
 import com.example.localguidebe.converter.UserToUserDtoConverter;
 import com.example.localguidebe.dto.requestdto.UpdatePersonalInformationDTO;
+import com.example.localguidebe.dto.responsedto.IsCanReviewResponseDTO;
 import com.example.localguidebe.entity.User;
 import com.example.localguidebe.security.service.CustomUserDetails;
 import com.example.localguidebe.service.UserService;
@@ -10,10 +11,7 @@ import com.example.localguidebe.utils.AuthUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
@@ -56,6 +54,33 @@ public class UserController {
                         HttpStatus.INTERNAL_SERVER_ERROR.value(),
                         "Can not update personal information"));
           }
+        });
+  }
+
+  @GetMapping("/{guideId}")
+  public ResponseEntity<Result> isCanCommentOnGuide(
+      Authentication authentication, @PathVariable("guideId") Long guideId) {
+    return AuthUtils.checkAuthentication(
+        authentication,
+        () -> {
+          String travelerEmail = ((CustomUserDetails) authentication.getPrincipal()).getEmail();
+          User traveler = userService.findUserByEmail(travelerEmail);
+          if (!userService.isTravelerCanAddReviewForGuide(traveler, guideId)) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+                .body(
+                    new Result(
+                        false,
+                        HttpStatus.NOT_ACCEPTABLE.value(),
+                        "You can't add review for this guide",
+                        new IsCanReviewResponseDTO(false)));
+          } else
+            return ResponseEntity.status(HttpStatus.OK)
+                .body(
+                    new Result(
+                        true,
+                        HttpStatus.OK.value(),
+                        "You can add review for this guide",
+                        new IsCanReviewResponseDTO(true)));
         });
   }
 }
