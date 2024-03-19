@@ -83,4 +83,35 @@ public class UserController {
                         new IsCanReviewResponseDTO(true)));
         });
   }
+
+  @GetMapping("/me")
+  public ResponseEntity<Result> getSelfInformation(Authentication authentication) {
+    return AuthUtils.checkAuthentication(
+        authentication,
+        () -> {
+          try {
+            String email = ((CustomUserDetails) authentication.getPrincipal()).getEmail();
+            User user = userService.findUserByEmail(email);
+            if (user == null) {
+              return ResponseEntity.status(HttpStatus.OK)
+                  .body(new Result(false, HttpStatus.OK.value(), "The user not exist"));
+            }
+            return ResponseEntity.status(HttpStatus.OK)
+                .body(
+                    new Result(
+                        false,
+                        HttpStatus.OK.value(),
+                        "Get user information successfully",
+                        userToUserDtoConverter.convert(user)));
+
+          } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(
+                    new Result(
+                        true,
+                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                        "Can not get personal information"));
+          }
+        });
+  }
 }

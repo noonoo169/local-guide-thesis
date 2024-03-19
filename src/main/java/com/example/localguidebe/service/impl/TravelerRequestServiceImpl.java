@@ -42,7 +42,8 @@ public class TravelerRequestServiceImpl implements TravelerRequestService {
     User guide = userService.findById(addTravelerRequestDTO.guideId()).orElse(null);
     if (guide == null) return null;
 
-    // if traveler A adds 1st request for guide B and that is PENDING, can not add 2nd request to that guide
+    // if traveler A adds 1st request for guide B and that is PENDING, can not add 2nd request to
+    // that guide
     if (guide.getTravelerRequestsOfGuide().stream()
         .anyMatch(
             travelerRequest ->
@@ -89,10 +90,11 @@ public class TravelerRequestServiceImpl implements TravelerRequestService {
     TravelerRequest travelerRequest = findTravelerRequestById(travelerRequestId);
     if (travelerRequest == null) return null;
 
-    // If user is traveler, they only cancel there request
+    // If user is traveler, they only cancel or make draft there request
     User user = userService.findUserByEmail(email);
     if (user.getRoles().stream().noneMatch(role -> role.getName().equals(RolesEnum.GUIDER))
-        && !updateTravelerRequestDTO.status().equals(TravelerRequestStatus.CANCELED)) return null;
+        && !updateTravelerRequestDTO.status().equals(TravelerRequestStatus.CANCELED)
+        && !updateTravelerRequestDTO.status().equals(TravelerRequestStatus.DRAFT)) return null;
 
     if (!travelerRequest.getTraveler().getEmail().equals(email)
         && !travelerRequest.getGuide().getEmail().equals(email)) return null;
