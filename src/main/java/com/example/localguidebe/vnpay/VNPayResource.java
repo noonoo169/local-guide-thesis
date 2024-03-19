@@ -69,8 +69,12 @@ public class VNPayResource {
       throws IOException {
     String vnp_ResponseCode = queryParams.get("vnp_ResponseCode");
 
-    // TODO: change here to List bookingIds
+    String travelerEmail = queryParams.get("travelerEmail");
+
     String email = queryParams.get("email");
+    String fullName = queryParams.get("fullName");
+    String phone = queryParams.get("phone");
+
     List<Long> bookingIds =
         Arrays.stream(queryParams.get("bookingId").split(",")).map(Long::valueOf).toList();
     Double priceInVND = Double.parseDouble(queryParams.get("vnp_Amount")) / 100;
@@ -84,7 +88,15 @@ public class VNPayResource {
             frontendHost
                 + "/booking-success/"
                 + invoiceService
-                    .createBookingInInvoice(bookingIds, email, priceInUSD, priceInVND, usdVndRate)
+                    .createBookingInInvoice(
+                        bookingIds,
+                        email,
+                        travelerEmail,
+                        fullName,
+                        phone,
+                        priceInUSD,
+                        priceInVND,
+                        usdVndRate)
                     .getId());
       } else {
         logger.error("Giao dịch thất bại");
@@ -96,13 +108,16 @@ public class VNPayResource {
   @GetMapping("pay")
   public ResponseEntity<Result> getPay(
       Authentication authentication,
-      @RequestParam("price") long price,
-      @RequestParam("bookingIds") List<Long> bookingIds)
+      @RequestParam("price") Long price,
+      @RequestParam("bookingIds") List<Long> bookingIds,
+      @RequestParam("email") String email,
+      @RequestParam("fullName") String fullName,
+      @RequestParam("phone") String phone)
       throws UnsupportedEncodingException {
     return AuthUtils.checkAuthentication(
         authentication,
         () -> {
-          String email = ((CustomUserDetails) authentication.getPrincipal()).getEmail();
+          String travelerEmail = ((CustomUserDetails) authentication.getPrincipal()).getEmail();
           String vnp_Version = "2.1.0";
           String vnp_Command = "pay";
           String orderType = "other";
@@ -139,8 +154,14 @@ public class VNPayResource {
                   + Config.vnp_ReturnUrl
                   + "?bookingId="
                   + bookingIds.stream().map(Object::toString).collect(Collectors.joining(","))
+                  + "&travelerEmail="
+                  + travelerEmail
                   + "&email="
                   + email
+                  + "&fullName="
+                  + fullName
+                  + "&phone="
+                  + phone
                   + "&usd_vnd_Rate="
                   + usdVndRate;
 

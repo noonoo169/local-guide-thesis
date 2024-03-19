@@ -6,7 +6,14 @@ import java.util.Optional;
 
 public interface InvoiceService {
   Invoice createBookingInInvoice(
-      List<Long> bookingIds, String email, Double priceTotal, Double priceInVND, Double usdVndRate);
+      List<Long> bookingIds,
+      String email,
+      String travelerEmail,
+      String fullName,
+      String phone,
+      Double priceTotal,
+      Double priceInVND,
+      Double usdVndRate);
 
   Optional<Invoice> findById(Long id);
 }

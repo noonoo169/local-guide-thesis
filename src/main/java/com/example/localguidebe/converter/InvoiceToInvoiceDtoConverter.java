@@ -19,6 +19,9 @@ public class InvoiceToInvoiceDtoConverter {
         source.getCreateAt(),
         source.getVndPrice(),
         source.getConversionRate(),
+        source.getFullName(),
+        source.getPhone(),
+        source.getEmail(),
         source.getBookings().stream().map(bookingToBookingDtoConverter::convert).toList());
   }
 }
