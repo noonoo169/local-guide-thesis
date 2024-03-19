@@ -1,6 +1,7 @@
 package com.example.localguidebe.service.impl;
 
 import com.example.localguidebe.converter.NotificationToNotificationDtoConverter;
+import com.example.localguidebe.converter.TourToTourDtoConverter;
 import com.example.localguidebe.entity.*;
 import com.example.localguidebe.enums.NotificationTypeEnum;
 import com.example.localguidebe.repository.BookingRepository;
@@ -26,6 +27,7 @@ public class InvoiceServiceImpl implements InvoiceService {
   private final NotificationService notificationService;
   private final SimpMessagingTemplate messagingTemplate;
   private final NotificationToNotificationDtoConverter notificationToNotificationDtoConverter;
+  private final TourToTourDtoConverter tourToTourDtoConverter;
 
   @Autowired
   public InvoiceServiceImpl(
@@ -34,13 +36,15 @@ public class InvoiceServiceImpl implements InvoiceService {
       InvoiceRepository invoiceRepository,
       NotificationService notificationService,
       SimpMessagingTemplate messagingTemplate,
-      NotificationToNotificationDtoConverter notificationToNotificationDtoConverter) {
+      NotificationToNotificationDtoConverter notificationToNotificationDtoConverter,
+      TourToTourDtoConverter tourToTourDtoConverter) {
     this.cartService = cartService;
     this.bookingRepository = bookingRepository;
     this.invoiceRepository = invoiceRepository;
     this.notificationService = notificationService;
     this.messagingTemplate = messagingTemplate;
     this.notificationToNotificationDtoConverter = notificationToNotificationDtoConverter;
+    this.tourToTourDtoConverter = tourToTourDtoConverter;
   }
 
   @Override
@@ -73,6 +77,14 @@ public class InvoiceServiceImpl implements InvoiceService {
             .build();
     bookings.forEach(
         booking -> {
+          // add tour dupe
+          try {
+            TourDupe tourDupe = new TourDupe(tourToTourDtoConverter.convert(booking.getTour()));
+            booking.setTourDupe(tourDupe);
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+
           booking.setInvoice(invoice);
           // notification send to guide
           Notification guideNotification =
