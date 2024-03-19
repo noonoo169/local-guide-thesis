@@ -133,8 +133,8 @@ public class ReviewController {
     try {
       List<Review> reviews = reviewService.getReviewsOfGuide(guideId, ratings, sortBy);
       if (reviews.isEmpty()) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-            .body(new Result(true, HttpStatus.NOT_FOUND.value(), "No review for this condition"));
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(new Result(true, HttpStatus.OK.value(), "No review for this condition"));
       }
       return ResponseEntity.status(HttpStatus.OK)
           .body(

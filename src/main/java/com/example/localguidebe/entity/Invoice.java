@@ -30,6 +30,12 @@ public class Invoice {
   @Column(name = "create_at")
   private LocalDateTime createAt;
 
+  @Column() private String fullName;
+
+  @Column() private String phone;
+
+  @Column() private String email;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "traveler_id")
   private User traveler;
