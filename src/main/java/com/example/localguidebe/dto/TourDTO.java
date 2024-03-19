@@ -54,5 +54,4 @@ public class TourDTO {
   private List<Image> images = new ArrayList<>();
 
   private List<LocationDTO> locations = new ArrayList<>();
-
 }
