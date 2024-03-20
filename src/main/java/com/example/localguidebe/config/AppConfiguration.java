@@ -2,7 +2,9 @@ package com.example.localguidebe.config;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import java.util.List;
 import java.util.Properties;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -14,6 +16,8 @@ import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 public class AppConfiguration {
+  @Value("${spring.profiles.active}")
+  private String activeProfile;
 
   @Bean
   public Cloudinary getCloudinary() {
@@ -28,7 +32,15 @@ public class AppConfiguration {
   @Bean
   public CorsFilter corsFilter() {
     CorsConfiguration corsConfiguration = new CorsConfiguration();
-    corsConfiguration.addAllowedOriginPattern("*");
+    if (activeProfile.equals("dev")) {
+      corsConfiguration.addAllowedOriginPattern("*");
+      System.out.println("dev");
+    }
+
+    if (activeProfile.equals("prod")) {
+      corsConfiguration.setAllowedOrigins(List.of("https://interns-local-guide.vercel.app/"));
+      System.out.println("prod");
+    }
     corsConfiguration.addAllowedHeader("*");
     corsConfiguration.addAllowedMethod("*");
     corsConfiguration.setAllowCredentials(true);
