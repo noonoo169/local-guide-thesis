@@ -44,12 +44,16 @@ public class TravelerRequestServiceImpl implements TravelerRequestService {
 
     // if traveler A adds 1st request for guide B and that is PENDING, can not add 2nd request to
     // that guide
-    if (guide.getTravelerRequestsOfGuide().stream()
-        .anyMatch(
-            travelerRequest ->
-                travelerRequest.getTraveler().getEmail().equals(travelerEmail)
-                    && travelerRequest.getStatus().equals(TravelerRequestStatus.PENDING)))
-      return null;
+    if (addTravelerRequestDTO.travelerRequestStatus().equals(TravelerRequestStatus.PENDING))
+      if (guide.getTravelerRequestsOfGuide().stream()
+          .anyMatch(
+              travelerRequest ->
+                  travelerRequest.getTraveler().getEmail().equals(travelerEmail)
+                      && travelerRequest.getStatus().equals(TravelerRequestStatus.PENDING)))
+        return null;
+    if (addTravelerRequestDTO.travelerRequestId() != null) {
+      travelerRequestRepository.deleteById(addTravelerRequestDTO.travelerRequestId());
+    }
     TravelerRequest travelerRequest =
         TravelerRequest.builder()
             .destination(addTravelerRequestDTO.destination())
@@ -59,7 +63,7 @@ public class TravelerRequestServiceImpl implements TravelerRequestService {
             .transportation(String.join(", ", addTravelerRequestDTO.transportation()))
             .unit(addTravelerRequestDTO.unit())
             .duration(addTravelerRequestDTO.duration())
-            .status(TravelerRequestStatus.PENDING)
+            .status(addTravelerRequestDTO.travelerRequestStatus())
             .traveler(traveler)
             .guide(guide)
             .build();
