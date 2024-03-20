@@ -8,6 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProvinceResponseDTO {
-    private String name;
+  private Object name;
   private Long bookedQuantity;
 }
