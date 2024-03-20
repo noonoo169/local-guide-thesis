@@ -1,0 +1,127 @@
+package com.example.localguidebe.service.impl;
+
+import com.example.localguidebe.dto.responsedto.StatisticalGuideDTO;
+import com.example.localguidebe.dto.responsedto.StatisticalGuidePaginationDTO;
+import com.example.localguidebe.dto.responsedto.StatisticalTourDTO;
+import com.example.localguidebe.dto.responsedto.StatisticalTourPaginationDTO;
+import com.example.localguidebe.entity.Tour;
+import com.example.localguidebe.entity.User;
+import com.example.localguidebe.enums.RolesEnum;
+import com.example.localguidebe.repository.BookingRepository;
+import com.example.localguidebe.repository.TourRepository;
+import com.example.localguidebe.repository.UserRepository;
+import com.example.localguidebe.service.StatisticService;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
+@Service
+public class StatisticServiceImpl implements StatisticService {
+  private final BookingRepository bookingRepository;
+
+  private final UserRepository userRepository;
+
+  private final TourRepository tourRepository;
+
+  public StatisticServiceImpl(
+      BookingRepository bookingRepository,
+      UserRepository userRepository,
+      TourRepository tourRepository) {
+    this.bookingRepository = bookingRepository;
+    this.userRepository = userRepository;
+    this.tourRepository = tourRepository;
+  }
+
+  @Override
+  public StatisticalGuidePaginationDTO getStatisticalByGuide(
+      Integer page, Integer limit, String order) {
+    Sort sort =
+        order.equals("asc") ? Sort.by("fullName").ascending() : Sort.by("fullName").descending();
+    Pageable paging = PageRequest.of(page, limit, sort);
+    Page<User> guidePage = userRepository.findByRoles_Name(RolesEnum.GUIDER, paging);
+    List<StatisticalGuideDTO> statisticalGuideDTOS = new ArrayList<>();
+    for (User guide : guidePage.get().toList()) {
+      StatisticalGuideDTO statisticalGuideDTO =
+          StatisticalGuideDTO.builder()
+              .id(guide.getId())
+              .phone(guide.getPhone())
+              .dateOfBirth(guide.getDateOfBirth())
+              .email(guide.getEmail())
+              .fullName(guide.getFullName())
+              .address(guide.getAddress())
+              .totalRevenue(getRevenueByGuide(guide.getId()))
+              .totalTravelerNumber(getTotalTravelerNumberByGuide(guide.getId()))
+              .build();
+      statisticalGuideDTOS.add(statisticalGuideDTO);
+    }
+
+    return new StatisticalGuidePaginationDTO(
+        statisticalGuideDTOS, guidePage.getTotalPages(), (int) guidePage.getTotalElements());
+  }
+
+  @Override
+  public Double getRevenueByGuide(Long guideId) {
+    double revenueOfGuide = 0.0;
+    List<Long> tourIdOfGuides = bookingRepository.getTourIdByGuide(guideId);
+    for (Long tourIdOfGuide : tourIdOfGuides) {
+      revenueOfGuide +=
+          getRevenueByTour(tourIdOfGuide) != null ? getRevenueByTour(tourIdOfGuide) : 0L;
+    }
+    return revenueOfGuide;
+  }
+
+  @Override
+  public Double getRevenueByTour(Long tourId) {
+    return bookingRepository.getRevenueByTourId(tourId);
+  }
+
+  @Override
+  public Long getTotalTravelerNumberByTour(Long tourId) {
+    return bookingRepository.getTotalTravelerNumberByTour(tourId);
+  }
+
+  @Override
+  public Long getTotalTravelerNumberByGuide(Long guideId) {
+    long totalTravelerNumbers = 0L;
+    List<Long> tourIdOfGuides = bookingRepository.getTourIdByGuide(guideId);
+    for (Long tourIdOfGuide : tourIdOfGuides) {
+      totalTravelerNumbers +=
+          getTotalTravelerNumberByTour(tourIdOfGuide) != null
+              ? getTotalTravelerNumberByTour(tourIdOfGuide)
+              : 0;
+    }
+    return totalTravelerNumbers;
+  }
+
+  @Override
+  public StatisticalTourPaginationDTO getStatisticalByTour(
+      Integer page, Integer limit, String order) {
+    Sort sort = order.equals("asc") ? Sort.by("name").ascending() : Sort.by("name").descending();
+    Pageable paging = PageRequest.of(page, limit, sort);
+    Page<Tour> tourPage = tourRepository.findAll(paging);
+    List<StatisticalTourDTO> statisticalTourDTOS = new ArrayList<>();
+    for (Tour tour : tourPage.get().toList()) {
+      StatisticalTourDTO statisticalTourDTO =
+          StatisticalTourDTO.builder()
+              .id(tour.getId())
+              .name(tour.getName())
+              .limitTraveler(tour.getLimitTraveler())
+              .pricePerTraveler(tour.getPricePerTraveler())
+              .extraPrice(tour.getExtraPrice())
+              .totalTravelerNumber(
+                  getTotalTravelerNumberByTour(tour.getId()) != null
+                      ? getTotalTravelerNumberByTour(tour.getId())
+                      : 0)
+              .totalRevenue(
+                  getRevenueByTour(tour.getId()) != null ? getRevenueByTour(tour.getId()) : 0.0)
+              .build();
+      statisticalTourDTOS.add(statisticalTourDTO);
+    }
+    return new StatisticalTourPaginationDTO(
+        statisticalTourDTOS, tourPage.getTotalPages(), (int) tourPage.getTotalElements());
+  }
+}
