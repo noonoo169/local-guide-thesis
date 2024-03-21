@@ -4,6 +4,7 @@ import com.example.localguidebe.converter.UserToUserDtoConverter;
 import com.example.localguidebe.dto.requestdto.UpdatePersonalInformationDTO;
 import com.example.localguidebe.dto.responsedto.IsCanReviewResponseDTO;
 import com.example.localguidebe.entity.User;
+import com.example.localguidebe.enums.RolesEnum;
 import com.example.localguidebe.security.service.CustomUserDetails;
 import com.example.localguidebe.service.UserService;
 import com.example.localguidebe.system.Result;
@@ -12,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/users")
@@ -111,6 +114,48 @@ public class UserController {
                         true,
                         HttpStatus.INTERNAL_SERVER_ERROR.value(),
                         "Can not get personal information"));
+          }
+        });
+  }
+
+  @DeleteMapping("/{userId}")
+  public ResponseEntity<Result> deleteUser(
+      Authentication authentication, @PathVariable("userId") Long userId) {
+    return AuthUtils.checkAuthentication(
+        authentication,
+        () -> {
+          try {
+            String email = ((CustomUserDetails) authentication.getPrincipal()).getEmail();
+            User userInSession = userService.findUserByEmail(email);
+            User userBeDeleted = userService.findById(userId).orElse(null);
+
+            if (userBeDeleted == null) {
+              return ResponseEntity.status(HttpStatus.OK)
+                  .body(new Result(false, HttpStatus.OK.value(), "The user not exist"));
+            }
+            if (!Objects.equals(userInSession.getId(), userBeDeleted.getId())) {
+              if (userToUserDtoConverter.convert(userInSession).role() != RolesEnum.ADMIN) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(
+                        new Result(
+                            false, HttpStatus.CONFLICT.value(), "You can not delete this user"));
+              }
+            }
+            return ResponseEntity.status(HttpStatus.OK)
+                .body(
+                    new Result(
+                        true,
+                        HttpStatus.OK.value(),
+                        "Delete user successfully",
+                        userToUserDtoConverter.convert(userService.deleteUser(userBeDeleted))));
+
+          } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(
+                    new Result(
+                        false,
+                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                        "You can not delete this user"));
           }
         });
   }

@@ -58,7 +58,7 @@ public class Tour {
   private String itinerary;
 
   @Column(name = "is_deleted", columnDefinition = "boolean default false")
-  private Boolean isDeleted = Boolean.FALSE;
+  private Boolean isDeleted;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "guide_id")
@@ -97,5 +97,5 @@ public class Tour {
   private List<Location> locations = new ArrayList<>();
 
   @Column(name = "is_for_specific_traveler", columnDefinition = "boolean default false")
-  private Boolean isForSpecificTraveler = Boolean.FALSE;
+  private Boolean isForSpecificTraveler;
 }

@@ -49,7 +49,7 @@ public class Review {
   private User traveler;
 
   @Column(columnDefinition = "boolean default false")
-  private Boolean isEdited = Boolean.FALSE;
+  private Boolean isEdited;
 
   @PostPersist
   @PostUpdate
