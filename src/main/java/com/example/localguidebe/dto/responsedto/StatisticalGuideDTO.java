@@ -16,6 +16,7 @@ public class StatisticalGuideDTO {
   private String phone;
   private String address;
   private LocalDateTime dateOfBirth;
+  private Double overallRating;
   private Long totalTravelerNumber;
   private Double totalRevenue;
   private Long totalBooking;

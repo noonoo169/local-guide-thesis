@@ -100,6 +100,7 @@ public class StatisticServiceImpl implements StatisticService {
             .limitTraveler(tour.getLimitTraveler())
             .pricePerTraveler(tour.getPricePerTraveler())
             .extraPrice(tour.getExtraPrice())
+            .overallRating(tour.getOverallRating() != null ? tour.getOverallRating() : 0.0)
             .totalTravelerNumber(
                 getTotalTravelerNumberByTour(tour.getId()) != null
                     ? getTotalTravelerNumberByTour(tour.getId())
@@ -122,6 +123,7 @@ public class StatisticServiceImpl implements StatisticService {
             .dateOfBirth(guide.getDateOfBirth())
             .email(guide.getEmail())
             .fullName(guide.getFullName())
+            .overallRating(guide.getOverallRating() != null ? guide.getOverallRating() : 0.0)
             .address(guide.getAddress())
             .totalRevenue(getRevenueByGuide(guide.getId()))
             .totalTravelerNumber(getTotalTravelerNumberByGuide(guide.getId()))
