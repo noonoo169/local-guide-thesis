@@ -1,5 +1,6 @@
 package com.example.localguidebe.service;
 
+import com.example.localguidebe.dto.responsedto.StatisticalGuideDTO;
 import com.example.localguidebe.dto.responsedto.StatisticalGuidePaginationDTO;
 import com.example.localguidebe.dto.responsedto.StatisticalTourDTO;
 import com.example.localguidebe.dto.responsedto.StatisticalTourPaginationDTO;
@@ -22,4 +23,6 @@ public interface StatisticService {
   Long getTotalBookingByGuide(Long guideId);
 
   StatisticalTourDTO getStatisticByPerTour(Long tourId);
+
+  StatisticalGuideDTO getStatisticByPerGuide(Long guideId);
 }
