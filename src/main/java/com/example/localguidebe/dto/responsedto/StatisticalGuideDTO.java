@@ -18,4 +18,5 @@ public class StatisticalGuideDTO {
   private LocalDateTime dateOfBirth;
   private Long totalTravelerNumber;
   private Double totalRevenue;
+  private Long totalBooking;
 }

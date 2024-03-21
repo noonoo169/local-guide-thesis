@@ -15,4 +15,7 @@ public interface StatisticService {
   Long getTotalTravelerNumberByGuide(Long guideId);
 
   StatisticalTourPaginationDTO getStatisticalByTour(Integer page, Integer limit, String order);
+
+  Long getTotalBookingByTour(Long tourId);
+  Long getTotalBookingByGuide(Long guideId);
 }

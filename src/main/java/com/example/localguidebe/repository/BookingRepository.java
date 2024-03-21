@@ -80,4 +80,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
   @Query(
       "SELECT SUM(booking.numberTravelers) FROM Booking booking WHERE booking.tour.id = :tourId AND booking.status = 'PAID'")
   Long getTotalTravelerNumberByTour(Long tourId);
+
+  @Query(
+      "SELECT count(booking) FROM Booking booking WHERE booking.tour.id = :tourId AND booking.status ='PAID'")
+  Long getTotalBookingByTour(Long tourId);
 }

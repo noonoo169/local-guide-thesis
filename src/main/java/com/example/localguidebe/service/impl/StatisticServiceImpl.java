@@ -55,6 +55,7 @@ public class StatisticServiceImpl implements StatisticService {
               .address(guide.getAddress())
               .totalRevenue(getRevenueByGuide(guide.getId()))
               .totalTravelerNumber(getTotalTravelerNumberByGuide(guide.getId()))
+              .totalBooking(getTotalBookingByGuide(guide.getId()))
               .build();
       statisticalGuideDTOS.add(statisticalGuideDTO);
     }
@@ -82,6 +83,17 @@ public class StatisticServiceImpl implements StatisticService {
   @Override
   public Long getTotalTravelerNumberByTour(Long tourId) {
     return bookingRepository.getTotalTravelerNumberByTour(tourId);
+  }
+
+  @Override
+  public Long getTotalBookingByGuide(Long guideId) {
+    Long totalBookingNumbers = 0L;
+    List<Long> tourIdOfGuides = bookingRepository.getTourIdByGuide(guideId);
+    for (Long tourIdOfGuide : tourIdOfGuides) {
+      totalBookingNumbers +=
+          getTotalBookingByTour(tourIdOfGuide) != null ? getTotalBookingByTour(tourIdOfGuide) : 0L;
+    }
+    return totalBookingNumbers;
   }
 
   @Override
@@ -118,10 +130,16 @@ public class StatisticServiceImpl implements StatisticService {
                       : 0)
               .totalRevenue(
                   getRevenueByTour(tour.getId()) != null ? getRevenueByTour(tour.getId()) : 0.0)
+              .totalBooking(getTotalBookingByTour(tour.getId()))
               .build();
       statisticalTourDTOS.add(statisticalTourDTO);
     }
     return new StatisticalTourPaginationDTO(
         statisticalTourDTOS, tourPage.getTotalPages(), (int) tourPage.getTotalElements());
+  }
+
+  @Override
+  public Long getTotalBookingByTour(Long tourId) {
+    return bookingRepository.getTotalBookingByTour(tourId);
   }
 }

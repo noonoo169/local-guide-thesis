@@ -17,4 +17,5 @@ public class StatisticalTourDTO {
   private Double overallRating;
   private Long totalTravelerNumber;
   private Double totalRevenue;
+  private Long totalBooking;
 }
