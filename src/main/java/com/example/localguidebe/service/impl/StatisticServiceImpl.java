@@ -1,9 +1,6 @@
 package com.example.localguidebe.service.impl;
 
-import com.example.localguidebe.dto.responsedto.StatisticalGuideDTO;
-import com.example.localguidebe.dto.responsedto.StatisticalGuidePaginationDTO;
-import com.example.localguidebe.dto.responsedto.StatisticalTourDTO;
-import com.example.localguidebe.dto.responsedto.StatisticalTourPaginationDTO;
+import com.example.localguidebe.dto.responsedto.*;
 import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.entity.User;
 import com.example.localguidebe.enums.RolesEnum;
@@ -130,6 +127,21 @@ public class StatisticServiceImpl implements StatisticService {
             .totalBooking(getTotalBookingByGuide(guide.getId()))
             .build();
     return statisticalGuideDTO;
+  }
+// get statistic of tours by guide
+  @Override
+  public StatisticOfToursByGuidePaginationDTO getStatisticOfToursByGuide(
+      Long guideId, Integer page, Integer limit, String order) {
+    List<StatisticalTourDTO> statisticOfToursByGuide = new ArrayList<>();
+    Sort sort =
+            order.equals("asc") ? Sort.by("id").ascending() : Sort.by("id").descending();
+    Pageable paging = PageRequest.of(page, limit, sort);
+    Page<Long> tourIdOfGuidesPage = bookingRepository.getTourIdByGuide(guideId,paging);
+    for(Long tourIdOfGuide: tourIdOfGuidesPage.stream().toList()){
+      statisticOfToursByGuide.add(getStatisticByPerTour(tourIdOfGuide));
+    }
+
+    return new StatisticOfToursByGuidePaginationDTO(statisticOfToursByGuide,tourIdOfGuidesPage.getTotalPages(),(int)tourIdOfGuidesPage.getTotalElements());
   }
 
   // get total traveler number by guide

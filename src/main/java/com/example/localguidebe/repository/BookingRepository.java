@@ -6,6 +6,8 @@ import com.example.localguidebe.dto.TourRevenueDTO;
 import com.example.localguidebe.entity.Booking;
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -76,6 +78,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
   @Query("SELECT tour.id FROM User user JOIN user.tours tour  WHERE user.id = :guideId")
   List<Long> getTourIdByGuide(Long guideId);
+
+  @Query("SELECT tour.id FROM User user JOIN user.tours tour  WHERE user.id = :guideId")
+  Page<Long> getTourIdByGuide(Long guideId, Pageable pageable);
 
   @Query(
       "SELECT SUM(booking.numberTravelers) FROM Booking booking WHERE booking.tour.id = :tourId AND booking.status = 'PAID'")
