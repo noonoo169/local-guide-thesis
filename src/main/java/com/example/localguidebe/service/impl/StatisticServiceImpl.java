@@ -36,6 +36,7 @@ public class StatisticServiceImpl implements StatisticService {
     this.tourRepository = tourRepository;
   }
 
+  // get statistic of all guide
   @Override
   public StatisticalGuidePaginationDTO getStatisticalByGuide(
       Integer page, Integer limit, String order) {
@@ -45,25 +46,14 @@ public class StatisticServiceImpl implements StatisticService {
     Page<User> guidePage = userRepository.findByRoles_Name(RolesEnum.GUIDER, paging);
     List<StatisticalGuideDTO> statisticalGuideDTOS = new ArrayList<>();
     for (User guide : guidePage.get().toList()) {
-      StatisticalGuideDTO statisticalGuideDTO =
-          StatisticalGuideDTO.builder()
-              .id(guide.getId())
-              .phone(guide.getPhone())
-              .dateOfBirth(guide.getDateOfBirth())
-              .email(guide.getEmail())
-              .fullName(guide.getFullName())
-              .address(guide.getAddress())
-              .totalRevenue(getRevenueByGuide(guide.getId()))
-              .totalTravelerNumber(getTotalTravelerNumberByGuide(guide.getId()))
-              .totalBooking(getTotalBookingByGuide(guide.getId()))
-              .build();
-      statisticalGuideDTOS.add(statisticalGuideDTO);
+      statisticalGuideDTOS.add(getStatisticByPerGuide(guide.getId()));
     }
 
     return new StatisticalGuidePaginationDTO(
         statisticalGuideDTOS, guidePage.getTotalPages(), (int) guidePage.getTotalElements());
   }
 
+  // get revenue of per guide
   @Override
   public Double getRevenueByGuide(Long guideId) {
     double revenueOfGuide = 0.0;
@@ -75,16 +65,19 @@ public class StatisticServiceImpl implements StatisticService {
     return revenueOfGuide;
   }
 
+  // get revenue of per tour
   @Override
   public Double getRevenueByTour(Long tourId) {
     return bookingRepository.getRevenueByTourId(tourId);
   }
 
+  // get total traveler number booked by tour
   @Override
   public Long getTotalTravelerNumberByTour(Long tourId) {
     return bookingRepository.getTotalTravelerNumberByTour(tourId);
   }
 
+  // get total traveler number booked by guide
   @Override
   public Long getTotalBookingByGuide(Long guideId) {
     Long totalBookingNumbers = 0L;
@@ -96,6 +89,7 @@ public class StatisticServiceImpl implements StatisticService {
     return totalBookingNumbers;
   }
 
+  // get statistic of per tour
   @Override
   public StatisticalTourDTO getStatisticByPerTour(Long tourId) {
     Tour tour = tourRepository.findById(tourId).orElseThrow();
@@ -117,6 +111,26 @@ public class StatisticServiceImpl implements StatisticService {
     return statisticalTourDTO;
   }
 
+  // get statistic of per guide
+  @Override
+  public StatisticalGuideDTO getStatisticByPerGuide(Long guideId) {
+    User guide = userRepository.findById(guideId).orElseThrow();
+    StatisticalGuideDTO statisticalGuideDTO =
+        StatisticalGuideDTO.builder()
+            .id(guide.getId())
+            .phone(guide.getPhone())
+            .dateOfBirth(guide.getDateOfBirth())
+            .email(guide.getEmail())
+            .fullName(guide.getFullName())
+            .address(guide.getAddress())
+            .totalRevenue(getRevenueByGuide(guide.getId()))
+            .totalTravelerNumber(getTotalTravelerNumberByGuide(guide.getId()))
+            .totalBooking(getTotalBookingByGuide(guide.getId()))
+            .build();
+    return statisticalGuideDTO;
+  }
+
+  // get total traveler number by guide
   @Override
   public Long getTotalTravelerNumberByGuide(Long guideId) {
     long totalTravelerNumbers = 0L;
@@ -130,6 +144,7 @@ public class StatisticServiceImpl implements StatisticService {
     return totalTravelerNumbers;
   }
 
+  // get statistic of all tours
   @Override
   public StatisticalTourPaginationDTO getStatisticalByTour(
       Integer page, Integer limit, String order) {
@@ -144,6 +159,7 @@ public class StatisticServiceImpl implements StatisticService {
         statisticalTourDTOS, tourPage.getTotalPages(), (int) tourPage.getTotalElements());
   }
 
+  // get total booking  of per tour
   @Override
   public Long getTotalBookingByTour(Long tourId) {
     return bookingRepository.getTotalBookingByTour(tourId);
