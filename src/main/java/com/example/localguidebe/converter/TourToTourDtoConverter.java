@@ -23,12 +23,13 @@ public class TourToTourDtoConverter {
 
   @Autowired
   public TourToTourDtoConverter(
-          ImageToImageDtoConverter imageToImageDtoConverter,
-          UserToUserDtoConverter userToUserDtoConverter,
-          CategoryToCategoryDtoConverter categoryToCategoryDtoConverter,
-          ImageService imageService,
-          LocationToLocationDtoConverter locationToLocationDtoConverter,
-          ReviewToReviewDtoConverter reviewToReviewDtoConverter, TourStartTimeToTourStartTimeDtoConverter tourStartTimeToTourStartTimeDtoConverter) {
+      ImageToImageDtoConverter imageToImageDtoConverter,
+      UserToUserDtoConverter userToUserDtoConverter,
+      CategoryToCategoryDtoConverter categoryToCategoryDtoConverter,
+      ImageService imageService,
+      LocationToLocationDtoConverter locationToLocationDtoConverter,
+      ReviewToReviewDtoConverter reviewToReviewDtoConverter,
+      TourStartTimeToTourStartTimeDtoConverter tourStartTimeToTourStartTimeDtoConverter) {
     this.imageToImageDtoConverter = imageToImageDtoConverter;
     this.userToUserDtoConverter = userToUserDtoConverter;
     this.categoryToCategoryDtoConverter = categoryToCategoryDtoConverter;
@@ -56,7 +57,10 @@ public class TourToTourDtoConverter {
         tour.getIsDeleted(),
         tour.getAddress(),
         tour.getGuide() != null ? userToUserDtoConverter.convert(tour.getGuide()) : null,
-        tour.getTourStartTimes().stream().map(tourStartTime -> tourStartTime.getStartTime().toString()).toList(),
+        tour.getStatus(),
+        tour.getTourStartTimes().stream()
+            .map(tourStartTime -> tourStartTime.getStartTime().toString())
+            .toList(),
         tour.getCategories() != null
             ? tour.getCategories().stream()
                 .map(categoryToCategoryDtoConverter::convertCategory)

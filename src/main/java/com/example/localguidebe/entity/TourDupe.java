@@ -1,6 +1,7 @@
 package com.example.localguidebe.entity;
 
 import com.example.localguidebe.dto.TourDTO;
+import com.example.localguidebe.enums.TourStatusEnum;
 import com.example.localguidebe.utils.JsonUtils;
 import jakarta.persistence.*;
 import lombok.*;
@@ -56,12 +57,27 @@ public class TourDupe {
   @Column(name = "is_deleted", columnDefinition = "boolean default false")
   private Boolean isDeleted = Boolean.FALSE;
 
-  @Column(columnDefinition = "TEXT") private String guide;
-  @Column(columnDefinition = "TEXT") private String tourStartTimes;
-  @Column(columnDefinition = "TEXT") private String categories;
-  @Column(columnDefinition = "TEXT") private String reviews;
-  @Column(columnDefinition = "TEXT") private String locations;
-  @Column(columnDefinition = "TEXT") private String images;
+  @Column(name = "status")
+  @Enumerated(EnumType.STRING)
+  private TourStatusEnum status;
+
+  @Column(columnDefinition = "TEXT")
+  private String guide;
+
+  @Column(columnDefinition = "TEXT")
+  private String tourStartTimes;
+
+  @Column(columnDefinition = "TEXT")
+  private String categories;
+
+  @Column(columnDefinition = "TEXT")
+  private String reviews;
+
+  @Column(columnDefinition = "TEXT")
+  private String locations;
+
+  @Column(columnDefinition = "TEXT")
+  private String images;
 
   @Column(name = "is_for_specific_traveler", columnDefinition = "boolean default false")
   private Boolean isForSpecificTraveler = Boolean.FALSE;
@@ -89,28 +105,62 @@ public class TourDupe {
 
   @Override
   public String toString() {
-    return "TourDupe{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            ", description='" + description + '\'' +
-            ", transportation='" + transportation + '\'' +
-            ", includeService='" + includeService + '\'' +
-            ", duration=" + duration +
-            ", unit='" + unit + '\'' +
-            ", estimatedLocalCashNeeded='" + estimatedLocalCashNeeded + '\'' +
-            ", pricePerTraveler=" + pricePerTraveler +
-            ", limitTraveler=" + limitTraveler +
-            ", extraPrice=" + extraPrice +
-            ", overallRating=" + overallRating +
-            ", itinerary='" + itinerary + '\'' +
-            ", isDeleted=" + isDeleted +
-            ", guide='" + guide + '\'' +
-            ", tourStartTimes='" + tourStartTimes + '\'' +
-            ", categories='" + categories + '\'' +
-            ", reviews='" + reviews + '\'' +
-            ", locations='" + locations + '\'' +
-            ", images='" + images + '\'' +
-            ", isForSpecificTraveler=" + isForSpecificTraveler +
-            '}';
+    return "TourDupe{"
+        + "id="
+        + id
+        + ", name='"
+        + name
+        + '\''
+        + ", description='"
+        + description
+        + '\''
+        + ", transportation='"
+        + transportation
+        + '\''
+        + ", includeService='"
+        + includeService
+        + '\''
+        + ", duration="
+        + duration
+        + ", unit='"
+        + unit
+        + '\''
+        + ", estimatedLocalCashNeeded='"
+        + estimatedLocalCashNeeded
+        + '\''
+        + ", pricePerTraveler="
+        + pricePerTraveler
+        + ", limitTraveler="
+        + limitTraveler
+        + ", extraPrice="
+        + extraPrice
+        + ", overallRating="
+        + overallRating
+        + ", itinerary='"
+        + itinerary
+        + '\''
+        + ", isDeleted="
+        + isDeleted
+        + ", guide='"
+        + guide
+        + '\''
+        + ", tourStartTimes='"
+        + tourStartTimes
+        + '\''
+        + ", categories='"
+        + categories
+        + '\''
+        + ", reviews='"
+        + reviews
+        + '\''
+        + ", locations='"
+        + locations
+        + '\''
+        + ", images='"
+        + images
+        + '\''
+        + ", isForSpecificTraveler="
+        + isForSpecificTraveler
+        + '}';
   }
 }

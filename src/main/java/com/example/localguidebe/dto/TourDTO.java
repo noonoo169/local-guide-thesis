@@ -1,6 +1,7 @@
 package com.example.localguidebe.dto;
 
 import com.example.localguidebe.entity.*;
+import com.example.localguidebe.enums.TourStatusEnum;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -44,6 +45,8 @@ public class TourDTO {
   private String address;
 
   private UserDTO guide;
+
+  private TourStatusEnum status;
 
   private List<String> startTimes = new ArrayList<>();
 
