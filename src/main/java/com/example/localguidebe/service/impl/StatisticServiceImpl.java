@@ -97,6 +97,27 @@ public class StatisticServiceImpl implements StatisticService {
   }
 
   @Override
+  public StatisticalTourDTO getStatisticByPerTour(Long tourId) {
+    Tour tour = tourRepository.findById(tourId).orElseThrow();
+    StatisticalTourDTO statisticalTourDTO =
+        StatisticalTourDTO.builder()
+            .id(tour.getId())
+            .name(tour.getName())
+            .limitTraveler(tour.getLimitTraveler())
+            .pricePerTraveler(tour.getPricePerTraveler())
+            .extraPrice(tour.getExtraPrice())
+            .totalTravelerNumber(
+                getTotalTravelerNumberByTour(tour.getId()) != null
+                    ? getTotalTravelerNumberByTour(tour.getId())
+                    : 0)
+            .totalRevenue(
+                getRevenueByTour(tour.getId()) != null ? getRevenueByTour(tour.getId()) : 0.0)
+            .totalBooking(getTotalBookingByTour(tour.getId()))
+            .build();
+    return statisticalTourDTO;
+  }
+
+  @Override
   public Long getTotalTravelerNumberByGuide(Long guideId) {
     long totalTravelerNumbers = 0L;
     List<Long> tourIdOfGuides = bookingRepository.getTourIdByGuide(guideId);
@@ -117,22 +138,7 @@ public class StatisticServiceImpl implements StatisticService {
     Page<Tour> tourPage = tourRepository.findAll(paging);
     List<StatisticalTourDTO> statisticalTourDTOS = new ArrayList<>();
     for (Tour tour : tourPage.get().toList()) {
-      StatisticalTourDTO statisticalTourDTO =
-          StatisticalTourDTO.builder()
-              .id(tour.getId())
-              .name(tour.getName())
-              .limitTraveler(tour.getLimitTraveler())
-              .pricePerTraveler(tour.getPricePerTraveler())
-              .extraPrice(tour.getExtraPrice())
-              .totalTravelerNumber(
-                  getTotalTravelerNumberByTour(tour.getId()) != null
-                      ? getTotalTravelerNumberByTour(tour.getId())
-                      : 0)
-              .totalRevenue(
-                  getRevenueByTour(tour.getId()) != null ? getRevenueByTour(tour.getId()) : 0.0)
-              .totalBooking(getTotalBookingByTour(tour.getId()))
-              .build();
-      statisticalTourDTOS.add(statisticalTourDTO);
+      statisticalTourDTOS.add(getStatisticByPerTour(tour.getId()));
     }
     return new StatisticalTourPaginationDTO(
         statisticalTourDTOS, tourPage.getTotalPages(), (int) tourPage.getTotalElements());
