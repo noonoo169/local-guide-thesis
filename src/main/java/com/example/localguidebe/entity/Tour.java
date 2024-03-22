@@ -83,6 +83,13 @@ public class Tour {
       inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id"))
   private Set<Category> categories = new HashSet<>();
 
+  @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinTable(
+      name = "wishlist",
+      joinColumns = @JoinColumn(name = "tour_id", referencedColumnName = "id"),
+      inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
+  private List<User> users = new ArrayList<>();
+
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "tour")
   private List<Review> reviews = new ArrayList<>();
 
