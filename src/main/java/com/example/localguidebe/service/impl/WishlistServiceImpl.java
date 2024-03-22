@@ -46,4 +46,15 @@ public class WishlistServiceImpl implements WishlistService {
     user.getWishListTour();
     return user.getWishListTour().stream().map(tourToTourDtoConverter::convert).toList();
   }
+
+  @Override
+  public List<TourDTO> deleteTourInWishlist(Long tourId, Long travelerId) {
+    User traveler = userRepository.findById(travelerId).orElseThrow();
+    Tour tour = tourRepository.findById(tourId).orElseThrow();
+    traveler.getWishListTour().remove(tour);
+    tour.getUsers().remove(traveler);
+    return userRepository.save(traveler).getWishListTour().stream()
+        .map(tourToTourDtoConverter::convert)
+        .toList();
+  }
 }
