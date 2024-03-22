@@ -70,4 +70,30 @@ public class WishlistController {
           }
         });
   }
+    @DeleteMapping("/{tourId}")
+    public ResponseEntity<Result> deleteWishlistByTraveler(
+            Authentication authentication, @PathVariable("tourId") Long tourId) {
+        return AuthUtils.checkAuthentication(
+                authentication,
+                () -> {
+                    try {
+                        return new ResponseEntity<>(
+                                new Result(
+                                        false,
+                                        HttpStatus.OK.value(),
+                                        "delete tour in wishlist by traveler successfully",
+                                        wishlistService.deleteTourInWishlist(
+                                                tourId, ((CustomUserDetails) authentication.getPrincipal()).getId())),
+                                HttpStatus.OK);
+                    } catch (Exception e) {
+                        return new ResponseEntity<>(
+                                new Result(
+                                        false,
+                                        HttpStatus.CONFLICT.value(),
+                                        "delete the failure wishlist by traveler",
+                                        null),
+                                HttpStatus.CONFLICT);
+                    }
+                });
+    }
 }
