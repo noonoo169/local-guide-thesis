@@ -113,6 +113,7 @@ public class CartServiceImpl implements CartService {
                 BusySchedule.builder()
                     .busyDate(bookingDTO.startDate().plusDays(count))
                     .typeBusyDay(TypeBusyDayEnum.BOOKED_DAY_BY_DAYS)
+                    .guide(tour.getGuide())
                     .build());
         count++;
       }
@@ -123,6 +124,7 @@ public class CartServiceImpl implements CartService {
               BusySchedule.builder()
                   .busyDate(bookingDTO.startDate())
                   .typeBusyDay(TypeBusyDayEnum.BOOKED_DAY_BY_HOURS)
+                  .guide(tour.getGuide())
                   .build());
     }
     tourRepository.save(tour);
