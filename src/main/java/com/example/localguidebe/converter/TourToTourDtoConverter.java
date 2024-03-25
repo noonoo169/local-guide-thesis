@@ -4,6 +4,7 @@ import com.example.localguidebe.dto.LocationDTO;
 import com.example.localguidebe.dto.TourDTO;
 import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.enums.AssociateName;
+import com.example.localguidebe.enums.TourStatusEnum;
 import com.example.localguidebe.service.ImageService;
 import java.util.Comparator;
 import java.util.stream.Collectors;
@@ -57,7 +58,7 @@ public class TourToTourDtoConverter {
         tour.getIsDeleted(),
         tour.getAddress(),
         tour.getGuide() != null ? userToUserDtoConverter.convert(tour.getGuide()) : null,
-        tour.getStatus(),
+        tour.getStatus() != null ? tour.getStatus() : TourStatusEnum.PENDING,
         tour.getTourStartTimes().stream()
             .map(tourStartTime -> tourStartTime.getStartTime().toString())
             .toList(),

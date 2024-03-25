@@ -336,4 +336,25 @@ public class TourController {
           }
         });
   }
+  @GetMapping("/pending")
+  public ResponseEntity<Result> getPendingTour(Authentication authentication){
+    return AuthUtils.checkAuthentication(
+        authentication,
+        () -> {
+          try {
+            return new ResponseEntity<>(
+                new Result(
+                    false,
+                    HttpStatus.OK.value(),
+                    "get list pending successfully",
+                    tourService.getPendingTour()),
+                HttpStatus.OK);
+          } catch (Exception e) {
+            return new ResponseEntity<>(
+                new Result(
+                    false, HttpStatus.CONFLICT.value(), "get list pending tour failure", null),
+                HttpStatus.CONFLICT);
+          }
+        });
+  }
 }
