@@ -118,6 +118,7 @@ public class TourServiceImpl implements TourService {
     User guide = userService.findUserByEmail(email);
     Gson gson = new Gson();
     BeanUtils.copyProperties(tourRequestDTO, newTour, "categories", "images", "locations");
+
     // add tour start time
     tourRequestDTO
         .getStartTimes()
@@ -126,7 +127,7 @@ public class TourServiceImpl implements TourService {
                 newTour
                     .getTourStartTimes()
                     .add(TourStartTime.builder().startTime(getStartTime).tour(newTour).build()));
-
+    newTour.setStatus(TourStatusEnum.PENDING);
     if (tourRequestDTO.getLocations().size() != 0) {
       tourRequestDTO
           .getLocations()
@@ -434,5 +435,13 @@ public class TourServiceImpl implements TourService {
     Tour tour = tourRepository.findById(tourId).orElseThrow();
     tour.setStatus(TourStatusEnum.DENY);
     return tourToTourDtoConverter.convert(tourRepository.save(tour));
+  }
+
+  @Override
+  public List<TourDTO> getPendingTour() {
+    return tourRepository.findAll().stream()
+        .filter(tour -> TourStatusEnum.PENDING.equals(tour.getStatus()))
+        .map(tourToTourDtoConverter::convert)
+        .collect(Collectors.toList());
   }
 }
