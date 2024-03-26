@@ -2,9 +2,9 @@ package com.example.localguidebe.controller;
 
 import com.example.localguidebe.converter.GuideApplicationToGuideApplicationDtoConverter;
 import com.example.localguidebe.dto.requestdto.AddGuideApplicationDTO;
+import com.example.localguidebe.dto.requestdto.UpdateGuideApplicationDTO;
 import com.example.localguidebe.dto.requestdto.UpdateGuideApplicationStatus;
 import com.example.localguidebe.entity.GuideApplication;
-import com.example.localguidebe.enums.GuideApplicationStatus;
 import com.example.localguidebe.service.GuideApplicationService;
 import com.example.localguidebe.system.Result;
 import java.util.List;
@@ -123,6 +123,35 @@ public class GuideApplicationController {
           .body(new Result(true, HttpStatus.OK.value(), "Add guide application successfully"));
 
     } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(
+              new Result(
+                  true,
+                  HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                  "Update guide application failed"));
+    }
+  }
+
+  @PutMapping("/{id}")
+  public ResponseEntity<Result> updateGuideApplication(
+      Authentication authentication,
+      @PathVariable("id") Long id,
+      @RequestBody() UpdateGuideApplicationDTO updateGuideApplicationDTO) {
+    try {
+      boolean isUpdated =
+          guideApplicationService.updateGuideApplication(id, updateGuideApplicationDTO);
+      if (!isUpdated) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+            .body(
+                new Result(
+                    false,
+                    HttpStatus.CONFLICT.value(),
+                    "Guide application does not exist or your applicant is accepted"));
+      }
+      return ResponseEntity.status(HttpStatus.OK)
+          .body(new Result(true, HttpStatus.OK.value(), "Update guide application successfully"));
+
+    } catch (RuntimeException e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
           .body(
               new Result(

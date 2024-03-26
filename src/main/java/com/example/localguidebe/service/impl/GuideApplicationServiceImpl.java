@@ -1,35 +1,48 @@
 package com.example.localguidebe.service.impl;
 
 import com.example.localguidebe.dto.requestdto.AddGuideApplicationDTO;
+import com.example.localguidebe.dto.requestdto.UpdateGuideApplicationDTO;
 import com.example.localguidebe.dto.requestdto.UpdateGuideApplicationStatus;
 import com.example.localguidebe.entity.GuideApplication;
+import com.example.localguidebe.entity.Image;
 import com.example.localguidebe.entity.Role;
 import com.example.localguidebe.entity.User;
+import com.example.localguidebe.enums.AssociateName;
+import com.example.localguidebe.enums.FolderName;
 import com.example.localguidebe.enums.GuideApplicationStatus;
 import com.example.localguidebe.enums.RolesEnum;
 import com.example.localguidebe.repository.GuideApplicationRepository;
 import com.example.localguidebe.service.GuideApplicationService;
+import com.example.localguidebe.service.ImageService;
 import com.example.localguidebe.service.RoleService;
 import com.example.localguidebe.service.UserService;
+
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class GuideApplicationServiceImpl implements GuideApplicationService {
   private final UserService userService;
   private final RoleService roleService;
   private final GuideApplicationRepository guideApplicationRepository;
+  private final ImageService imageService;
 
   public GuideApplicationServiceImpl(
       UserService userService,
       RoleService roleService,
-      GuideApplicationRepository guideApplicationRepository) {
+      GuideApplicationRepository guideApplicationRepository,
+      ImageService imageService) {
     this.userService = userService;
     this.roleService = roleService;
     this.guideApplicationRepository = guideApplicationRepository;
+    this.imageService = imageService;
   }
 
   BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -44,6 +57,7 @@ public class GuideApplicationServiceImpl implements GuideApplicationService {
     return guideApplicationRepository.findById(id).orElse(null);
   }
 
+  @Transactional
   @Override
   public GuideApplication addGuideApplication(AddGuideApplicationDTO addGuideApplicationDTO) {
     User user;
@@ -66,16 +80,29 @@ public class GuideApplicationServiceImpl implements GuideApplicationService {
               .build();
       user = userService.saveUser(newUser);
     }
-    GuideApplication guideApplication =
-        GuideApplication.builder()
-            .isLicensedGuide(addGuideApplicationDTO.isLicensedGuide())
-            .transportation(addGuideApplicationDTO.transportation())
-            .yearsOfExperience(addGuideApplicationDTO.yearsOfExperience())
-            .howGuideHearAboutUs(addGuideApplicationDTO.howGuideHearAboutUs())
-            .status(GuideApplicationStatus.PENDING)
-            .user(user)
-            .build();
-    return guideApplicationRepository.save(guideApplication);
+    GuideApplication newGuideApplication =
+        guideApplicationRepository.save(
+            GuideApplication.builder()
+                .isLicensedGuide(addGuideApplicationDTO.isLicensedGuide())
+                .transportation(addGuideApplicationDTO.transportation())
+                .yearsOfExperience(addGuideApplicationDTO.yearsOfExperience())
+                .howGuideHearAboutUs(addGuideApplicationDTO.howGuideHearAboutUs())
+                .status(GuideApplicationStatus.PENDING)
+                .user(user)
+                .build());
+
+    if (addGuideApplicationDTO.isLicensedGuide()) {
+      addGuideApplicationDTO
+          .licenseImages()
+          .forEach(
+              imageInBase64 ->
+                  imageService.addImage(
+                      imageInBase64,
+                      newGuideApplication.getId(),
+                      AssociateName.GUIDE_APPLICATION,
+                      FolderName.guide_application));
+    }
+    return newGuideApplication;
   }
 
   @Override
@@ -90,6 +117,18 @@ public class GuideApplicationServiceImpl implements GuideApplicationService {
     if (updateGuideApplicationStatus.status().equals(GuideApplicationStatus.DENIED)) {
       guideApplication.setReasonDeny(updateGuideApplicationStatus.reasonDeny());
     }
+    guideApplicationRepository.save(guideApplication);
+    return true;
+  }
+
+  @Transactional
+  @Override
+  public boolean updateGuideApplication(
+      Long id, UpdateGuideApplicationDTO updateGuideApplicationDTO) {
+    GuideApplication guideApplication = guideApplicationRepository.findById(id).orElse(null);
+    if (guideApplication == null) return false;
+    if (guideApplication.getStatus().equals(GuideApplicationStatus.ACCEPTED)) return false;
+    BeanUtils.copyProperties(updateGuideApplicationDTO, guideApplication);
     guideApplicationRepository.save(guideApplication);
     return true;
   }
