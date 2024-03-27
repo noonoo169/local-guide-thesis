@@ -11,5 +11,6 @@ public enum NotificationTypeEnum {
   BOOKED_TOUR,
   RECEIVED_BOOKING,
   ACCEPTED_TOUR,
-  DENY_TOUR
+  DENY_TOUR,
+  CANCEL_BOOKING
 }
