@@ -1,11 +1,13 @@
 package com.example.localguidebe.controller;
 
+import com.example.localguidebe.converter.NotificationToNotificationDtoConverter;
 import com.example.localguidebe.converter.TourToTourDtoConverter;
 import com.example.localguidebe.converter.TourToUpdateTourResponseDtoConverter;
 import com.example.localguidebe.dto.CategoryDTO;
 import com.example.localguidebe.dto.TourDTO;
 import com.example.localguidebe.dto.requestdto.TourRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateTourRequestDTO;
+import com.example.localguidebe.entity.Notification;
 import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.entity.User;
 import com.example.localguidebe.enums.NotificationTypeEnum;
@@ -17,9 +19,11 @@ import com.example.localguidebe.utils.AddressUtils;
 import com.example.localguidebe.utils.AuthUtils;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,18 +38,23 @@ public class TourController {
   private final TourToUpdateTourResponseDtoConverter tourToUpdateTourResponseDtoConverter;
   private final UserService userService;
   private final TravelerRequestService travelerRequestService;
-
+  private final SimpMessagingTemplate messagingTemplate;
   private final NotificationService notificationService;
+  private final NotificationToNotificationDtoConverter notificationToNotificationDtoConverter;
 
   public TourController(
       TourToUpdateTourResponseDtoConverter tourToUpdateTourResponseDtoConverter,
       UserService userService,
       TravelerRequestService travelerRequestService,
-      NotificationService notificationService) {
+      SimpMessagingTemplate messagingTemplate,
+      NotificationService notificationService,
+      NotificationToNotificationDtoConverter notificationToNotificationDtoConverter) {
     this.tourToUpdateTourResponseDtoConverter = tourToUpdateTourResponseDtoConverter;
     this.userService = userService;
     this.travelerRequestService = travelerRequestService;
+    this.messagingTemplate = messagingTemplate;
     this.notificationService = notificationService;
+    this.notificationToNotificationDtoConverter = notificationToNotificationDtoConverter;
   }
 
   @Autowired
@@ -292,12 +301,45 @@ public class TourController {
           try {
             TourDTO tourDTO = tourService.acceptTour(tourId);
             if (tourDTO != null) {
-              notificationService.addNotification(
-                  tourDTO.getGuide().id(),
-                  null,
-                  tourId,
-                  NotificationTypeEnum.ACCEPTED_TOUR,
-                  NotificationMessage.ACCEPTED_TOUR);
+              // send to guide
+              Notification guideNotification =
+                  notificationService.addNotification(
+                      tourDTO.getGuide().id(),
+                      null,
+                      tourId,
+                      NotificationTypeEnum.ACCEPTED_TOUR,
+                      NotificationMessage.ACCEPTED_TOUR);
+              messagingTemplate.convertAndSend(
+                  "/topic/" + tourDTO.getGuide().email(),
+                  notificationToNotificationDtoConverter.convert(guideNotification));
+
+              // send to traveler
+              Tour tour = tourService.findTourById(tourId);
+              if (tour != null && tour.getIsForSpecificTraveler()) {
+                User traveler =
+                    Objects.requireNonNull(
+                            tour.getGuide().getTravelerRequestsOfGuide().stream()
+                                .filter(
+                                    travelerRequest ->
+                                        travelerRequest.getTour() != null
+                                            && travelerRequest
+                                                .getTour()
+                                                .getId()
+                                                .equals(tour.getId()))
+                                .findFirst()
+                                .orElse(null))
+                        .getTraveler();
+                Notification travelerNotification =
+                    notificationService.addNotification(
+                        traveler.getId(),
+                        null,
+                        tourId,
+                        NotificationTypeEnum.ADD_TOUR_BY_TRAVELER_REQUEST,
+                        NotificationMessage.ADD_TOUR_BY_TRAVELER_REQUEST);
+                messagingTemplate.convertAndSend(
+                    "/topic/" + traveler.getEmail(),
+                    notificationToNotificationDtoConverter.convert(travelerNotification));
+              }
             }
             return new ResponseEntity<>(
                 new Result(false, HttpStatus.OK.value(), "accepted for tour successfully", tourDTO),
@@ -319,12 +361,45 @@ public class TourController {
           try {
             TourDTO tourDTO = tourService.denyTour(tourId);
             if (tourDTO != null) {
-              notificationService.addNotification(
-                  tourDTO.getGuide().id(),
-                  null,
-                  tourId,
-                  NotificationTypeEnum.DENY_TOUR,
-                  NotificationMessage.DENY_TOUR);
+              // send to guide
+              Notification guideNotification =
+                  notificationService.addNotification(
+                      tourDTO.getGuide().id(),
+                      null,
+                      tourId,
+                      NotificationTypeEnum.DENY_TOUR,
+                      NotificationMessage.DENY_TOUR);
+              messagingTemplate.convertAndSend(
+                  "/topic/" + tourDTO.getGuide().email(),
+                  notificationToNotificationDtoConverter.convert(guideNotification));
+
+              // send to traveler
+              Tour tour = tourService.findTourById(tourId);
+              if (tour != null && tour.getIsForSpecificTraveler()) {
+                User traveler =
+                    Objects.requireNonNull(
+                            tour.getGuide().getTravelerRequestsOfGuide().stream()
+                                .filter(
+                                    travelerRequest ->
+                                        travelerRequest.getTour() != null
+                                            && travelerRequest
+                                                .getTour()
+                                                .getId()
+                                                .equals(tour.getId()))
+                                .findFirst()
+                                .orElse(null))
+                        .getTraveler();
+                Notification travelerNotification =
+                    notificationService.addNotification(
+                        traveler.getId(),
+                        null,
+                        tourId,
+                        NotificationTypeEnum.DENY_TOUR_BY_TRAVELER_REQUEST,
+                        NotificationMessage.DENY_TOUR_BY_TRAVELER_REQUEST);
+                messagingTemplate.convertAndSend(
+                    "/topic/" + traveler.getEmail(),
+                    notificationToNotificationDtoConverter.convert(travelerNotification));
+              }
             }
             return new ResponseEntity<>(
                 new Result(false, HttpStatus.OK.value(), "deny tour successfully", tourDTO),
@@ -336,8 +411,9 @@ public class TourController {
           }
         });
   }
+
   @GetMapping("/pending")
-  public ResponseEntity<Result> getPendingTour(Authentication authentication){
+  public ResponseEntity<Result> getPendingTour(Authentication authentication) {
     return AuthUtils.checkAuthentication(
         authentication,
         () -> {

@@ -9,4 +9,8 @@ public class NotificationMessage {
   public static final String ACCEPTED_TOUR = "your tour is accepted ";
   public static final String DENY_TOUR = "your tour is confused";
   public static final String CANCEL_BOOKING = "your booking has been canceled by ";
+  public static final String ADD_NEW_TRAVELER_REQUEST = "you received traveler request from ";
+  public static final String ADD_TOUR_BY_TRAVELER_REQUEST = "your traveler request has been done";
+  public static final String DENY_TOUR_BY_TRAVELER_REQUEST =
+      "tour is created by your traveler request has been deny";
 }

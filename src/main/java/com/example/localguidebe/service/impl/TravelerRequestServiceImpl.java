@@ -1,18 +1,24 @@
 package com.example.localguidebe.service.impl;
 
+import com.example.localguidebe.converter.NotificationToNotificationDtoConverter;
 import com.example.localguidebe.dto.requestdto.AddTravelerRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateTravelerRequestDTO;
+import com.example.localguidebe.entity.Notification;
 import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.entity.TravelerRequest;
 import com.example.localguidebe.entity.User;
+import com.example.localguidebe.enums.NotificationTypeEnum;
 import com.example.localguidebe.enums.RolesEnum;
 import com.example.localguidebe.enums.TravelerRequestStatus;
 import com.example.localguidebe.repository.TourRepository;
 import com.example.localguidebe.repository.TravelerRequestRepository;
+import com.example.localguidebe.service.NotificationService;
 import com.example.localguidebe.service.TravelerRequestService;
 import com.example.localguidebe.service.UserService;
+import com.example.localguidebe.system.NotificationMessage;
 import java.util.List;
 import org.springframework.beans.BeanUtils;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,14 +26,23 @@ public class TravelerRequestServiceImpl implements TravelerRequestService {
   private final TravelerRequestRepository travelerRequestRepository;
   private final UserService userService;
   private final TourRepository tourRepository;
+  private final NotificationService notificationService;
+  private final SimpMessagingTemplate messagingTemplate;
+  private final NotificationToNotificationDtoConverter notificationToNotificationDtoConverter;
 
   public TravelerRequestServiceImpl(
       TravelerRequestRepository travelerRequestRepository,
       UserService userService,
-      TourRepository tourRepository) {
+      TourRepository tourRepository,
+      NotificationService notificationService,
+      SimpMessagingTemplate messagingTemplate,
+      NotificationToNotificationDtoConverter notificationToNotificationDtoConverter) {
     this.travelerRequestRepository = travelerRequestRepository;
     this.userService = userService;
     this.tourRepository = tourRepository;
+    this.notificationService = notificationService;
+    this.messagingTemplate = messagingTemplate;
+    this.notificationToNotificationDtoConverter = notificationToNotificationDtoConverter;
   }
 
   @Override
@@ -67,6 +82,19 @@ public class TravelerRequestServiceImpl implements TravelerRequestService {
             .traveler(traveler)
             .guide(guide)
             .build();
+
+    // notification send to guide
+    Notification guideNotification =
+        notificationService.addNotification(
+            guide.getId(),
+            traveler.getId(),
+            travelerRequest.getId(),
+            NotificationTypeEnum.ADD_NEW_TRAVELER_REQUEST,
+            NotificationMessage.ADD_NEW_TRAVELER_REQUEST);
+
+    messagingTemplate.convertAndSend(
+        "/topic/" + guide.getEmail(),
+        notificationToNotificationDtoConverter.convert(guideNotification));
 
     return travelerRequestRepository.save(travelerRequest);
   }
