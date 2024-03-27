@@ -1,6 +1,7 @@
 package com.example.localguidebe.controller;
 
 import com.example.localguidebe.converter.UserToUserDtoConverter;
+import com.example.localguidebe.dto.requestdto.ChangePasswordDTO;
 import com.example.localguidebe.dto.requestdto.UpdatePersonalInformationDTO;
 import com.example.localguidebe.dto.responsedto.IsCanReviewResponseDTO;
 import com.example.localguidebe.entity.User;
@@ -9,12 +10,12 @@ import com.example.localguidebe.security.service.CustomUserDetails;
 import com.example.localguidebe.service.UserService;
 import com.example.localguidebe.system.Result;
 import com.example.localguidebe.utils.AuthUtils;
+import java.util.Objects;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/users")
@@ -26,6 +27,8 @@ public class UserController {
     this.userService = userService;
     this.userToUserDtoConverter = userToUserDtoConverter;
   }
+
+  BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
   @PutMapping("")
   public ResponseEntity<Result> updatePersonalInformation(
@@ -157,6 +160,34 @@ public class UserController {
                         HttpStatus.INTERNAL_SERVER_ERROR.value(),
                         "You can not delete this user"));
           }
+        });
+  }
+
+  @PatchMapping("")
+  public ResponseEntity<Result> changPassword(
+      Authentication authentication, @RequestBody ChangePasswordDTO changePasswordDTO) {
+    return AuthUtils.checkAuthentication(
+        authentication,
+        () -> {
+          String email = ((CustomUserDetails) authentication.getPrincipal()).getEmail();
+          User user = userService.findUserByEmail(email);
+          if (bCryptPasswordEncoder.matches(changePasswordDTO.oldPassword(), user.getPassword())) {
+            if (!bCryptPasswordEncoder.matches(
+                changePasswordDTO.newPassword(), user.getPassword())) {
+              user.setPassword(bCryptPasswordEncoder.encode(changePasswordDTO.newPassword()));
+              userService.saveUser(user);
+              return ResponseEntity.status(HttpStatus.OK)
+                  .body(new Result(false, HttpStatus.OK.value(), "Change password successfully"));
+            }
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(
+                    new Result(
+                        false,
+                        HttpStatus.CONFLICT.value(),
+                        "New password and old password could not be same"));
+          }
+          return ResponseEntity.status(HttpStatus.CONFLICT)
+              .body(new Result(false, HttpStatus.CONFLICT.value(), "Your old password not match"));
         });
   }
 }
