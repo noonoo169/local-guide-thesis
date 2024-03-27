@@ -64,6 +64,7 @@ public class TourServiceImpl implements TourService {
   private final NotificationService notificationService;
   private final CartRepository cartRepository;
   private final ReviewRepository reviewRepository;
+  private final TourDupeService tourDupeService;
 
   @Autowired
   public TourServiceImpl(
@@ -81,7 +82,8 @@ public class TourServiceImpl implements TourService {
       ReviewToReviewResponseDto reviewToReviewResponseDto,
       NotificationService notificationService,
       CartRepository cartRepository,
-      ReviewRepository reviewRepository) {
+      ReviewRepository reviewRepository,
+      TourDupeService tourDupeService) {
     this.tourStartTimeRepository = tourStartTimeRepository;
     this.toResultInSearchSuggestionDtoConverter = toResultInSearchSuggestionDtoConverter;
     this.geoCodingService = geoCodingService;
@@ -97,6 +99,7 @@ public class TourServiceImpl implements TourService {
     this.notificationService = notificationService;
     this.cartRepository = cartRepository;
     this.reviewRepository = reviewRepository;
+    this.tourDupeService = tourDupeService;
   }
 
   @Autowired
@@ -283,7 +286,15 @@ public class TourServiceImpl implements TourService {
                 });
         logger.info("updated location");
       }
-      return tourRepository.save(tour);
+      Tour tourBeforeAddTourDupe = tourRepository.save(tour);
+
+      try {
+        tourDupeService.addTourDupe(tourBeforeAddTourDupe);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+
+      return tourBeforeAddTourDupe;
     }
     return null;
   }
