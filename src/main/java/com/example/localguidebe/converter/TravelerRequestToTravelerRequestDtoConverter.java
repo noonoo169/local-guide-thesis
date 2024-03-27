@@ -9,12 +9,15 @@ import org.springframework.stereotype.Component;
 public class TravelerRequestToTravelerRequestDtoConverter {
   private final UserToUserDtoConverter userToUserDtoConverter;
   private final UserToGuideDtoConverter userToGuideDtoConverter;
+  private final TourToTourDtoConverter tourToTourDtoConverter;
 
   public TravelerRequestToTravelerRequestDtoConverter(
       UserToUserDtoConverter userToUserDtoConverter,
-      UserToGuideDtoConverter userToGuideDtoConverter) {
+      UserToGuideDtoConverter userToGuideDtoConverter,
+      TourToTourDtoConverter tourToTourDtoConverter) {
     this.userToUserDtoConverter = userToUserDtoConverter;
     this.userToGuideDtoConverter = userToGuideDtoConverter;
+    this.tourToTourDtoConverter = tourToTourDtoConverter;
   }
 
   public TravelerRequestDTO convert(TravelerRequest source) {
@@ -30,6 +33,6 @@ public class TravelerRequestToTravelerRequestDtoConverter {
         source.getStatus(),
         userToGuideDtoConverter.convert(source.getGuide()),
         userToUserDtoConverter.convert(source.getTraveler()),
-        source.getTour() == null ? null : source.getTour().getId());
+        source.getTour() == null ? null : tourToTourDtoConverter.convert(source.getTour()));
   }
 }
