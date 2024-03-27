@@ -137,8 +137,21 @@ public class InvoiceServiceImpl implements InvoiceService {
     invoice
         .getBookings()
         .forEach(
-            booking ->
-                busyScheduleService.updateBusyScheduleBeforeUpdateOrDeleteBooking(null, booking));
+            booking -> {
+              busyScheduleService.updateBusyScheduleBeforeUpdateOrDeleteBooking(null, booking);
+
+              // notification send to guide
+              Notification guideNotification =
+                  notificationService.addNotification(
+                      booking.getTour().getGuide().getId(),
+                      invoice.getTraveler().getId(),
+                      booking.getId(),
+                      NotificationTypeEnum.CANCEL_BOOKING,
+                      NotificationMessage.CANCEL_BOOKING);
+              messagingTemplate.convertAndSend(
+                  "/topic/" + booking.getTour().getGuide().getEmail(),
+                  notificationToNotificationDtoConverter.convert(guideNotification));
+            });
     return invoiceRepository.save(invoice);
   }
 
