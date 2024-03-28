@@ -269,24 +269,32 @@ public class TourServiceImpl implements TourService {
                 location -> {
                   if (location.getId() != null)
                     tour.getLocations().add(locationService.findById(location.getId()));
-                  else
+                  else {
+                    InfoLocationDTO infoLocationDTO =
+                        gson.fromJson(
+                            geoCodingService.getAddress(
+                                location.getLatitude(), location.getLongitude()),
+                            InfoLocationDTO.class);
                     tour.getLocations()
                         .add(
-                            new Location(
-                                location.getName(),
-                                location.getLatitude(),
-                                location.getLongitude()));
+                            Location.builder()
+                                .address(
+                                    AddressUtils.removeVietnameseAccents(
+                                        infoLocationDTO.getDisplay_name()))
+                                .name(location.getName())
+                                .latitude(location.getLatitude())
+                                .longitude(location.getLongitude())
+                                .build());
+                  }
                 });
         logger.info("updated location");
       }
       Tour tourBeforeAddTourDupe = tourRepository.save(tour);
-
       try {
         tourDupeService.addTourDupe(tourBeforeAddTourDupe);
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
-
       return tourBeforeAddTourDupe;
     }
     return null;
