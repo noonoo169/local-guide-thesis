@@ -1,3 +1,3 @@
 package com.example.localguidebe.dto.requestdto;
 
-public record ChangePasswordDTO(String oldPassword, String newPassword) {}
+public record ChangePasswordDTO(String password, String newPassword) {}
