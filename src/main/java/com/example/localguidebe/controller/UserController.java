@@ -171,7 +171,7 @@ public class UserController {
         () -> {
           String email = ((CustomUserDetails) authentication.getPrincipal()).getEmail();
           User user = userService.findUserByEmail(email);
-          if (bCryptPasswordEncoder.matches(changePasswordDTO.oldPassword(), user.getPassword())) {
+          if (bCryptPasswordEncoder.matches(changePasswordDTO.password(), user.getPassword())) {
             if (!bCryptPasswordEncoder.matches(
                 changePasswordDTO.newPassword(), user.getPassword())) {
               user.setPassword(bCryptPasswordEncoder.encode(changePasswordDTO.newPassword()));
