@@ -16,7 +16,7 @@ import com.example.localguidebe.entity.*;
 import com.example.localguidebe.enums.*;
 import com.example.localguidebe.repository.*;
 import com.example.localguidebe.service.*;
-import com.example.localguidebe.system.NotificationMessage;
+import com.example.localguidebe.system.constants.NotificationMessage;
 import com.example.localguidebe.utils.AddressUtils;
 import com.example.localguidebe.utils.CloudinaryUtil;
 import com.google.gson.Gson;

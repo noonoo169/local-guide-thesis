@@ -8,7 +8,7 @@ import com.example.localguidebe.enums.NotificationTypeEnum;
 import com.example.localguidebe.repository.BookingRepository;
 import com.example.localguidebe.repository.InvoiceRepository;
 import com.example.localguidebe.service.*;
-import com.example.localguidebe.system.NotificationMessage;
+import com.example.localguidebe.system.constants.NotificationMessage;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -33,6 +33,7 @@ public class InvoiceServiceImpl implements InvoiceService {
   private final TourToTourDtoConverter tourToTourDtoConverter;
   private final BusyScheduleService busyScheduleService;
   private final TourDupeService tourDupeService;
+  private final EmailService emailService;
 
   Logger logger = LoggerFactory.getLogger(InvoiceServiceImpl.class);
 
@@ -46,7 +47,8 @@ public class InvoiceServiceImpl implements InvoiceService {
       NotificationToNotificationDtoConverter notificationToNotificationDtoConverter,
       TourToTourDtoConverter tourToTourDtoConverter,
       BusyScheduleService busyScheduleService,
-      TourDupeService tourDupeService) {
+      TourDupeService tourDupeService,
+      EmailService emailService) {
     this.cartService = cartService;
     this.bookingRepository = bookingRepository;
     this.invoiceRepository = invoiceRepository;
@@ -56,6 +58,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     this.tourToTourDtoConverter = tourToTourDtoConverter;
     this.busyScheduleService = busyScheduleService;
     this.tourDupeService = tourDupeService;
+    this.emailService = emailService;
   }
 
   @Override
@@ -111,6 +114,7 @@ public class InvoiceServiceImpl implements InvoiceService {
           messagingTemplate.convertAndSend(
               "/topic/" + booking.getTour().getGuide().getEmail(),
               notificationToNotificationDtoConverter.convert(guideNotification));
+          emailService.sendEmailForNewBooking(booking);
 
           // notification send to traveler
           Notification travelerNotification =

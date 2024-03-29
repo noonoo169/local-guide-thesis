@@ -1,4 +1,4 @@
-package com.example.localguidebe.system;
+package com.example.localguidebe.system.constants;
 
 public class NotificationMessage {
   public static final String ADD_REVIEW_FOR_TOUR = " just reviewed your tour";
