@@ -16,7 +16,7 @@ import com.example.localguidebe.repository.UserRepository;
 import com.example.localguidebe.service.NotificationService;
 import com.example.localguidebe.service.ReviewService;
 import com.example.localguidebe.service.TourService;
-import com.example.localguidebe.system.NotificationMessage;
+import com.example.localguidebe.system.constants.NotificationMessage;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;

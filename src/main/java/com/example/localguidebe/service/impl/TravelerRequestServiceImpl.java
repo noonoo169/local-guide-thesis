@@ -15,7 +15,7 @@ import com.example.localguidebe.repository.TravelerRequestRepository;
 import com.example.localguidebe.service.NotificationService;
 import com.example.localguidebe.service.TravelerRequestService;
 import com.example.localguidebe.service.UserService;
-import com.example.localguidebe.system.NotificationMessage;
+import com.example.localguidebe.system.constants.NotificationMessage;
 import java.util.List;
 import org.springframework.beans.BeanUtils;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
