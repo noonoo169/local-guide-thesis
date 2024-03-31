@@ -1,7 +1,9 @@
 package com.example.localguidebe.service;
 
+import com.example.localguidebe.dto.CryptoPayDto;
+import com.example.localguidebe.entity.Booking;
+import com.example.localguidebe.entity.Cart;
 import com.example.localguidebe.entity.Invoice;
-import com.example.localguidebe.enums.InvoiceStatus;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,4 +24,8 @@ public interface InvoiceService {
   Optional<Invoice> findById(Long id);
 
   Double getRefundAmount(Invoice invoice);
+
+  Invoice createInvoiceByCrypto(CryptoPayDto cryptoPayDto);
+
+  void updateBookingAndSendNotification(Cart cart, List<Long> bookingIds, Invoice invoice);
 }

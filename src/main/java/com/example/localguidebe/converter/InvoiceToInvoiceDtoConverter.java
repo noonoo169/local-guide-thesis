@@ -23,6 +23,7 @@ public class InvoiceToInvoiceDtoConverter {
         source.getPhone(),
         source.getEmail(),
         source.getStatus(),
-        source.getBookings().stream().map(bookingToBookingDtoConverter::convert).toList());
+        source.getBookings().stream().map(bookingToBookingDtoConverter::convert).toList(),
+        source.getCryptoPaymentDetail() == null ? null : source.getCryptoPaymentDetail());
   }
 }
