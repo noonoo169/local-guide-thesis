@@ -88,8 +88,8 @@ public class AppConfiguration {
         FirebaseOptions.builder()
             .setCredentials(GoogleCredentials.fromStream(serviceAccount))
             .build();
-    if(FirebaseApp.getApps().isEmpty()) {
-      FirebaseApp.initializeApp(options);
+    if (FirebaseApp.getApps().isEmpty()) {
+      return FirebaseApp.initializeApp(options);
     }
     return FirebaseApp.getApps().get(0);
   }
