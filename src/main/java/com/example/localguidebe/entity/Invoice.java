@@ -52,4 +52,8 @@ public class Invoice {
 
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "invoice")
   private List<Booking> bookings = new ArrayList<>();
+
+  @OneToOne
+  @JoinColumn(name = "crypto_payment_detail_id")
+  private CryptoPaymentDetail cryptoPaymentDetail;
 }
