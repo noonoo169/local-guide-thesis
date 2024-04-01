@@ -1,4 +1,4 @@
-package com.example.localguidebe.crypto.model.coinpayments.resquest;
+package com.example.localguidebe.dto.coinDTO.coinpayments.resquest;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

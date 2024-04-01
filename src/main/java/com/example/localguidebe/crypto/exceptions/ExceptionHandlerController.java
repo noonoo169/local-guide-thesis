@@ -1,6 +1,6 @@
 package com.example.localguidebe.crypto.exceptions;
 
-import com.example.localguidebe.crypto.model.ApiError;
+import com.example.localguidebe.dto.coinDTO.ApiError;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,6 +12,7 @@ public class ExceptionHandlerController {
 
     /**
      * Custom Exception to handle Currency Conversion From PathVariables
+     *
      * @param conversionFailedException
      * @return ApiError
      */

@@ -1,4 +1,4 @@
-package com.example.localguidebe.crypto.model.coinpayments.response;
+package com.example.localguidebe.dto.coinDTO.coinpayments.response.info;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
