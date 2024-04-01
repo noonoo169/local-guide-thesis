@@ -1,4 +1,4 @@
-package com.example.localguidebe.crypto.model.coinpayments.response;
+package com.example.localguidebe.dto.coinDTO.coinpayments.response.Result;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;

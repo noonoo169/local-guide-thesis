@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Load all Coinpayments configurations from application.yml
+ * Load all Coinpayments configurations from application.properties
  */
 @Getter
 @Setter
