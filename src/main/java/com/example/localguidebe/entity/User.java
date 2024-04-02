@@ -1,5 +1,6 @@
 package com.example.localguidebe.entity;
 
+import com.example.localguidebe.oauth2.OAuth2Provider;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -92,6 +93,10 @@ public class User {
 
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
   List<GuideApplication> guideApplications = new ArrayList<>();
+
+  @Column
+  @Enumerated(EnumType.STRING)
+  private OAuth2Provider oAuth2Provider;
 
   @Override
   public String toString() {
