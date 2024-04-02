@@ -1,7 +1,6 @@
 package com.example.localguidebe.service.impl;
 
-import com.example.localguidebe.dto.responsedto.StatisticalGuideDTO;
-import com.example.localguidebe.dto.responsedto.StatisticalTourDTO;
+import com.example.localguidebe.dto.responsedto.*;
 import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.entity.User;
 import com.example.localguidebe.enums.RolesEnum;
@@ -9,6 +8,10 @@ import com.example.localguidebe.repository.BookingRepository;
 import com.example.localguidebe.repository.TourRepository;
 import com.example.localguidebe.repository.UserRepository;
 import com.example.localguidebe.service.StatisticService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -33,15 +36,19 @@ public class StatisticServiceImpl implements StatisticService {
 
     // get statistic of all guide
     @Override
-    public List<StatisticalGuideDTO> getStatisticalByGuide(
-    ) {
-        List<User> guides = userRepository.findByRoles_Name(RolesEnum.GUIDER);
+    public StatisticalGuidePaginationDTO getStatisticalByGuide(
+            Integer page, Integer limit, String order) {
+        Sort sort =
+                order.equals("asc") ? Sort.by("fullName").ascending() : Sort.by("fullName").descending();
+        Pageable paging = PageRequest.of(page, limit, sort);
+        Page<User> guidePage = userRepository.findByRoles_Name(RolesEnum.GUIDER, paging);
         List<StatisticalGuideDTO> statisticalGuideDTOS = new ArrayList<>();
-        for (User guide : guides) {
+        for (User guide : guidePage.get().toList()) {
             statisticalGuideDTOS.add(getStatisticByPerGuide(guide.getId()));
         }
 
-        return statisticalGuideDTOS;
+        return new StatisticalGuidePaginationDTO(
+                statisticalGuideDTOS, guidePage.getTotalPages(), (int) guidePage.getTotalElements());
     }
 
     // get revenue of per guide
@@ -125,16 +132,18 @@ public class StatisticServiceImpl implements StatisticService {
 
     // get statistic of tours by guide
     @Override
-    public List<StatisticalTourDTO> getStatisticOfToursByGuide(
-            Long guideId) {
+    public StatisticOfToursByGuidePaginationDTO getStatisticOfToursByGuide(
+            Long guideId, Integer page, Integer limit, String order) {
         List<StatisticalTourDTO> statisticOfToursByGuide = new ArrayList<>();
-
-        List<Long> tourIdOfGuidesPage = bookingRepository.getTourIdByGuide(guideId);
+        Sort sort =
+                order.equals("asc") ? Sort.by("id").ascending() : Sort.by("id").descending();
+        Pageable paging = PageRequest.of(page, limit, sort);
+        Page<Long> tourIdOfGuidesPage = bookingRepository.getTourIdByGuide(guideId, paging);
         for (Long tourIdOfGuide : tourIdOfGuidesPage.stream().toList()) {
             statisticOfToursByGuide.add(getStatisticByPerTour(tourIdOfGuide));
         }
 
-        return statisticOfToursByGuide;
+        return new StatisticOfToursByGuidePaginationDTO(statisticOfToursByGuide, tourIdOfGuidesPage.getTotalPages(), (int) tourIdOfGuidesPage.getTotalElements());
     }
 
     // get total traveler number by guide
@@ -153,13 +162,17 @@ public class StatisticServiceImpl implements StatisticService {
 
     // get statistic of all tours
     @Override
-    public List<StatisticalTourDTO> getStatisticalByTour() {
-        List<Tour> tours = tourRepository.findAll();
+    public StatisticalTourPaginationDTO getStatisticalByTour(
+            Integer page, Integer limit, String order) {
+        Sort sort = order.equals("asc") ? Sort.by("name").ascending() : Sort.by("name").descending();
+        Pageable paging = PageRequest.of(page, limit, sort);
+        Page<Tour> tourPage = tourRepository.findAll(paging);
         List<StatisticalTourDTO> statisticalTourDTOS = new ArrayList<>();
-        for (Tour tour : tours) {
+        for (Tour tour : tourPage.get().toList()) {
             statisticalTourDTOS.add(getStatisticByPerTour(tour.getId()));
         }
-        return statisticalTourDTOS;
+        return new StatisticalTourPaginationDTO(
+                statisticalTourDTOS, tourPage.getTotalPages(), (int) tourPage.getTotalElements());
     }
 
     // get total booking  of per tour

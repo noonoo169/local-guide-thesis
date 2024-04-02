@@ -7,10 +7,7 @@ import com.example.localguidebe.utils.AuthUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/statistic")
@@ -22,14 +19,17 @@ public class StatisticController {
     }
 
     @GetMapping("/guides")
-    public ResponseEntity<Result> getStatisticByGuides() {
+    public ResponseEntity<Result> getStatisticByGuides(
+            @RequestParam(required = false, defaultValue = "0") Integer page,
+            @RequestParam(required = false, defaultValue = "5") Integer limit,
+            @RequestParam(required = false, defaultValue = "desc") String order) {
         try {
             return new ResponseEntity<>(
                     new Result(
                             false,
                             HttpStatus.OK.value(),
                             "get statistic of guide successfully",
-                            statisticService.getStatisticalByGuide()),
+                            statisticService.getStatisticalByGuide(page, limit, order)),
                     HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(
@@ -39,14 +39,17 @@ public class StatisticController {
     }
 
     @GetMapping("/tours")
-    public ResponseEntity<Result> getStatisticByTours() {
+    public ResponseEntity<Result> getStatisticByTours(
+            @RequestParam(required = false, defaultValue = "0") Integer page,
+            @RequestParam(required = false, defaultValue = "5") Integer limit,
+            @RequestParam(required = false, defaultValue = "desc") String order) {
         try {
             return new ResponseEntity<>(
                     new Result(
                             false,
                             HttpStatus.OK.value(),
                             "get statistic of tour successfully",
-                            statisticService.getStatisticalByTour()),
+                            statisticService.getStatisticalByTour(page, limit, order)),
                     HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(
@@ -103,7 +106,10 @@ public class StatisticController {
 
     @GetMapping("/guide/tours")
     public ResponseEntity<Result> getStatisticOfToursByGuide(
-            Authentication authentication) {
+            Authentication authentication,
+            @RequestParam(required = false, defaultValue = "0") Integer page,
+            @RequestParam(required = false, defaultValue = "5") Integer limit,
+            @RequestParam(required = false, defaultValue = "desc") String order) {
         return AuthUtils.checkAuthentication(
                 authentication,
                 () -> {
@@ -114,7 +120,7 @@ public class StatisticController {
                                         HttpStatus.OK.value(),
                                         "get statistic of tours by guide successfully",
                                         statisticService.getStatisticOfToursByGuide(
-                                                ((CustomUserDetails) authentication.getPrincipal()).getId())),
+                                                ((CustomUserDetails) authentication.getPrincipal()).getId(), page, limit, order)),
                                 HttpStatus.OK);
                     } catch (Exception e) {
                         return new ResponseEntity<>(
