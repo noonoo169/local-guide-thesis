@@ -32,7 +32,7 @@ public class CoinpaymentsServiceImpl implements CoinpaymentsService {
 
     @Override
     public BaseResponse<DepositAddress> getDepositAddress(String currency) {
-        final String requestBody = new RequestBody(coinpaymentsProperties.getVersion(), Cmd.rates.getCmd(),
+        final String requestBody = new RequestBody(coinpaymentsProperties.getVersion(), Cmd.RATES.getCmd(),
                 currency, coinpaymentsProperties.getPublicKey()).toString();
         CoinInfo coinInfo = coinpaymentsClient.getRates(requestBody);
         return coinpaymentsClient.getDepositAddres(requestBody);
@@ -40,21 +40,21 @@ public class CoinpaymentsServiceImpl implements CoinpaymentsService {
 
     @Override
     public Double getCoinAmount(Double usdAmount) {
-        final String requestBody = new RequestBody(coinpaymentsProperties.getVersion(), Cmd.rates.getCmd(),
+        final String requestBody = new RequestBody(coinpaymentsProperties.getVersion(), Cmd.RATES.getCmd(),
                 Currency.ltct.toString(), coinpaymentsProperties.getPublicKey()).toString();
         CoinInfo coinInfo = coinpaymentsClient.getRates(requestBody);
         return coinInfo.getResult().get("USD").getRate_btc() / coinInfo.getResult().get("LTC").getRate_btc() * usdAmount;
     }
     @Override
     public Double getUSDAmount(Double coinAmount) {
-        final String requestBody = new RequestBody(coinpaymentsProperties.getVersion(), Cmd.rates.getCmd(),
+        final String requestBody = new RequestBody(coinpaymentsProperties.getVersion(), Cmd.RATES.getCmd(),
                 Currency.ltct.toString(), coinpaymentsProperties.getPublicKey()).toString();
         CoinInfo coinInfo = coinpaymentsClient.getRates(requestBody);
         return   coinInfo.getResult().get("LTC").getRate_btc()/coinInfo.getResult().get("USD").getRate_btc() * coinAmount;
     }
     @Override
     public Double getUSDAndLTCTRate(){
-        final String requestBody = new RequestBody(coinpaymentsProperties.getVersion(), Cmd.rates.getCmd(),
+        final String requestBody = new RequestBody(coinpaymentsProperties.getVersion(), Cmd.RATES.getCmd(),
                 Currency.ltct.toString(), coinpaymentsProperties.getPublicKey()).toString();
         CoinInfo coinInfo = coinpaymentsClient.getRates(requestBody);
         return   coinInfo.getResult().get("LTC").getRate_btc()/coinInfo.getResult().get("USD").getRate_btc();
@@ -64,14 +64,14 @@ public class CoinpaymentsServiceImpl implements CoinpaymentsService {
 
     @Override
     public WithdrawalInfo createWithdrawal(TransactionRequest transactionRequest) {
-        final String request = new WithdrawalBody(coinpaymentsProperties.getVersion(), coinpaymentsProperties.getPublicKey().toString(), Cmd.create_withdrawal.getCmd(), transactionRequest.getAmount(), Currency.ltct.toString(), "mimZqNG3fBVP2jyg47nKuTitdk7P6hZZwv", "1").toString();
+        final String request = new WithdrawalBody(coinpaymentsProperties.getVersion(), coinpaymentsProperties.getPublicKey().toString(), Cmd.CREATE_WITHDRAWAL.getCmd(), transactionRequest.getAmount(), Currency.ltct.toString(), "mimZqNG3fBVP2jyg47nKuTitdk7P6hZZwv", "1").toString();
         WithdrawalInfo withdrawalInfo = coinpaymentsClient.createWithdrawal(request);
         return withdrawalInfo;
     }
 
     @Override
     public BillInfoData getPaymentInfo(String txid) {
-        final String request = new PaymentInfoBody(coinpaymentsProperties.getVersion(), coinpaymentsProperties.getPublicKey(), Cmd.get_withdrawal_info.getCmd(), txid).toString();
+        final String request = new PaymentInfoBody(coinpaymentsProperties.getVersion(), coinpaymentsProperties.getPublicKey(), Cmd.GET_WITHDRAWAL_INFO.getCmd(), txid).toString();
         BillInfoData billInfoData = coinpaymentsClient.getInfoTransaction(request);
         return billInfoData;
     }
