@@ -8,10 +8,11 @@ public enum Cmd {
      * Extend this for other Cmd calls
      */
     DEPOSIT_ADDRESS("get_deposit_address"),
-    get_callback_address("get_callback_address"),
-    rates("rates "),
-    create_withdrawal("create_withdrawal"),
-    get_withdrawal_info("get_withdrawal_info");
+    GET_CALLBACK_ADDRESS("get_callback_address"),
+    RATES("rates "),
+    CREATE_WITHDRAWAL("create_withdrawal"),
+    GET_WITHDRAWAL_INFO("get_withdrawal_info");
+
 
     /* Name used on the enumeration */
     public final String cmd;
