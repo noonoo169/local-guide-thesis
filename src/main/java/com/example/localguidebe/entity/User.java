@@ -98,6 +98,9 @@ public class User {
   @Enumerated(EnumType.STRING)
   private OAuth2Provider oAuth2Provider;
 
+  @Column(columnDefinition = "TEXT")
+  private String rpToken;
+
   @Override
   public String toString() {
     return "{"
