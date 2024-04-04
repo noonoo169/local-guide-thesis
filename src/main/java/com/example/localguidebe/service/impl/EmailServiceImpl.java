@@ -34,6 +34,9 @@ public class EmailServiceImpl implements EmailService {
   private final ImageService imageService;
   private final TemplateEngine templateEngine;
 
+  @Value("${frontend.host}")
+  private String feHost;
+
   @Autowired
   public EmailServiceImpl(
       JavaMailSender mailSender,
@@ -99,7 +102,7 @@ public class EmailServiceImpl implements EmailService {
   // Method 1
   // To send a simple email
   @Override
-  public boolean sendSimpleMail(EmailDetails details, String templateName, Context context) {
+  public boolean sendSimpleMail(EmailDetails details) {
     // Try block to check for exceptions
     try {
       // Creating a simple mail message
@@ -180,5 +183,20 @@ public class EmailServiceImpl implements EmailService {
     context.setVariable("startDate", booking.getStartDate());
     context.setVariable("totalPrice", booking.getPrice());
     return sendMimeMail(emailDetails, "email/new-booking", context);
+  }
+
+  @Override
+  public boolean sendEmailForResetPassword(String email, String token) {
+    String subject = EmailSubject.RESET_PASSWORD;
+    String linkResetPassword = feHost + "/change-password-by-token" + "?token=" + token;
+    EmailDetails emailDetails =
+        EmailDetails.builder()
+            .recipient(email)
+            .subject(subject)
+            .msgBody(
+                "Please use this link to reset your password. Please note that the link will expire in 10 minutes.\n"
+                    + linkResetPassword)
+            .build();
+    return sendSimpleMail(emailDetails);
   }
 }
