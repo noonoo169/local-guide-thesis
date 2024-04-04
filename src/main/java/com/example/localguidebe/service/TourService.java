@@ -8,51 +8,54 @@ import com.example.localguidebe.dto.responsedto.ReviewResponseDTO;
 import com.example.localguidebe.dto.responsedto.SearchSuggestionResponseDTO;
 import com.example.localguidebe.dto.responsedto.SearchTourDTO;
 import com.example.localguidebe.entity.Tour;
+
 import java.time.LocalDate;
 import java.util.List;
 
 public interface TourService {
-  SearchTourDTO getListTour(Integer page, Integer limit);
+    SearchTourDTO getListTour(Integer page, Integer limit);
 
-  Tour saveTour(TourRequestDTO tourRequestDTO, String email);
+    Tour saveTour(TourRequestDTO tourRequestDTO, String email);
 
-  Tour updateTour(UpdateTourRequestDTO updateTourRequestDTO);
+    Tour updateTour(UpdateTourRequestDTO updateTourRequestDTO);
 
-  TourDTO getTourById(Long id);
+    TourDTO getTourById(Long id);
 
-  SearchTourDTO getTours(
-      Integer page,
-      Integer limit,
-      String sortBy,
-      String order,
-      String searchKey,
-      Double minPrice,
-      Double maxPrice,
-      List<Long> categoryId);
+    SearchTourDTO getTours(
+            Integer page,
+            Integer limit,
+            String sortBy,
+            String order,
+            String searchKey,
+            Double minPrice,
+            Double maxPrice,
+            List<Long> categoryId);
 
-  List<TourDTO> deleteTour(Long id);
+    List<TourDTO> deleteTour(Long id);
 
-  List<Tour> getToursOfGuide(Long guideId);
+    List<Tour> getToursOfGuide(Long guideId);
 
-  SearchSuggestionResponseDTO getTourAndTourLocations(String searchValue);
+    SearchTourDTO getListTourForAdmin(Integer page, Integer limit);
 
-  List<String> getTourStartTimeAvailable(Long tourId, LocalDate localDate);
+    SearchSuggestionResponseDTO getTourAndTourLocations(String searchValue);
 
-  boolean checkBookingByTraveler(Long tourId, String email);
+    List<String> getTourStartTimeAvailable(Long tourId, LocalDate localDate);
 
-  boolean checkExistingReviewsByTraveler(Long travelerId, Long tourId);
+    boolean checkBookingByTraveler(Long tourId, String email);
 
-  void updateRatingForTour(Tour tour);
+    boolean checkExistingReviewsByTraveler(Long travelerId, Long tourId);
 
-  List<String> getLocationName(List<LocationDTO> locationDTOS);
+    void updateRatingForTour(Tour tour);
 
-  List<ReviewResponseDTO> filterReviewForTour(List<Integer> ratings, Long tourId, String sortBy);
+    List<String> getLocationName(List<LocationDTO> locationDTOS);
 
-  TourDTO acceptTour(Long tourId);
+    List<ReviewResponseDTO> filterReviewForTour(List<Integer> ratings, Long tourId, String sortBy);
 
-  TourDTO denyTour(Long tourId);
+    TourDTO acceptTour(Long tourId);
 
-  List<TourDTO> getPendingTour();
+    TourDTO denyTour(Long tourId);
 
-  Tour findTourById(Long id);
+    List<TourDTO> getPendingTour();
+
+    Tour findTourById(Long id);
 }
