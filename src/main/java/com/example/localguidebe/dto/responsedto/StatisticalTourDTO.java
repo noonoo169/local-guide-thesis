@@ -13,7 +13,6 @@ public class StatisticalTourDTO {
   private String name;
   private Double pricePerTraveler;
   private Integer limitTraveler;
-  private Double extraPrice;
   private Double overallRating;
   private Long totalTravelerNumber;
   private Double totalRevenue;

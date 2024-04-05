@@ -16,7 +16,6 @@ public record UpdateTourRequestDTO(
     String estimatedLocalCashNeeded,
     Double pricePerTraveler,
     Integer limitTraveler,
-    Double extraPrice,
     String address,
     String itinerary,
     Integer guide_id,

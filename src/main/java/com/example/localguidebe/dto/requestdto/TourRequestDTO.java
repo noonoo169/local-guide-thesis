@@ -27,7 +27,6 @@ public class TourRequestDTO {
   private String estimatedLocalCashNeeded;
   private Double pricePerTraveler;
   private Integer limitTraveler;
-  private Double extraPrice;
   private String address;
   private String itinerary;
   private User guide;
