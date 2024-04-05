@@ -52,7 +52,6 @@ public class TourToTourDtoConverter {
         tour.getEstimatedLocalCashNeeded(),
         tour.getPricePerTraveler(),
         tour.getLimitTraveler(),
-        tour.getExtraPrice(),
         tour.getOverallRating() != null ? tour.getOverallRating() : 0.0,
         tour.getItinerary(),
         tour.getIsDeleted(),

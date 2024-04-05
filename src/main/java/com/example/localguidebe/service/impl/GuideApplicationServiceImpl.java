@@ -4,7 +4,6 @@ import com.example.localguidebe.dto.requestdto.AddGuideApplicationDTO;
 import com.example.localguidebe.dto.requestdto.UpdateGuideApplicationDTO;
 import com.example.localguidebe.dto.requestdto.UpdateGuideApplicationStatus;
 import com.example.localguidebe.entity.GuideApplication;
-import com.example.localguidebe.entity.Image;
 import com.example.localguidebe.entity.Role;
 import com.example.localguidebe.entity.User;
 import com.example.localguidebe.enums.AssociateName;
@@ -16,12 +15,9 @@ import com.example.localguidebe.service.GuideApplicationService;
 import com.example.localguidebe.service.ImageService;
 import com.example.localguidebe.service.RoleService;
 import com.example.localguidebe.service.UserService;
-
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -64,6 +60,11 @@ public class GuideApplicationServiceImpl implements GuideApplicationService {
     if (addGuideApplicationDTO.userId() != null) {
       user = userService.findById(addGuideApplicationDTO.userId()).orElse(null);
       if (user == null) return null;
+      user.setPhone(addGuideApplicationDTO.phone());
+      user.setDateOfBirth(addGuideApplicationDTO.dateOfBirth());
+      user.setFullName(addGuideApplicationDTO.fullName());
+      user.setAddress(addGuideApplicationDTO.address());
+      user = userService.saveUser(user);
     } else {
       if (userService.findUserByEmail(addGuideApplicationDTO.email()) != null) return null;
       Set<Role> role = new HashSet<>();
@@ -76,6 +77,7 @@ public class GuideApplicationServiceImpl implements GuideApplicationService {
               .password(passwordEncoder.encode(addGuideApplicationDTO.password()))
               .phone(addGuideApplicationDTO.phone())
               .dateOfBirth(addGuideApplicationDTO.dateOfBirth())
+              .biography(addGuideApplicationDTO.biography())
               .roles(role)
               .build();
       user = userService.saveUser(newUser);

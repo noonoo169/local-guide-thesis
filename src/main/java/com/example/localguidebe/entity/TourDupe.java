@@ -97,7 +97,6 @@ public class TourDupe {
     this.estimatedLocalCashNeeded = tour.getEstimatedLocalCashNeeded();
     this.pricePerTraveler = tour.getPricePerTraveler();
     this.limitTraveler = tour.getLimitTraveler();
-    this.extraPrice = tour.getExtraPrice();
     this.overallRating = tour.getOverallRating();
     this.itinerary = tour.getItinerary();
     this.guide = JsonUtils.convertObjectToJson(tour.getGuide());

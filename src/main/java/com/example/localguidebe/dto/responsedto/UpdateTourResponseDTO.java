@@ -18,7 +18,6 @@ public record UpdateTourResponseDTO(
     String estimatedLocalCashNeeded,
     Double pricePerTraveler,
     Integer limitTraveler,
-    Double extraPrice,
     String itinerary,
     String province,
     List<TourStartTimeDTO> tourStartTimes,

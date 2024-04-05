@@ -30,9 +30,9 @@ public class StatisticServiceImpl implements StatisticService {
   private final TourRepository tourRepository;
 
   public StatisticServiceImpl(
-      BookingRepository bookingRepository,
-      UserRepository userRepository,
-      TourRepository tourRepository) {
+          BookingRepository bookingRepository,
+          UserRepository userRepository,
+          TourRepository tourRepository) {
     this.bookingRepository = bookingRepository;
     this.userRepository = userRepository;
     this.tourRepository = tourRepository;
@@ -41,9 +41,9 @@ public class StatisticServiceImpl implements StatisticService {
   // get statistic of all guide
   @Override
   public StatisticalGuidePaginationDTO getStatisticalByGuide(
-      Integer page, Integer limit, String order) {
+          Integer page, Integer limit, String order) {
     Sort sort =
-        order.equals("asc") ? Sort.by("fullName").ascending() : Sort.by("fullName").descending();
+            order.equals("asc") ? Sort.by("fullName").ascending() : Sort.by("fullName").descending();
     Pageable paging = PageRequest.of(page, limit, sort);
     Page<User> guidePage = userRepository.findByRoles_Name(RolesEnum.GUIDER, paging);
     List<StatisticalGuideDTO> statisticalGuideDTOS = new ArrayList<>();
@@ -52,7 +52,7 @@ public class StatisticServiceImpl implements StatisticService {
     }
 
     return new StatisticalGuidePaginationDTO(
-        statisticalGuideDTOS, guidePage.getTotalPages(), (int) guidePage.getTotalElements());
+            statisticalGuideDTOS, guidePage.getTotalPages(), (int) guidePage.getTotalElements());
   }
 
   // get revenue of per guide
@@ -62,7 +62,7 @@ public class StatisticServiceImpl implements StatisticService {
     List<Long> tourIdOfGuides = bookingRepository.getTourIdByGuide(guideId);
     for (Long tourIdOfGuide : tourIdOfGuides) {
       revenueOfGuide +=
-          getRevenueByTour(tourIdOfGuide) != null ? getRevenueByTour(tourIdOfGuide) : 0L;
+              getRevenueByTour(tourIdOfGuide) != null ? getRevenueByTour(tourIdOfGuide) : 0L;
     }
     return revenueOfGuide;
   }
@@ -86,7 +86,7 @@ public class StatisticServiceImpl implements StatisticService {
     List<Long> tourIdOfGuides = bookingRepository.getTourIdByGuide(guideId);
     for (Long tourIdOfGuide : tourIdOfGuides) {
       totalBookingNumbers +=
-          getTotalBookingByTour(tourIdOfGuide) != null ? getTotalBookingByTour(tourIdOfGuide) : 0L;
+              getTotalBookingByTour(tourIdOfGuide) != null ? getTotalBookingByTour(tourIdOfGuide) : 0L;
     }
     return totalBookingNumbers;
   }
@@ -96,21 +96,20 @@ public class StatisticServiceImpl implements StatisticService {
   public StatisticalTourDTO getStatisticByPerTour(Long tourId) {
     Tour tour = tourRepository.findById(tourId).orElseThrow();
     StatisticalTourDTO statisticalTourDTO =
-        StatisticalTourDTO.builder()
-            .id(tour.getId())
-            .name(tour.getName())
-            .limitTraveler(tour.getLimitTraveler())
-            .pricePerTraveler(tour.getPricePerTraveler())
-            .extraPrice(tour.getExtraPrice())
-            .overallRating(tour.getOverallRating() != null ? tour.getOverallRating() : 0.0)
-            .totalTravelerNumber(
-                getTotalTravelerNumberByTour(tour.getId()) != null
-                    ? getTotalTravelerNumberByTour(tour.getId())
-                    : 0)
-            .totalRevenue(
-                getRevenueByTour(tour.getId()) != null ? getRevenueByTour(tour.getId()) : 0.0)
-            .totalBooking(getTotalBookingByTour(tour.getId()))
-            .build();
+            StatisticalTourDTO.builder()
+                    .id(tour.getId())
+                    .name(tour.getName())
+                    .limitTraveler(tour.getLimitTraveler())
+                    .pricePerTraveler(tour.getPricePerTraveler())
+                    .overallRating(tour.getOverallRating() != null ? tour.getOverallRating() : 0.0)
+                    .totalTravelerNumber(
+                            getTotalTravelerNumberByTour(tour.getId()) != null
+                                    ? getTotalTravelerNumberByTour(tour.getId())
+                                    : 0)
+                    .totalRevenue(
+                            getRevenueByTour(tour.getId()) != null ? getRevenueByTour(tour.getId()) : 0.0)
+                    .totalBooking(getTotalBookingByTour(tour.getId()))
+                    .build();
     return statisticalTourDTO;
   }
 
@@ -119,25 +118,25 @@ public class StatisticServiceImpl implements StatisticService {
   public StatisticalGuideDTO getStatisticByPerGuide(Long guideId) {
     User guide = userRepository.findById(guideId).orElseThrow();
     StatisticalGuideDTO statisticalGuideDTO =
-        StatisticalGuideDTO.builder()
-            .id(guide.getId())
-            .phone(guide.getPhone())
-            .dateOfBirth(guide.getDateOfBirth())
-            .email(guide.getEmail())
-            .fullName(guide.getFullName())
-            .overallRating(guide.getOverallRating() != null ? guide.getOverallRating() : 0.0)
-            .address(guide.getAddress())
-            .totalRevenue(getRevenueByGuide(guide.getId()))
-            .totalTravelerNumber(getTotalTravelerNumberByGuide(guide.getId()))
-            .totalBooking(getTotalBookingByGuide(guide.getId()))
-            .build();
+            StatisticalGuideDTO.builder()
+                    .id(guide.getId())
+                    .phone(guide.getPhone())
+                    .dateOfBirth(guide.getDateOfBirth())
+                    .email(guide.getEmail())
+                    .fullName(guide.getFullName())
+                    .overallRating(guide.getOverallRating() != null ? guide.getOverallRating() : 0.0)
+                    .address(guide.getAddress())
+                    .totalRevenue(getRevenueByGuide(guide.getId()))
+                    .totalTravelerNumber(getTotalTravelerNumberByGuide(guide.getId()))
+                    .totalBooking(getTotalBookingByGuide(guide.getId()))
+                    .build();
     return statisticalGuideDTO;
   }
 
   // get statistic of tours by guide
   @Override
   public StatisticOfToursByGuidePaginationDTO getStatisticOfToursByGuide(
-      Long guideId, Integer page, Integer limit, String order) {
+          Long guideId, Integer page, Integer limit, String order) {
     List<StatisticalTourDTO> statisticOfToursByGuide = new ArrayList<>();
     Sort sort = order.equals("asc") ? Sort.by("id").ascending() : Sort.by("id").descending();
     Pageable paging = PageRequest.of(page, limit, sort);
@@ -147,11 +146,11 @@ public class StatisticServiceImpl implements StatisticService {
     }
 
     return new StatisticOfToursByGuidePaginationDTO(
-        statisticOfToursByGuide,
-        tourIdOfGuidesPage.getTotalPages(),
-        (int) tourIdOfGuidesPage.getTotalElements());
+            statisticOfToursByGuide,
+            tourIdOfGuidesPage.getTotalPages(),
+            (int) tourIdOfGuidesPage.getTotalElements());
   }
-// get statistic for year
+  // get statistic for year
   @Override
   public StatisticByMonthDTO getStatisticByMonth(Integer year) {
     //get all paid booking
@@ -159,40 +158,40 @@ public class StatisticServiceImpl implements StatisticService {
     Map<Integer, MonthDTO> statisticByMonth = new HashMap<>();
 
     StatisticByMonthDTO statisticByMonthDTO =
-        StatisticByMonthDTO.builder().year(year).monthDTOS(new ArrayList<>()).build();
+            StatisticByMonthDTO.builder().year(year).monthDTOS(new ArrayList<>()).build();
     for (Booking booking : bookings) {
       if (booking.getStartDate().getYear() == year) {
         //If the month does not exist, add it to the map
         if (!statisticByMonth.containsKey(booking.getStartDate().getMonthValue())) {
           statisticByMonth.put(
-              booking.getStartDate().getMonthValue(),
-              MonthDTO.builder().bookingOfNumber(1).revenue(booking.getPrice()).build());
+                  booking.getStartDate().getMonthValue(),
+                  MonthDTO.builder().bookingOfNumber(1).revenue(booking.getPrice()).build());
         }
         //If month exists, update the value for the map
         else {
           statisticByMonth.put(
-              booking.getStartDate().getMonthValue(),
-              MonthDTO.builder()
-                  .revenue(
-                      statisticByMonth.get(booking.getStartDate().getMonthValue()).getRevenue()
-                          + booking.getPrice())
-                  .bookingOfNumber(
-                      statisticByMonth
-                              .get(booking.getStartDate().getMonthValue())
-                              .getBookingOfNumber()
-                          + 1)
-                  .build());
+                  booking.getStartDate().getMonthValue(),
+                  MonthDTO.builder()
+                          .revenue(
+                                  statisticByMonth.get(booking.getStartDate().getMonthValue()).getRevenue()
+                                          + booking.getPrice())
+                          .bookingOfNumber(
+                                  statisticByMonth
+                                          .get(booking.getStartDate().getMonthValue())
+                                          .getBookingOfNumber()
+                                          + 1)
+                          .build());
         }
       }
     }
     //transfer map to list
     for (Map.Entry<Integer, MonthDTO> entry : statisticByMonth.entrySet()) {
       MonthDTO monthDTO =
-          MonthDTO.builder()
-              .revenue(entry.getValue().getRevenue())
-              .bookingOfNumber(entry.getValue().getBookingOfNumber())
-              .month(entry.getKey())
-              .build();
+              MonthDTO.builder()
+                      .revenue(entry.getValue().getRevenue())
+                      .bookingOfNumber(entry.getValue().getBookingOfNumber())
+                      .month(entry.getKey())
+                      .build();
       statisticByMonthDTO.getMonthDTOS().add(monthDTO);
     }
     return statisticByMonthDTO;
@@ -205,9 +204,9 @@ public class StatisticServiceImpl implements StatisticService {
     List<Long> tourIdOfGuides = bookingRepository.getTourIdByGuide(guideId);
     for (Long tourIdOfGuide : tourIdOfGuides) {
       totalTravelerNumbers +=
-          getTotalTravelerNumberByTour(tourIdOfGuide) != null
-              ? getTotalTravelerNumberByTour(tourIdOfGuide)
-              : 0;
+              getTotalTravelerNumberByTour(tourIdOfGuide) != null
+                      ? getTotalTravelerNumberByTour(tourIdOfGuide)
+                      : 0;
     }
     return totalTravelerNumbers;
   }
@@ -215,7 +214,7 @@ public class StatisticServiceImpl implements StatisticService {
   // get statistic of all tours
   @Override
   public StatisticalTourPaginationDTO getStatisticalByTour(
-      Integer page, Integer limit, String order) {
+          Integer page, Integer limit, String order) {
     Sort sort = order.equals("asc") ? Sort.by("name").ascending() : Sort.by("name").descending();
     Pageable paging = PageRequest.of(page, limit, sort);
     Page<Tour> tourPage = tourRepository.findAll(paging);
@@ -224,7 +223,7 @@ public class StatisticServiceImpl implements StatisticService {
       statisticalTourDTOS.add(getStatisticByPerTour(tour.getId()));
     }
     return new StatisticalTourPaginationDTO(
-        statisticalTourDTOS, tourPage.getTotalPages(), (int) tourPage.getTotalElements());
+            statisticalTourDTOS, tourPage.getTotalPages(), (int) tourPage.getTotalElements());
   }
 
   // get total booking  of per tour

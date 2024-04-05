@@ -150,22 +150,28 @@ public class UserServiceImpl implements UserService {
     List<User> guiders = userRepository.findByRoles_Name(RolesEnum.GUIDER);
     List<String> addressesFiltered =
         guiders.stream()
-            .map(guider -> AddressUtils.removeVietnameseAccents(guider.getAddress()))
+            .map(User::getAddress)
             .distinct()
             .filter(
-                address ->
-                    AddressUtils.removeVietnameseAccents(address)
-                        .toLowerCase()
-                        .contains(AddressUtils.removeVietnameseAccents(searchValue).toLowerCase()))
+                address -> {
+                  if (address == null) return false;
+                  return AddressUtils.removeVietnameseAccents(address)
+                      .toLowerCase()
+                      .contains(AddressUtils.removeVietnameseAccents(searchValue).toLowerCase());
+                })
             .toList();
     List<ResultInSearchSuggestionDTO> guidersFiltered =
         guiders.stream()
-            .sorted(Comparator.comparing(User::getOverallRating).reversed())
+            .sorted(
+                Comparator.comparing(
+                    User::getOverallRating, Comparator.nullsLast(Comparator.reverseOrder())))
             .filter(
-                guider ->
-                    AddressUtils.removeVietnameseAccents(guider.getFullName())
-                        .toLowerCase()
-                        .contains(AddressUtils.removeVietnameseAccents(searchValue).toLowerCase()))
+                guider -> {
+                  if (guider.getFullName() == null) return false;
+                  return AddressUtils.removeVietnameseAccents(guider.getFullName())
+                      .toLowerCase()
+                      .contains(AddressUtils.removeVietnameseAccents(searchValue).toLowerCase());
+                })
             .map(toResultInSearchSuggestionDtoConverter::convert)
             .toList();
     return new SearchSuggestionResponseDTO(addressesFiltered, guidersFiltered);

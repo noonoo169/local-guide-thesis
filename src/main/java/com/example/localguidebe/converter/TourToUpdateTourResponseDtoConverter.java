@@ -40,7 +40,6 @@ public class TourToUpdateTourResponseDtoConverter {
         source.getEstimatedLocalCashNeeded(),
         source.getPricePerTraveler(),
         source.getLimitTraveler(),
-        source.getExtraPrice(),
         source.getItinerary(),
         source.getAddress(),
         source.getTourStartTimes().stream()
