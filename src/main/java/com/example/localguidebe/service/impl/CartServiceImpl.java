@@ -53,7 +53,12 @@ public class CartServiceImpl implements CartService {
 
   @Override
   public Cart getCartByEmail(String email) {
-    return cartRepository.getCartByEmail(email).orElse(null);
+    Optional<Cart> optionalCart = cartRepository.getCartByTravelerEmail(email);
+    if (optionalCart.isEmpty()) return null;
+
+    Optional<Cart> optionalCartWithUnPaidBooking =
+        cartRepository.getCartWithUnPaidBooKingByEmail(email);
+    return optionalCartWithUnPaidBooking.orElseGet(optionalCart::get);
   }
 
   @Transactional
@@ -132,7 +137,8 @@ public class CartServiceImpl implements CartService {
     Booking bookingRequest = addBookingRequestDtoToBookingDtoConverter.convert(bookingDTO);
     bookingRequest.setStatus(BookingStatusEnum.PENDING_PAYMENT);
     Booking booking = bookingRepository.save(bookingRequest);
-    Cart cart = cartRepository.getCartByEmail(email).orElse(null);
+    Cart cart = getCartByEmail(email);
+    System.out.println("cart" + cart);
     // save booking to cart
     if (cart != null) {
       booking.setCart(cart);
