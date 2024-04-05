@@ -1,5 +1,6 @@
 package com.example.localguidebe.service;
 
+import com.example.localguidebe.dto.StatisticByMonthDTO;
 import com.example.localguidebe.dto.responsedto.*;
 
 public interface StatisticService {
@@ -25,4 +26,5 @@ public interface StatisticService {
 
     StatisticOfToursByGuidePaginationDTO getStatisticOfToursByGuide(
             Long guideId, Integer page, Integer limit, String order);
+    StatisticByMonthDTO getStatisticByMonth(Integer year);
 }
