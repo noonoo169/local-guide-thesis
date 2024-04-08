@@ -5,6 +5,7 @@ import com.example.localguidebe.converter.TourToTourDtoConverter;
 import com.example.localguidebe.entity.*;
 import com.example.localguidebe.enums.InvoiceStatus;
 import com.example.localguidebe.enums.NotificationTypeEnum;
+import com.example.localguidebe.exception.ConvertTourToTourDupeException;
 import com.example.localguidebe.repository.BookingRepository;
 import com.example.localguidebe.repository.InvoiceRepository;
 import com.example.localguidebe.service.*;
@@ -100,7 +101,7 @@ public class InvoiceServiceImpl implements InvoiceService {
           try {
             booking.setTourDupe(tourDupeService.getTourDupe(booking.getTour()));
           } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new ConvertTourToTourDupeException(e.getMessage());
           }
 
           booking.setInvoice(invoice);
