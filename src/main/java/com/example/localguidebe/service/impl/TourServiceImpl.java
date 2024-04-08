@@ -14,6 +14,7 @@ import com.example.localguidebe.dto.responsedto.SearchSuggestionResponseDTO;
 import com.example.localguidebe.dto.responsedto.SearchTourDTO;
 import com.example.localguidebe.entity.*;
 import com.example.localguidebe.enums.*;
+import com.example.localguidebe.exception.ConvertTourToTourDupeException;
 import com.example.localguidebe.repository.*;
 import com.example.localguidebe.service.*;
 import com.example.localguidebe.system.constants.NotificationMessage;
@@ -305,7 +306,7 @@ public class TourServiceImpl implements TourService {
       try {
         tourDupeService.addTourDupe(tourBeforeAddTourDupe);
       } catch (Exception e) {
-        throw new RuntimeException(e);
+        throw new ConvertTourToTourDupeException(e.getMessage());
       }
       return tourBeforeAddTourDupe;
     }
