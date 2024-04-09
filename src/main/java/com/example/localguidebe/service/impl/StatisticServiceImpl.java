@@ -150,9 +150,13 @@ public class StatisticServiceImpl implements StatisticService {
 
   // get statistic for year
   @Override
-  public StatisticByMonthDTO getStatisticByMonth(Integer year) {
+  public StatisticByMonthDTO getStatisticByMonthForAdmin(Integer year) {
     // get all paid booking
     List<Booking> bookings = bookingRepository.getPaidBooking();
+    return getStatisticByMonth(year, bookings);
+  }
+
+  public StatisticByMonthDTO getStatisticByMonth(Integer year, List<Booking> bookings) {
     Map<Integer, MonthDTO> statisticByMonth = new HashMap<>();
 
     StatisticByMonthDTO statisticByMonthDTO =
@@ -206,6 +210,12 @@ public class StatisticServiceImpl implements StatisticService {
         .sorted(Comparator.comparing(StatisticalGuideDTO::getTotalRevenue).reversed())
         .limit(5)
         .toList();
+  }
+
+  @Override
+  public StatisticByMonthDTO getStatisticByMonthForGuide(Integer year, Long guideId) {
+    List<Booking> bookings = bookingRepository.getPaidBookingForGuide(guideId);
+    return getStatisticByMonth(year, bookings);
   }
 
   // get total traveler number by guide

@@ -137,8 +137,8 @@ public class StatisticController {
         });
   }
 
-  @GetMapping("/month/{year}")
-  public ResponseEntity<Result> getStatisticOfYear(
+  @GetMapping("/month/admin/{year}")
+  public ResponseEntity<Result> getStatisticOfYearForAdmin(
       @PathVariable("year") int year, Authentication authentication) {
     return AuthUtils.checkAuthentication(
         authentication,
@@ -148,13 +148,43 @@ public class StatisticController {
                 new Result(
                     false,
                     HttpStatus.OK.value(),
-                    "get statistic of year successfully",
-                    statisticService.getStatisticByMonth(year)),
+                    "get statistic of year for admin successfully",
+                    statisticService.getStatisticByMonthForAdmin(year)),
                 HttpStatus.OK);
           } catch (Exception e) {
             return new ResponseEntity<>(
                 new Result(
-                    false, HttpStatus.CONFLICT.value(), "Get statistics of year failure", null),
+                    false,
+                    HttpStatus.CONFLICT.value(),
+                    "Get statistics of year for admin failure",
+                    null),
+                HttpStatus.CONFLICT);
+          }
+        });
+  }
+
+  @GetMapping("/month/guide/{year}")
+  public ResponseEntity<Result> getStatisticOfYearForGuide(
+      @PathVariable("year") int year, Authentication authentication) {
+    return AuthUtils.checkAuthentication(
+        authentication,
+        () -> {
+          try {
+            return new ResponseEntity<>(
+                new Result(
+                    false,
+                    HttpStatus.OK.value(),
+                    "get statistic of year for guide successfully",
+                    statisticService.getStatisticByMonthForGuide(
+                        year, ((CustomUserDetails) authentication.getPrincipal()).getId())),
+                HttpStatus.OK);
+          } catch (Exception e) {
+            return new ResponseEntity<>(
+                new Result(
+                    false,
+                    HttpStatus.CONFLICT.value(),
+                    "Get statistics of year for guide failure",
+                    null),
                 HttpStatus.CONFLICT);
           }
         });
