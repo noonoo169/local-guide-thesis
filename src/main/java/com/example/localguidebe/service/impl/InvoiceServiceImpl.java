@@ -31,7 +31,6 @@ public class InvoiceServiceImpl implements InvoiceService {
   private final NotificationService notificationService;
   private final SimpMessagingTemplate messagingTemplate;
   private final NotificationToNotificationDtoConverter notificationToNotificationDtoConverter;
-  private final TourToTourDtoConverter tourToTourDtoConverter;
   private final BusyScheduleService busyScheduleService;
   private final TourDupeService tourDupeService;
   private final EmailService emailService;
@@ -46,7 +45,6 @@ public class InvoiceServiceImpl implements InvoiceService {
       NotificationService notificationService,
       SimpMessagingTemplate messagingTemplate,
       NotificationToNotificationDtoConverter notificationToNotificationDtoConverter,
-      TourToTourDtoConverter tourToTourDtoConverter,
       BusyScheduleService busyScheduleService,
       TourDupeService tourDupeService,
       EmailService emailService) {
@@ -56,7 +54,6 @@ public class InvoiceServiceImpl implements InvoiceService {
     this.notificationService = notificationService;
     this.messagingTemplate = messagingTemplate;
     this.notificationToNotificationDtoConverter = notificationToNotificationDtoConverter;
-    this.tourToTourDtoConverter = tourToTourDtoConverter;
     this.busyScheduleService = busyScheduleService;
     this.tourDupeService = tourDupeService;
     this.emailService = emailService;
@@ -117,7 +114,7 @@ public class InvoiceServiceImpl implements InvoiceService {
           messagingTemplate.convertAndSend(
               "/topic/" + booking.getTour().getGuide().getEmail(),
               notificationToNotificationDtoConverter.convert(guideNotification));
-          emailService.sendEmailForNewBooking(booking);
+          // emailService.sendEmailForNewBooking(booking);
 
           // notification send to traveler
           Notification travelerNotification =

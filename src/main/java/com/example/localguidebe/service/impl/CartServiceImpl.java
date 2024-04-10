@@ -11,6 +11,7 @@ import com.example.localguidebe.entity.Cart;
 import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.enums.BookingStatusEnum;
 import com.example.localguidebe.enums.TypeBusyDayEnum;
+import com.example.localguidebe.exception.DateBookedException;
 import com.example.localguidebe.exception.ExceedLimitTravelerOfTourException;
 import com.example.localguidebe.repository.BookingRepository;
 import com.example.localguidebe.repository.CartRepository;
@@ -55,11 +56,14 @@ public class CartServiceImpl implements CartService {
   @Override
   public Cart getCartByEmail(String email) {
     Optional<Cart> optionalCart = cartRepository.getCartByTravelerEmail(email);
-    if (optionalCart.isEmpty()) return null;
+    return optionalCart.orElse(null);
+  }
 
+  @Override
+  public Cart getCartWithUnPaidBooKingByEmail(String email) {
     Optional<Cart> optionalCartWithUnPaidBooking =
         cartRepository.getCartWithUnPaidBooKingByEmail(email);
-    return optionalCartWithUnPaidBooking.orElseGet(optionalCart::get);
+    return optionalCartWithUnPaidBooking.orElse(null);
   }
 
   @Transactional
@@ -85,9 +89,9 @@ public class CartServiceImpl implements CartService {
   @Transactional
   @Override
   public Cart updateBookingInCart(String email, UpdateBookingDTO updateBookingDTO) {
-    Cart cart = getCartByEmail(email);
+    if (getCartByEmail(email) == null) return null;
+    Cart cart = getCartWithUnPaidBooKingByEmail(email);
     if (cart == null) return null;
-
     Optional<Booking> optionalBooking =
         cart.getBookings().stream()
             .filter(booking -> booking.getId().equals(updateBookingDTO.id()))
@@ -96,10 +100,15 @@ public class CartServiceImpl implements CartService {
 
     LocalDateTime newStartDate =
         updateBookingDTO.startDate().toLocalDate().atTime(updateBookingDTO.startTime());
-    if (!busyScheduleService.updateBusyScheduleBeforeUpdateOrDeleteBooking(
-        newStartDate, optionalBooking.get())) return null;
-
     Booking booking = optionalBooking.get();
+    if (busyScheduleService
+            .getBusyDateByTour(booking.getTour().getId())
+            .contains(updateBookingDTO.startDate().toLocalDate())
+        && !newStartDate.equals(booking.getStartDate()))
+      throw new DateBookedException("This date has been booked");
+    if (!busyScheduleService.updateBusyScheduleBeforeUpdateOrDeleteBooking(newStartDate, booking))
+      return null;
+
     booking.setNumberTravelers(updateBookingDTO.numberTravelers());
     booking.setStartDate(newStartDate);
     bookingRepository.save(booking);
@@ -113,6 +122,11 @@ public class CartServiceImpl implements CartService {
     Tour tour = tourRepository.findById(bookingDTO.id()).orElseThrow();
     if (tour.getLimitTraveler().compareTo(bookingDTO.numberTravelers()) < 0)
       throw new ExceedLimitTravelerOfTourException("You exceed limit traveler of this tour");
+    if (busyScheduleService
+        .getBusyDateByTour(tour.getId())
+        .contains(bookingDTO.startDate().toLocalDate()))
+      throw new DateBookedException("This date has been booked");
+
     // save busy schedules
     if (tour.getUnit().equals("day(s)")) {
       while (count < tour.getDuration()) {
@@ -141,9 +155,9 @@ public class CartServiceImpl implements CartService {
     Booking bookingRequest = addBookingRequestDtoToBookingDtoConverter.convert(bookingDTO);
     bookingRequest.setStatus(BookingStatusEnum.PENDING_PAYMENT);
     Booking booking = bookingRepository.save(bookingRequest);
-    Cart cart = getCartByEmail(email);
+    Cart cart = getCartWithUnPaidBooKingByEmail(email);
     // save booking to cart
-    if (cart != null) {
+    if (getCartByEmail(email) != null) {
       booking.setCart(cart);
       cart.getBookings().add(booking);
       return cartToCartDtoConverter.convert(cartRepository.save(cart), false);
