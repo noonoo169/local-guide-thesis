@@ -155,9 +155,9 @@ public class CartServiceImpl implements CartService {
     Booking bookingRequest = addBookingRequestDtoToBookingDtoConverter.convert(bookingDTO);
     bookingRequest.setStatus(BookingStatusEnum.PENDING_PAYMENT);
     Booking booking = bookingRepository.save(bookingRequest);
-    Cart cart = getCartWithUnPaidBooKingByEmail(email);
+    Cart cart = getCartByEmail(email);
     // save booking to cart
-    if (getCartByEmail(email) != null) {
+    if (cart != null) {
       booking.setCart(cart);
       cart.getBookings().add(booking);
       return cartToCartDtoConverter.convert(cartRepository.save(cart), false);
