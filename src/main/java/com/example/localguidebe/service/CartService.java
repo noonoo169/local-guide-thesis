@@ -13,4 +13,6 @@ public interface CartService {
   Cart updateBookingInCart(String email, UpdateBookingDTO updateBookingDTO);
 
   CartDTO addBookingInCart(String email, AddBookingRequestDTO bookingDTO);
+
+  Cart getCartWithUnPaidBooKingByEmail(String email);
 }

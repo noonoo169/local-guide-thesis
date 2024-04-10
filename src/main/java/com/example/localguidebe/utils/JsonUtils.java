@@ -2,6 +2,7 @@ package com.example.localguidebe.utils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.beans.PropertyDescriptor;
 import java.util.HashSet;
 import java.util.List;
@@ -10,7 +11,8 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 
 public class JsonUtils {
-  private static final ObjectMapper objectMapper = new ObjectMapper();
+  private static final ObjectMapper objectMapper =
+      new ObjectMapper().registerModule(new JavaTimeModule());
 
   public static String convertObjectToJson(Object obj) throws Exception {
     return objectMapper.writeValueAsString(obj);
