@@ -102,7 +102,7 @@ public class SchedulesController {
                     true,
                     HttpStatus.OK.value(),
                     "Get a list of busy schedules and pre booked schedules successfully",
-                    busyScheduleService.getBusySchedulesAndPreBookedSchedules(
+                    busyScheduleService.getBusyScheduleByGuide(
                         ((CustomUserDetails) authentication.getPrincipal()).getEmail())),
                 HttpStatus.OK);
           } catch (Exception e) {
