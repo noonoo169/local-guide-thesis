@@ -10,6 +10,7 @@ public record GuideApplicationDTO(
     String transportation,
     Integer yearsOfExperience,
     String howGuideHearAboutUs,
+    String biography,
     GuideApplicationStatus status,
     String reasonDeny,
     List<Image> images,
