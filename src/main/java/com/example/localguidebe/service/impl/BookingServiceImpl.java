@@ -7,6 +7,7 @@ import com.example.localguidebe.dto.StatisticalBookingDTO;
 import com.example.localguidebe.repository.BookingRepository;
 import com.example.localguidebe.service.BookingService;
 import com.example.localguidebe.service.UserService;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ public class BookingServiceImpl implements BookingService {
     Long travelerId = userService.findUserByEmail(email).getId();
     return bookingRepository.getBookingHistory(travelerId).stream()
         .map(bookingToBookingDtoConverter::convert)
+        .sorted(Comparator.comparing(BookingDTO::startDate).reversed())
         .collect(Collectors.toList());
   }
 
@@ -50,6 +52,7 @@ public class BookingServiceImpl implements BookingService {
   public List<BookingDTO> getBookingsOfGuide(String email) {
     return bookingRepository.getBookingsOfGuide(email).stream()
         .map(bookingToBookingDtoConverter::convert)
+        .sorted(Comparator.comparing(BookingDTO::startDate).reversed())
         .toList();
   }
 }
