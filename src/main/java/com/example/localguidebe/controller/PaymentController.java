@@ -54,46 +54,53 @@ public class PaymentController {
     @PostMapping("/transaction")
     @Transactional
     public ResponseEntity<Result> getTransaction(@RequestBody TransactionRequest transactionRequest, Authentication authentication) {
-        return AuthUtils.checkAuthentication(
-                authentication,
-                () -> {
-                    try {
-                        int statusCheck = 0;
-                        WithdrawalInfo withdrawalInfo = coinpaymentsService.createWithdrawal(transactionRequest);
-                        while (statusCheck != 2) {
-                            statusCheck = coinpaymentsService.getPaymentInfo(withdrawalInfo.getResult().getId()).getResult().getStatus();
-                            if (statusCheck == -1) {
-                                return new ResponseEntity<>(
-                                        new Result(
-                                                false,
-                                                HttpStatus.CONFLICT.value(),
-                                                "Payment failed",
-                                                null),
-                                        HttpStatus.CONFLICT);
-                            }
-                            Thread.sleep(10000);
-                        }
-                        List<Long> bookingIds = Arrays.stream(transactionRequest.getBookingIds().split(",")).map(Long::valueOf).toList();
-                        Invoice invoice = invoiceService.createBookingInInvoice(withdrawalInfo.getResult().getId(), bookingIds, transactionRequest.getPassengerInfo().getEmail(), ((CustomUserDetails) authentication.getPrincipal()).getEmail(), transactionRequest.getPassengerInfo().getFullName(), transactionRequest.getPassengerInfo().getPhone(), coinpaymentsService.getUSDAmount(transactionRequest.getAmount()), transactionRequest.getAmount(), coinpaymentsService.getUSDAndLTCTRate());
-                        return new ResponseEntity<>(
-                                new Result(
-                                        false,
-                                        HttpStatus.OK.value(),
-                                        "Payment success",
-                                        invoice.getId()),
-                                HttpStatus.OK);
-                    } catch (Exception e) {
-                        return new ResponseEntity<>(
-                                new Result(
-                                        false,
-                                        HttpStatus.CONFLICT.value(),
-                                        "Payment failed",
-                                        null),
-                                HttpStatus.CONFLICT);
-                    }
+    return AuthUtils.checkAuthentication(
+        authentication,
+        () -> {
+          try {
+            int statusCheck = 0;
+            WithdrawalInfo withdrawalInfo =
+                coinpaymentsService.createWithdrawal(transactionRequest);
 
-                }
-        );
+            while (statusCheck != 2) {
+              System.out.println(statusCheck);
+                statusCheck =   coinpaymentsService
+                  .getPaymentInfo(withdrawalInfo.getResult().getId())
+                  .getResult()
+                  .getStatus();
+              if (statusCheck == -1) {
+                return new ResponseEntity<>(
+                    new Result(false, HttpStatus.CONFLICT.value(), "Payment failed", null),
+                    HttpStatus.CONFLICT);
+              }
+              Thread.sleep(10000);
+            }
+
+            List<Long> bookingIds =
+                Arrays.stream(transactionRequest.getBookingIds().split(","))
+                    .map(Long::valueOf)
+                    .toList();
+            Invoice invoice =
+                invoiceService.createBookingInInvoice(
+                    withdrawalInfo.getResult().getId(),
+                    bookingIds,
+                    transactionRequest.getPassengerInfo().getEmail(),
+                    ((CustomUserDetails) authentication.getPrincipal()).getEmail(),
+                    transactionRequest.getPassengerInfo().getFullName(),
+                    transactionRequest.getPassengerInfo().getPhone(),
+                    coinpaymentsService.getUSDAmount(transactionRequest.getAmount()),
+                    transactionRequest.getAmount(),
+                    coinpaymentsService.getUSDAndLTCTRate());
+            return new ResponseEntity<>(
+                new Result(false, HttpStatus.OK.value(), "Payment success", invoice.getId()),
+                HttpStatus.OK);
+          } catch (Exception e) {
+
+            return new ResponseEntity<>(
+                new Result(false, HttpStatus.CONFLICT.value(), "Payment failed", null),
+                HttpStatus.CONFLICT);
+          }
+        });
     }
 
 }
