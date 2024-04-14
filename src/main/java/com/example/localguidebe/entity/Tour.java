@@ -101,7 +101,7 @@ public class Tour {
   private List<Location> locations = new ArrayList<>();
 
   @Column(name = "is_for_specific_traveler", columnDefinition = "boolean default false")
-  private Boolean isForSpecificTraveler;
+  private Boolean isForSpecificTraveler = Boolean.FALSE;
 
   @OneToOne
   @JoinColumn(name = "tour_dupe_id")

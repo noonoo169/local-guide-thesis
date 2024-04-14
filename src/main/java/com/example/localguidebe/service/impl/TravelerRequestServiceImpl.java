@@ -139,7 +139,7 @@ public class TravelerRequestServiceImpl implements TravelerRequestService {
   public void updateStatusAndTourForTravelerRequest(Long requestId, Long tourId) {
     TravelerRequest travelerRequest = travelerRequestRepository.findById(requestId).orElse(null);
     Tour travelerRequestTour = tourRepository.findById(tourId).orElseThrow();
-    if (travelerRequest != null && tourId != null) {
+    if (travelerRequest != null) {
       travelerRequestTour.setIsForSpecificTraveler(true);
       travelerRequest.setStatus(TravelerRequestStatus.DONE);
       travelerRequest.setTour(travelerRequestTour);
