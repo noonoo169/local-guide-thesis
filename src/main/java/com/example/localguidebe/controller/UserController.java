@@ -102,25 +102,32 @@ public class UserController {
     return AuthUtils.checkAuthentication(
         authentication,
         () -> {
-          String travelerEmail = ((CustomUserDetails) authentication.getPrincipal()).getEmail();
-          Long travelerId = ((CustomUserDetails) authentication.getPrincipal()).getId();
-          if (!tourService.checkBookingByTraveler(tourId, travelerEmail)
-              || !tourService.checkExistingReviewsByTraveler(travelerId, tourId)) {
             return ResponseEntity.status(HttpStatus.OK)
-                .body(
-                    new Result(
-                        false,
-                        HttpStatus.OK.value(),
-                        "You can't add review for this tour",
-                        new IsCanReviewResponseDTO(false)));
-          } else
-            return ResponseEntity.status(HttpStatus.OK)
-                .body(
-                    new Result(
-                        true,
-                        HttpStatus.OK.value(),
-                        "You can add review for this tour",
-                        new IsCanReviewResponseDTO(true)));
+                    .body(
+                            new Result(
+                                    true,
+                                    HttpStatus.OK.value(),
+                                    "You can add review for this tour",
+                                    new IsCanReviewResponseDTO(true)));
+//          String travelerEmail = ((CustomUserDetails) authentication.getPrincipal()).getEmail();
+//          Long travelerId = ((CustomUserDetails) authentication.getPrincipal()).getId();
+//          if (!tourService.checkBookingByTraveler(tourId, travelerEmail)
+//              || !tourService.checkExistingReviewsByTraveler(travelerId, tourId)) {
+//            return ResponseEntity.status(HttpStatus.OK)
+//                .body(
+//                    new Result(
+//                        false,
+//                        HttpStatus.OK.value(),
+//                        "You can't add review for this tour",
+//                        new IsCanReviewResponseDTO(false)));
+//          } else
+//            return ResponseEntity.status(HttpStatus.OK)
+//                .body(
+//                    new Result(
+//                        true,
+//                        HttpStatus.OK.value(),
+//                        "You can add review for this tour",
+//                        new IsCanReviewResponseDTO(true)));
         });
   }
 
