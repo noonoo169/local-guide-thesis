@@ -1,6 +1,7 @@
 package com.example.localguidebe.controller;
 
 import com.example.localguidebe.converter.UserToLoginResponseDtoConverter;
+import com.example.localguidebe.dto.fcmdto.NotificationSubscriptionRequest;
 import com.example.localguidebe.dto.requestdto.LoginRequestDTO;
 import com.example.localguidebe.dto.requestdto.ResetPasswordRequestDTO;
 import com.example.localguidebe.dto.requestdto.UserAuthDTO;
@@ -10,10 +11,12 @@ import com.example.localguidebe.enums.RolesEnum;
 import com.example.localguidebe.security.jwt.JwtTokenProvider;
 import com.example.localguidebe.security.service.CustomUserDetails;
 import com.example.localguidebe.service.EmailService;
+import com.example.localguidebe.service.FcmService;
 import com.example.localguidebe.service.RoleService;
 import com.example.localguidebe.service.UserService;
 import com.example.localguidebe.system.Result;
 import com.example.localguidebe.utils.AuthUtils;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,16 +34,19 @@ public class AuthController {
   private final RoleService roleService;
   private final EmailService emailService;
   private final UserToLoginResponseDtoConverter userToLoginResponseDtoConverter;
+  private final FcmService fcmService;
 
   public AuthController(
       UserService userService,
       RoleService roleService,
       EmailService emailService,
-      UserToLoginResponseDtoConverter userToLoginResponseDtoConverter) {
+      UserToLoginResponseDtoConverter userToLoginResponseDtoConverter,
+      FcmService fcmService) {
     this.userService = userService;
     this.roleService = roleService;
     this.emailService = emailService;
     this.userToLoginResponseDtoConverter = userToLoginResponseDtoConverter;
+    this.fcmService = fcmService;
   }
 
   @Autowired public JwtTokenProvider jwtTokenProvider;
@@ -159,5 +165,28 @@ public class AuthController {
     userService.saveUser(user);
     return ResponseEntity.status(HttpStatus.OK)
         .body(new Result(true, HttpStatus.OK.value(), "Reset password successfully"));
+  }
+
+  @PostMapping("/subscribe")
+  public ResponseEntity<Result> subscribeToTopic(
+      @RequestBody @Valid NotificationSubscriptionRequest request) {
+    try {
+      // Topic name cannot contain '@'
+      request.setTopicName(
+          request.getTopicName().substring(0, request.getTopicName().indexOf("@")));
+      fcmService.subscribeDeviceToTopic(request);
+      return ResponseEntity.status(HttpStatus.OK)
+          .body(
+              new Result(
+                  true, HttpStatus.OK.value(), "Device subscribed to the topic successfully."));
+    } catch (Exception e) {
+      e.printStackTrace();
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(
+              new Result(
+                  false,
+                  HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                  "Failed to subscribe device to the topic."));
+    }
   }
 }
