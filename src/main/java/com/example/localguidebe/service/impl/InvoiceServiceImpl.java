@@ -1,7 +1,5 @@
 package com.example.localguidebe.service.impl;
 
-import com.example.localguidebe.converter.NotificationToNotificationDtoConverter;
-import com.example.localguidebe.converter.TourToTourDtoConverter;
 import com.example.localguidebe.entity.*;
 import com.example.localguidebe.enums.InvoiceStatus;
 import com.example.localguidebe.enums.NotificationTypeEnum;
@@ -19,7 +17,6 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,8 +26,6 @@ public class InvoiceServiceImpl implements InvoiceService {
   private final BookingRepository bookingRepository;
   private final InvoiceRepository invoiceRepository;
   private final NotificationService notificationService;
-  private final SimpMessagingTemplate messagingTemplate;
-  private final NotificationToNotificationDtoConverter notificationToNotificationDtoConverter;
   private final BusyScheduleService busyScheduleService;
   private final TourDupeService tourDupeService;
   private final EmailService emailService;
@@ -43,8 +38,6 @@ public class InvoiceServiceImpl implements InvoiceService {
       BookingRepository bookingRepository,
       InvoiceRepository invoiceRepository,
       NotificationService notificationService,
-      SimpMessagingTemplate messagingTemplate,
-      NotificationToNotificationDtoConverter notificationToNotificationDtoConverter,
       BusyScheduleService busyScheduleService,
       TourDupeService tourDupeService,
       EmailService emailService) {
@@ -52,8 +45,6 @@ public class InvoiceServiceImpl implements InvoiceService {
     this.bookingRepository = bookingRepository;
     this.invoiceRepository = invoiceRepository;
     this.notificationService = notificationService;
-    this.messagingTemplate = messagingTemplate;
-    this.notificationToNotificationDtoConverter = notificationToNotificationDtoConverter;
     this.busyScheduleService = busyScheduleService;
     this.tourDupeService = tourDupeService;
     this.emailService = emailService;
@@ -74,6 +65,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     Cart cart = cartService.getCartByEmail(travelerEmail);
 
     if (cart == null) return null;
+    User traveler = cart.getTraveler();
     List<Booking> bookings = new ArrayList<>();
     Invoice invoice =
         Invoice.builder()
@@ -100,35 +92,26 @@ public class InvoiceServiceImpl implements InvoiceService {
           } catch (Exception e) {
             throw new ConvertTourToTourDupeException(e.getMessage());
           }
-
           booking.setInvoice(invoice);
+
           // notification send to guide
-          Notification guideNotification =
-              notificationService.addNotification(
-                  booking.getTour().getGuide().getId(),
-                  cart.getTraveler().getId(),
-                  booking.getId(),
+          User guide = booking.getTour().getGuide();
+          notificationService
+              .sendNotificationForNewBookingOrRefundBookingOrReviewOnGuideOrReviewOnTourOrNewTravelerRequestToGuide(
+                  guide,
+                  traveler,
+                  bookingId,
                   NotificationTypeEnum.RECEIVED_BOOKING,
-                  NotificationMessage.RECEIVED_BOOKING + cart.getTraveler().getFullName());
-
-          messagingTemplate.convertAndSend(
-              "/topic/" + booking.getTour().getGuide().getEmail(),
-              notificationToNotificationDtoConverter.convert(guideNotification));
-          // emailService.sendEmailForNewBooking(booking);
-
-          // notification send to traveler
-          Notification travelerNotification =
-              notificationService.addNotification(
-                  cart.getTraveler().getId(),
-                  null,
-                  booking.getId(),
-                  NotificationTypeEnum.BOOKED_TOUR,
-                  NotificationMessage.BOOKED_TOUR);
-
-          messagingTemplate.convertAndSend(
-              "/topic/" + cart.getTraveler().getEmail(),
-              notificationToNotificationDtoConverter.convert(travelerNotification));
+                  NotificationMessage.RECEIVED_BOOKING + traveler.getFullName());
         });
+    // create notification for traveler
+    Notification travelerNotification =
+        notificationService.addNotification(
+            cart.getTraveler().getId(),
+            null,
+            invoice.getId(),
+            NotificationTypeEnum.BOOKED_TOUR,
+            NotificationMessage.BOOKED_TOUR);
     invoice.setBookings(bookings);
     bookingIds.forEach(bookingRepository::setBookingStatusToPaid);
     return invoiceRepository.save(invoice);
@@ -136,6 +119,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
   @Override
   public Invoice refundInvoice(Invoice invoice, Double refundVndPrice) {
+    User traveler = invoice.getTraveler();
     invoice.setRefundVndPrice(refundVndPrice);
     invoice.setStatus(InvoiceStatus.REFUNDED);
     invoice
@@ -145,16 +129,14 @@ public class InvoiceServiceImpl implements InvoiceService {
               busyScheduleService.updateBusyScheduleBeforeUpdateOrDeleteBooking(null, booking);
 
               // notification send to guide
-              Notification guideNotification =
-                  notificationService.addNotification(
-                      booking.getTour().getGuide().getId(),
-                      invoice.getTraveler().getId(),
+              User guide = booking.getTour().getGuide();
+              notificationService
+                  .sendNotificationForNewBookingOrRefundBookingOrReviewOnGuideOrReviewOnTourOrNewTravelerRequestToGuide(
+                      guide,
+                      traveler,
                       booking.getId(),
                       NotificationTypeEnum.CANCEL_BOOKING,
-                      NotificationMessage.CANCEL_BOOKING);
-              messagingTemplate.convertAndSend(
-                  "/topic/" + booking.getTour().getGuide().getEmail(),
-                  notificationToNotificationDtoConverter.convert(guideNotification));
+                      NotificationMessage.CANCEL_BOOKING + traveler.getFullName());
             });
     return invoiceRepository.save(invoice);
   }
