@@ -75,4 +75,23 @@ public class NotificationController {
                   "The notification has been updated unsuccessfully."));
     }
   }
+
+  @GetMapping("/is-not-read")
+  public ResponseEntity<Result> getIsNotReadNotifications(
+          Authentication authentication) {
+    return AuthUtils.checkAuthentication(
+            authentication,
+            () -> {
+                String email = ((CustomUserDetails) authentication.getPrincipal()).getEmail();
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(
+                                new Result(
+                                        true,
+                                        HttpStatus.OK.value(),
+                                        "Get notifications successfully",
+                                        notificationService.getIsNotReadNotifications(email).size()));
+
+            });
+  }
+
 }

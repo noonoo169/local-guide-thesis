@@ -1,9 +1,7 @@
 package com.example.localguidebe.service.impl;
 
-import com.example.localguidebe.converter.NotificationToNotificationDtoConverter;
 import com.example.localguidebe.dto.requestdto.AddTravelerRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateTravelerRequestDTO;
-import com.example.localguidebe.entity.Notification;
 import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.entity.TravelerRequest;
 import com.example.localguidebe.entity.User;
@@ -18,7 +16,6 @@ import com.example.localguidebe.service.UserService;
 import com.example.localguidebe.system.constants.NotificationMessage;
 import java.util.List;
 import org.springframework.beans.BeanUtils;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,22 +24,16 @@ public class TravelerRequestServiceImpl implements TravelerRequestService {
   private final UserService userService;
   private final TourRepository tourRepository;
   private final NotificationService notificationService;
-  private final SimpMessagingTemplate messagingTemplate;
-  private final NotificationToNotificationDtoConverter notificationToNotificationDtoConverter;
 
   public TravelerRequestServiceImpl(
       TravelerRequestRepository travelerRequestRepository,
       UserService userService,
       TourRepository tourRepository,
-      NotificationService notificationService,
-      SimpMessagingTemplate messagingTemplate,
-      NotificationToNotificationDtoConverter notificationToNotificationDtoConverter) {
+      NotificationService notificationService) {
     this.travelerRequestRepository = travelerRequestRepository;
     this.userService = userService;
     this.tourRepository = tourRepository;
     this.notificationService = notificationService;
-    this.messagingTemplate = messagingTemplate;
-    this.notificationToNotificationDtoConverter = notificationToNotificationDtoConverter;
   }
 
   @Override
@@ -84,18 +75,13 @@ public class TravelerRequestServiceImpl implements TravelerRequestService {
             .build();
 
     // notification send to guide
-    Notification guideNotification =
-        notificationService.addNotification(
-            guide.getId(),
-            traveler.getId(),
+    notificationService
+        .sendNotificationForNewBookingOrRefundBookingOrReviewOnGuideOrReviewOnTourOrNewTravelerRequestToGuide(
+            guide,
+            traveler,
             travelerRequest.getId(),
             NotificationTypeEnum.ADD_NEW_TRAVELER_REQUEST,
-            NotificationMessage.ADD_NEW_TRAVELER_REQUEST);
-
-    messagingTemplate.convertAndSend(
-        "/topic/" + guide.getEmail(),
-        notificationToNotificationDtoConverter.convert(guideNotification));
-
+            NotificationMessage.ADD_NEW_TRAVELER_REQUEST + traveler.getFullName());
     return travelerRequestRepository.save(travelerRequest);
   }
 

@@ -2,11 +2,18 @@ package com.example.localguidebe.config;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.messaging.FirebaseMessaging;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.client.RestTemplate;
@@ -70,5 +77,25 @@ public class AppConfiguration {
     props.put("mail.smtp.starttls.enable", "true");
 
     return mailSender;
+  }
+
+  @Bean
+  public FirebaseApp firebaseApp() throws IOException {
+    InputStream serviceAccount =
+        new ClassPathResource("local-guide-notification-firebase-adminsdk-cgx4u-1163d8bc99.json")
+            .getInputStream();
+    FirebaseOptions options =
+        FirebaseOptions.builder()
+            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+            .build();
+    if(FirebaseApp.getApps().isEmpty()) {
+      FirebaseApp.initializeApp(options);
+    }
+    return FirebaseApp.getApps().get(0);
+  }
+
+  @Bean
+  FirebaseMessaging firebaseMessaging(FirebaseApp firebaseApp) {
+    return FirebaseMessaging.getInstance(firebaseApp);
   }
 }
