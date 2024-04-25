@@ -14,6 +14,7 @@ import com.example.localguidebe.enums.FolderName;
 import com.example.localguidebe.repository.ImageRepository;
 import com.example.localguidebe.repository.TourRepository;
 
+
 import com.example.localguidebe.service.CategoryService;
 import com.example.localguidebe.service.LocationService;
 import com.example.localguidebe.service.TourService;
@@ -24,6 +25,7 @@ import java.util.Comparator;
 import com.example.localguidebe.service.*;
 
 import java.io.IOException;
+
 
 import com.example.localguidebe.service.*;
 
@@ -52,7 +54,6 @@ public class TourServiceImpl implements TourService {
   public void setTourToDtoConverter(TourToTourDtoConverter tourToTourDtoConverter) {
     this.tourToTourDtoConverter = tourToTourDtoConverter;
   }
-
   private final ImageRepository imageRepository;
 
   private TourRepository tourRepository;
@@ -62,16 +63,16 @@ public class TourServiceImpl implements TourService {
   private final UserService userService;
   private final CloudinaryUtil cloudinaryUtil;
 
+
   @Autowired
   public TourServiceImpl(
       ToResultInSearchSuggestionDtoConverter toResultInSearchSuggestionDtoConverter,
       CategoryService categoryService,
       TourStartTimeService tourStartTimeService,
-      LocationService locationService,
-      UserService userService,
-      CloudinaryUtil cloudinaryUtil,
-      ImageRepository imageRepository) {
+
+      LocationService locationService ,UserService userService,CloudinaryUtil cloudinaryUtil,ImageRepository imageRepository) {
     this.toResultInSearchSuggestionDtoConverter = toResultInSearchSuggestionDtoConverter;
+
 
     this.categoryService = categoryService;
     this.tourStartTimeService = tourStartTimeService;
@@ -99,30 +100,29 @@ public class TourServiceImpl implements TourService {
     Tour newTour = new Tour();
     User guide = userService.findUserByEmail(email);
 
-    BeanUtils.copyProperties(tourRequestDTO, newTour, "categories", "images");
+    BeanUtils.copyProperties(tourRequestDTO, newTour, "categories","images");
     tourRequestDTO.getCategories().stream()
-        .forEach(
-            category -> {
-              newTour.getCategories().add(categoryService.getCategoryById(category.getId()));
-            });
+            .forEach(
+                    category -> {
+                      newTour.getCategories().add(categoryService.getCategoryById(category.getId()));
+                    });
     if (guide != null) {
       newTour.setGuide(guide);
     }
     Tour tour = tourRepository.save(newTour);
-    tourRequestDTO.getImages().stream()
-        .forEach(
-            image -> {
-              Image imageTour = new Image();
-              try {
-                imageTour.setImageLink(cloudinaryUtil.uploadFile(image, FolderName.tour));
-              } catch (IOException e) {
-                throw new RuntimeException(e);
-              }
-              imageTour.setAssociateId(tour.getId());
-              imageTour.setAssociateName(AssociateName.TOUR);
-              imageRepository.save(imageTour);
-            });
-    return tourRepository.save(tour);
+    tourRequestDTO.getImages().stream().forEach(image->{
+      Image imageTour = new Image();
+      try {
+        imageTour.setImageLink(cloudinaryUtil.uploadFile(image, FolderName.tour));
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+      imageTour.setAssociateId(tour.getId());
+      imageTour.setAssociateName(AssociateName.TOUR);
+      imageRepository.save(imageTour);
+
+    });
+    return  tourRepository.save(tour);
   }
 
   @Transactional
@@ -132,7 +132,13 @@ public class TourServiceImpl implements TourService {
     if (optionalTour.isPresent()) {
       Tour tour = optionalTour.get();
       BeanUtils.copyProperties(
-          updateTourRequestDTO, tour, "categories", "tourStartTimes", "meetingPoint", "locations");
+          updateTourRequestDTO,
+          tour,
+          "province",
+          "categories",
+          "tourStartTimes",
+          "meetingPoint",
+          "locations");
 
       // Update tour start time
       if (updateTourRequestDTO.tourStartTimes() != null) {
@@ -170,35 +176,7 @@ public class TourServiceImpl implements TourService {
         }
       }
 
-      // Update images
-      List<Image> tourImages =
-          imageRepository.getImageByAssociateIddAndAssociateName(
-              updateTourRequestDTO.id(), AssociateName.TOUR);
-      int maxSize = Math.max(tourImages.size(), updateTourRequestDTO.image_ids().size());
-      for (int i = 0; i < maxSize; i++) {
-        if (i < updateTourRequestDTO.image_ids().size()
-            && updateTourRequestDTO.image_ids().get(i).startsWith("data:")) {
-          Image imageTour = new Image();
-          try {
-            imageTour.setImageLink(
-                cloudinaryUtil.uploadFile(
-                    updateTourRequestDTO.image_ids().get(i), FolderName.tour));
-          } catch (IOException e) {
-            throw new RuntimeException(e);
-          }
-          imageTour.setAssociateId(tour.getId());
-          imageTour.setAssociateName(AssociateName.TOUR);
-          imageRepository.save(imageTour);
-        }
-
-        if (i < tourImages.size()
-            && !updateTourRequestDTO.image_ids().contains(tourImages.get(i).getId().toString())) {
-          if (cloudinaryUtil.deleteFile(tourImages.get(i).getImageLink())) {
-            imageRepository.deleteById(tourImages.get(i).getId());
-          }
-          ;
-        }
-      }
+      // TODO Update image
 
       // Update locations
       if (updateTourRequestDTO.locations() != null) {
@@ -230,6 +208,19 @@ public class TourServiceImpl implements TourService {
         locationService.save(newMeetingPoint);
         tour.setMeetingPoint(newMeetingPoint);
       }
+
+      // Update province
+      // TODO: Update here because province has change to String type
+      // if (updateTourRequestDTO.province() != null
+      //     && updateTourRequestDTO.province().getId() == null) {
+      //   Location newProvince =
+      //       new Location(
+      //           updateTourRequestDTO.province().getName(),
+      //           updateTourRequestDTO.province().getLatitude(),
+      //           updateTourRequestDTO.province().getLongitude());
+      //   locationService.save(newProvince);
+      //   tour.setProvince(newProvince);
+      // }
       return tourRepository.save(tour);
     }
     return null;
@@ -260,21 +251,11 @@ public class TourServiceImpl implements TourService {
   }
 
   @Override
-  public SearchTourDTO getToursByNameAndAddress(
-      Integer page,
-      Integer limit,
-      String sortBy,
-      String order,
-      List<String> searchNames,
-      List<String> addresses,
-      Double minPrice,
-      Double maxPrice,
-      List<Long> categoryId) {
+  public SearchTourDTO getToursByNameAndAddress(Integer page, Integer limit, String sortBy, String order, List<String> searchNames, List<String> addresses, Double minPrice, Double maxPrice, List<Long> categoryId) {
     Sort sort = order.equals("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
     Pageable paging = PageRequest.of(page, limit, sort);
     Page<Tour> tourPage =
-        tourRepository.findToursByNameAndAddress(
-            searchNames, minPrice, maxPrice, categoryId, paging, addresses);
+            tourRepository.findToursByNameAndAddress(searchNames, minPrice, maxPrice, categoryId, paging,addresses);
     return null;
   }
 
