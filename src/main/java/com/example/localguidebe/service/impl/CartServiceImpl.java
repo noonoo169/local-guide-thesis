@@ -11,13 +11,8 @@ import com.example.localguidebe.enums.BookingStatusEnum;
 import com.example.localguidebe.repository.BookingRepository;
 import com.example.localguidebe.repository.CartRepository;
 import com.example.localguidebe.repository.UserRepository;
-import com.example.localguidebe.service.BusyScheduleService;
 import com.example.localguidebe.service.CartService;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +25,6 @@ public class CartServiceImpl implements CartService {
   private final UserRepository userRepository;
   private final AddBookingRequestDtoToBookingDtoConverter addBookingRequestDtoToBookingDtoConverter;
   private final CartToCartDtoConverter cartToCartDtoConverter;
-  private final BusyScheduleService busyScheduleService;
 
   @Autowired
   public CartServiceImpl(
@@ -38,14 +32,12 @@ public class CartServiceImpl implements CartService {
       BookingRepository bookingRepository,
       UserRepository userRepository,
       AddBookingRequestDtoToBookingDtoConverter addBookingRequestDtoToBookingDtoConverter,
-      CartToCartDtoConverter cartToCartDtoConverter,
-      BusyScheduleService busyScheduleService) {
+      CartToCartDtoConverter cartToCartDtoConverter) {
     this.cartRepository = cartRepository;
     this.bookingRepository = bookingRepository;
     this.userRepository = userRepository;
     this.addBookingRequestDtoToBookingDtoConverter = addBookingRequestDtoToBookingDtoConverter;
     this.cartToCartDtoConverter = cartToCartDtoConverter;
-    this.busyScheduleService = busyScheduleService;
   }
 
   @Override
@@ -96,42 +88,16 @@ public class CartServiceImpl implements CartService {
 
   @Override
   public CartDTO addBookingInCart(String email, AddBookingRequestDTO bookingDTO) {
-
-    List<LocalDateTime> updatedBusyDates = new ArrayList<>();
-    Integer count = 0;
-
-    List<LocalDateTime> bookingDates =
-        bookingRepository.findAll().stream()
-            .map(Booking::getStartDate)
-            .collect(Collectors.toList());
-    // update busy date by duration
-    updatedBusyDates.addAll(bookingDates);
-    if (!bookingDates.stream()
-        .anyMatch(bookingDate -> bookingDate.toLocalDate().equals(bookingDTO.startDate()))) {
-      while (count < bookingDTO.tourDTO().getDuration()) {
-        updatedBusyDates.add(bookingDTO.startDate().plusDays(count));
-        count++;
-      }
-    }
-    // Add booking days to guider busy schedule
-    busyScheduleService.InsertAndUpdateBusyDates(
-        updatedBusyDates, bookingDTO.tourDTO().getGuide().email());
-    // save booking
     Booking booking =
         bookingRepository.save(addBookingRequestDtoToBookingDtoConverter.convert(bookingDTO));
-    Cart cart = cartRepository.getCartByTravelerEmail(email).orElse(null);
-    // save booking to cart
+    Cart cart = getCartByEmail(email);
     if (cart != null) {
-      booking.setCart(cart);
       cart.getBookings().add(booking);
       return cartToCartDtoConverter.convert(cartRepository.save(cart), false);
     } else {
       Cart newCart = new Cart();
-      newCart.setTraveler(userRepository.findUserByEmail(email));
-
-      newCart = cartRepository.save(newCart);
-      booking.setCart(newCart);
       newCart.getBookings().add(booking);
+      newCart.setTraveler(userRepository.findUserByEmail(email));
       return cartToCartDtoConverter.convert(cartRepository.save(newCart), false);
     }
   }
