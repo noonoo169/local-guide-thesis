@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.util.Set;
 
 public record UserDTO(
+
         Long id,
     String email,
     String username,
