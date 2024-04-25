@@ -12,9 +12,12 @@ import com.example.localguidebe.dto.responsedto.SearchTourDTO;
 import com.example.localguidebe.entity.*;
 import com.example.localguidebe.enums.AssociateName;
 import com.example.localguidebe.enums.FolderName;
+
 import com.example.localguidebe.repository.*;
+
 import com.example.localguidebe.repository.ImageRepository;
 import com.example.localguidebe.repository.TourRepository;
+
 import com.example.localguidebe.service.*;
 import com.example.localguidebe.service.CategoryService;
 import com.example.localguidebe.service.LocationService;
@@ -22,13 +25,19 @@ import com.example.localguidebe.service.TourService;
 import com.example.localguidebe.service.TourStartTimeService;
 import com.example.localguidebe.utils.AddressUtils;
 import com.example.localguidebe.utils.CloudinaryUtil;
-import com.google.gson.Gson;
+
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
+
+
+import com.google.gson.Gson;
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+
 import java.util.stream.Collectors;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +64,8 @@ public class TourServiceImpl implements TourService {
 
   private final BookingRepository bookingRepository;
 
+
+
   @Autowired
   public TourServiceImpl(
       ToResultInSearchSuggestionDtoConverter toResultInSearchSuggestionDtoConverter,
@@ -67,7 +78,8 @@ public class TourServiceImpl implements TourService {
       ImageRepository imageRepository,
       BookingRepository bookingRepository,
       TourToTourDtoConverter tourToTourDtoConverter,
-      GeoCodingService geoCodingService) {
+      GeoCodingService geoCodingService
+    ) {
     this.tourStartTimeRepository = tourStartTimeRepository;
     this.toResultInSearchSuggestionDtoConverter = toResultInSearchSuggestionDtoConverter;
     this.geoCodingService = geoCodingService;
@@ -281,6 +293,25 @@ public class TourServiceImpl implements TourService {
   }
 
   @Override
+  public SearchTourDTO getToursByNameAndAddress(
+      Integer page,
+      Integer limit,
+      String sortBy,
+      String order,
+      List<String> searchNames,
+      List<String> addresses,
+      Double minPrice,
+      Double maxPrice,
+      List<Long> categoryId) {
+    Sort sort = order.equals("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+    Pageable paging = PageRequest.of(page, limit, sort);
+    Page<Tour> tourPage =
+        tourRepository.findToursByNameAndAddress(
+            searchNames, minPrice, maxPrice, categoryId, paging, addresses);
+    return null;
+  }
+
+  @Override
   public List<TourDTO> deleteTour(Long id) {
     Tour tour = tourRepository.findById(id).orElseThrow();
     tour.setIsDeleted(true);
@@ -299,11 +330,12 @@ public class TourServiceImpl implements TourService {
   }
 
   @Override
-  public SearchSuggestionResponseDTO getTourAndTourLocations(String searchValue) {
+  public SearchSuggestionResponseDTO getTourAndTourAddresses(String searchValue) {
     List<Tour> tours = tourRepository.findAll();
     List<String> addressesFiltered =
         tours.stream()
-            .flatMap(tour -> tour.getLocations().stream().map(Location::getAddress))
+            .map(tour -> AddressUtils.removeVietnameseAccents(tour.getAddress()))
+            .distinct()
             .filter(
                 address ->
                     AddressUtils.removeVietnameseAccents(address)

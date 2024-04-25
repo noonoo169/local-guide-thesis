@@ -28,11 +28,22 @@ public interface TourService {
       Double maxPrice,
       List<Long> categoryId);
 
+  SearchTourDTO getToursByNameAndAddress(
+      Integer page,
+      Integer limit,
+      String sortBy,
+      String order,
+      List<String> searchNames,
+      List<String> addresses,
+      Double minPrice,
+      Double maxPrice,
+      List<Long> categoryId);
+
   List<TourDTO> deleteTour(Long id);
 
   List<Tour> getToursOfGuide(String email);
 
-  SearchSuggestionResponseDTO getTourAndTourLocations(String searchValue);
+  SearchSuggestionResponseDTO getTourAndTourAddresses(String searchValue);
 
   List<String> getTourStartTimeAvailable(Long tourId, LocalDate localDate);
 }
