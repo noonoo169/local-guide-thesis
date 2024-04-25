@@ -3,7 +3,6 @@ package com.example.localguidebe.service.impl;
 import com.example.localguidebe.converter.NotificationToNotificationDtoConverter;
 import com.example.localguidebe.converter.TourToTourDtoConverter;
 import com.example.localguidebe.entity.*;
-import com.example.localguidebe.enums.InvoiceStatus;
 import com.example.localguidebe.enums.NotificationTypeEnum;
 import com.example.localguidebe.repository.BookingRepository;
 import com.example.localguidebe.repository.InvoiceRepository;
@@ -11,17 +10,10 @@ import com.example.localguidebe.service.CartService;
 import com.example.localguidebe.service.InvoiceService;
 import com.example.localguidebe.service.NotificationService;
 import com.example.localguidebe.system.NotificationMessage;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import com.example.localguidebe.vnpay.VNPayResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -36,8 +28,6 @@ public class InvoiceServiceImpl implements InvoiceService {
   private final SimpMessagingTemplate messagingTemplate;
   private final NotificationToNotificationDtoConverter notificationToNotificationDtoConverter;
   private final TourToTourDtoConverter tourToTourDtoConverter;
-
-  Logger logger = LoggerFactory.getLogger(InvoiceServiceImpl.class);
 
   @Autowired
   public InvoiceServiceImpl(
@@ -60,7 +50,6 @@ public class InvoiceServiceImpl implements InvoiceService {
   @Override
   @Transactional
   public Invoice createBookingInInvoice(
-      String vnp_TxnRef,
       List<Long> bookingIds,
       String email,
       String travelerEmail,
@@ -85,8 +74,6 @@ public class InvoiceServiceImpl implements InvoiceService {
             .phone(phone)
             .email(email)
             .traveler(cart.getTraveler())
-            .vnpTxnRef(vnp_TxnRef)
-            .status(InvoiceStatus.PAID)
             .build();
     bookings.forEach(
         booking -> {
@@ -131,30 +118,7 @@ public class InvoiceServiceImpl implements InvoiceService {
   }
 
   @Override
-  public Invoice refundInvoice(Invoice invoice, Double refundVndPrice) {
-    invoice.setRefundVndPrice(refundVndPrice);
-    invoice.setStatus(InvoiceStatus.REFUNDED);
-    return invoiceRepository.save(invoice);
-  }
-
-  @Override
   public Optional<Invoice> findById(Long id) {
     return invoiceRepository.findById(id);
-  }
-
-  @Override
-  public Double getRefundAmount(Invoice invoice) {
-    LocalDateTime minStartDateOfBooking =
-        invoice.getBookings().stream()
-            .map(Booking::getStartDate)
-            .min(LocalDateTime::compareTo)
-            .orElse(null);
-    if (minStartDateOfBooking == null) return 0.0;
-
-    long daysBetween =
-        ChronoUnit.DAYS.between(LocalDate.now(), minStartDateOfBooking.toLocalDate());
-    if (daysBetween > 7) return invoice.getVndPrice();
-    else if (daysBetween > 0) return invoice.getVndPrice() / 2;
-    else return 0.0;
   }
 }
