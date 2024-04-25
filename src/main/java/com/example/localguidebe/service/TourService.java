@@ -10,10 +10,7 @@ import com.example.localguidebe.dto.TourDTO;
 
 import com.example.localguidebe.dto.TourDTO;
 
-import com.example.localguidebe.dto.responsedto.SearchTourDTO;
 import com.example.localguidebe.entity.Tour;
-import org.springframework.data.domain.Page;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -23,14 +20,11 @@ public interface TourService {
 
     Tour updateTour(UpdateTourRequestDTO updateTourRequestDTO);
 
+    List<TourDTO> searchTour(String nameTour);
     TourDTO getTourById(Long id);
-    SearchTourDTO getTours(Integer page,
-                           Integer limit,
-                           String sortBy,
-                           String order,
-                           String searchName,
-                           Double minPrice,
-                           Double maxPrice,
-                           Long categoryId);
+
+
+
+
 
 }

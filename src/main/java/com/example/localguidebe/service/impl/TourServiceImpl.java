@@ -3,8 +3,8 @@ package com.example.localguidebe.service.impl;
 
 import com.example.localguidebe.dto.requestdto.TourRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateTourRequestDTO;
-import com.example.localguidebe.dto.responsedto.SearchTourDTO;
-import com.example.localguidebe.entity.*;
+import com.example.localguidebe.entity.Category;
+import com.example.localguidebe.entity.Location;
 
 import com.example.localguidebe.converter.TourToTourDtoConverter;
 import com.example.localguidebe.dto.TourDTO;
@@ -13,22 +13,15 @@ import com.example.localguidebe.dto.TourDTO;
 import com.example.localguidebe.converter.TourToTourDtoConverter;
 import com.example.localguidebe.dto.TourDTO;
 
-import com.example.localguidebe.enums.RolesEnum;
+import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.repository.TourRepository;
 import com.example.localguidebe.repository.TourStartTimeRepository;
 import com.example.localguidebe.service.CategoryService;
 import com.example.localguidebe.service.LocationService;
 import com.example.localguidebe.service.TourService;
 import com.example.localguidebe.service.TourStartTimeService;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -152,7 +145,15 @@ public class TourServiceImpl implements TourService {
         }
         return null;
     }
-    
+
+    public List<TourDTO> searchTour(String nameTour) {
+          List<Tour> tours = tourRepository.findAll().stream().filter(tour -> tour.getName().contains(nameTour)).collect(Collectors.toList());
+          List<TourDTO> tourDTOS = new ArrayList<>();
+          for(Tour tour : tours){
+              tourDTOS.add(  tourToTourDtoConverter.convert(tour));
+          }
+        return tourDTOS;
+    }
 
     @Override
     public TourDTO getTourById(Long id) {
@@ -160,13 +161,18 @@ public class TourServiceImpl implements TourService {
 
     }
 
-    @Override
-    public SearchTourDTO getTours(Integer page, Integer limit, String sortBy, String order, String searchName,Double minPrice,Double maxPrice,Long categoryId) {
-        Sort sort = order.equals("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        Pageable paging = PageRequest.of(page, limit, sort);
-        Page<Tour> tourPage = tourRepository.findTours(searchName,minPrice,maxPrice,categoryId,paging);
-        return new SearchTourDTO (tourPage.get().map(tourToTourDtoConverter::convert).collect(Collectors.toList()), tourPage.getTotalPages());
-    }
-
-
+//    @Override
+//    public List<TourDTO> searchTour(String nameTour) {
+//          List<Tour> tours = tourRepository.findAll().stream().filter(tour -> tour.getName().contains(nameTour)).collect(Collectors.toList());
+//          List<TourDTO> tourDTOS = new ArrayList<>();
+//          for(Tour tour : tours){
+//              tourDTOS.add(  tourToTourDtoConverter.convert(tour));
+//          }
+//        return tourDTOS;
+//    }
+//
+//    @Override
+//    public TourDTO getTourById(Long id) {
+//        return tourToTourDtoConverter.convert(tourRepository.findById(id).orElseThrow());
+//    }
 }
