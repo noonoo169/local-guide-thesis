@@ -7,6 +7,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BusyScheduleService {
-    List<BusyScheduleDTO> InsertAndUpdateBusyDates(List<LocalDateTime> busyDates, String email);
+    List<BusyScheduleDTO> addBusySchedule(List<LocalDateTime> busyDates, String email);
     List<BusyScheduleDTO> getBusyScheduleByGuide(String email);
 }

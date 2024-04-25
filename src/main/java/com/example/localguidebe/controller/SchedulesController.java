@@ -26,7 +26,7 @@ public class SchedulesController {
     }
 
     @PostMapping ("/busy")
-    public ResponseEntity<Result> InsertAndUpdateBusyDates(@RequestBody List<LocalDateTime>busyDates, Authentication authentication ){
+    public ResponseEntity<Result> addBusyDates(@RequestBody List<LocalDateTime>busyDates, Authentication authentication ){
         return AuthUtils.checkAuthentication(
                 authentication,
                 () -> {
@@ -35,7 +35,7 @@ public class SchedulesController {
                                 new Result(
                                         true,
                                         HttpStatus.OK.value(),
-                                        "Added busy day list successfully", busyScheduleService.InsertAndUpdateBusyDates(busyDates,((CustomUserDetails) authentication.getPrincipal()).getEmail())),
+                                        "Added busy day list successfully", busyScheduleService.addBusySchedule(busyDates,((CustomUserDetails) authentication.getPrincipal()).getEmail())),
                                 HttpStatus.OK);
                     } catch (Exception e) {
                         return new ResponseEntity<>(
@@ -63,9 +63,4 @@ public class SchedulesController {
                     }
                 });
     }
-//    @DeleteMapping("/busy")
-//    public ResponseEntity<Result> removeBusyDates(){
-//
-//    }
-
 }
