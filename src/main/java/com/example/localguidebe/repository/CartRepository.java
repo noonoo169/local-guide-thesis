@@ -13,6 +13,9 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
       "SELECT c FROM Cart c JOIN FETCH c.bookings b WHERE c.traveler.email = :email AND b.status = 'PENDING_PAYMENT'")
   Optional<Cart> getCartByEmail(@Param("email") String email);
 
+  @Query("Select c FROM Cart c WHERE c.traveler.email = :email")
+  Optional<Cart> getCartByTravelerEmail(@Param("email") String email);
+
   @Query(
       "SELECT  Count(cart) FROM Cart cart JOIN cart.bookings b WHERE cart.traveler.id = :travelerId AND b.tour.id = :tourId AND b.status ='PAID'")
   int getSuccessBookingNumber(@Param("tourId") Long tourId, @Param("travelerId") Long travelerId);
