@@ -44,30 +44,4 @@ public class WishlistController {
           }
         });
   }
-
-  @GetMapping()
-  public ResponseEntity<Result> getWishlistByTraveler(Authentication authentication) {
-    return AuthUtils.checkAuthentication(
-        authentication,
-        () -> {
-          try {
-            return new ResponseEntity<>(
-                new Result(
-                    false,
-                    HttpStatus.OK.value(),
-                    "get wishlist by traveler successfully",
-                    wishlistService.getWishlist(
-                        ((CustomUserDetails) authentication.getPrincipal()).getId())),
-                HttpStatus.OK);
-          } catch (Exception e) {
-            return new ResponseEntity<>(
-                new Result(
-                    false,
-                    HttpStatus.CONFLICT.value(),
-                    "get the failure wishlist by traveler",
-                    null),
-                HttpStatus.CONFLICT);
-          }
-        });
-  }
 }
