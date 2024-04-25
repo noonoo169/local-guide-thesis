@@ -11,18 +11,29 @@ import com.example.localguidebe.dto.responsedto.SearchTourDTO;
 import com.example.localguidebe.entity.*;
 import com.example.localguidebe.enums.AssociateName;
 import com.example.localguidebe.enums.FolderName;
-import com.example.localguidebe.repository.*;
-import com.example.localguidebe.service.*;
+import com.example.localguidebe.repository.ImageRepository;
+import com.example.localguidebe.repository.TourRepository;
+
 import com.example.localguidebe.service.CategoryService;
 import com.example.localguidebe.service.LocationService;
 import com.example.localguidebe.service.TourService;
 import com.example.localguidebe.service.TourStartTimeService;
 import com.example.localguidebe.utils.AddressUtils;
-import com.example.localguidebe.utils.CloudinaryUtil;
+import java.util.Comparator;
+
+import com.example.localguidebe.service.*;
+
 import java.io.IOException;
-import java.time.LocalDate;
-import java.util.*;
+
+import com.example.localguidebe.service.*;
+
+import java.io.IOException;
+
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.example.localguidebe.utils.CloudinaryUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -34,41 +45,40 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TourServiceImpl implements TourService {
-  private final TourToTourDtoConverter tourToTourDtoConverter;
+  private TourToTourDtoConverter tourToTourDtoConverter;
   private final ToResultInSearchSuggestionDtoConverter toResultInSearchSuggestionDtoConverter;
-  private final TourStartTimeRepository tourStartTimeRepository;
+
+  @Autowired
+  public void setTourToDtoConverter(TourToTourDtoConverter tourToTourDtoConverter) {
+    this.tourToTourDtoConverter = tourToTourDtoConverter;
+  }
+
   private final ImageRepository imageRepository;
+
   private TourRepository tourRepository;
   private final CategoryService categoryService;
   private final TourStartTimeService tourStartTimeService;
   private final LocationService locationService;
   private final UserService userService;
   private final CloudinaryUtil cloudinaryUtil;
-  private final BookingRepository bookingRepository;
 
   @Autowired
   public TourServiceImpl(
       ToResultInSearchSuggestionDtoConverter toResultInSearchSuggestionDtoConverter,
-      TourStartTimeRepository tourStartTimeRepository,
       CategoryService categoryService,
       TourStartTimeService tourStartTimeService,
       LocationService locationService,
       UserService userService,
       CloudinaryUtil cloudinaryUtil,
-      ImageRepository imageRepository,
-      BookingRepository bookingRepository,
-      TourToTourDtoConverter tourToTourDtoConverter,
-      BookingRepository bookingRepository1) {
+      ImageRepository imageRepository) {
     this.toResultInSearchSuggestionDtoConverter = toResultInSearchSuggestionDtoConverter;
-    this.tourStartTimeRepository = tourStartTimeRepository;
+
     this.categoryService = categoryService;
     this.tourStartTimeService = tourStartTimeService;
     this.locationService = locationService;
     this.userService = userService;
     this.cloudinaryUtil = cloudinaryUtil;
     this.imageRepository = imageRepository;
-    this.tourToTourDtoConverter = tourToTourDtoConverter;
-    this.bookingRepository = bookingRepository1;
   }
 
   @Autowired
@@ -310,15 +320,5 @@ public class TourServiceImpl implements TourService {
             .map(toResultInSearchSuggestionDtoConverter::convert)
             .toList();
     return new SearchSuggestionResponseDTO(addressesFiltered, guidersFiltered);
-  }
-
-  @Override
-  public List<String> getTourStartTimeAvailable(Long tourId, LocalDate localDate) {
-    List<String> tourStartTimes = tourStartTimeRepository.findByTourId(tourId);
-    List<String> startDateTimesInBooKing =
-        bookingRepository.findStartDateTimesByTourIdAndStartDate(tourId, localDate);
-    List<String> tourStartTimesAvailable = new ArrayList<>(tourStartTimes);
-    tourStartTimesAvailable.removeAll(startDateTimesInBooKing);
-    return tourStartTimesAvailable;
   }
 }
