@@ -4,7 +4,6 @@ import com.example.localguidebe.dto.requestdto.AddTravelerRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateTravelerRequestDTO;
 import com.example.localguidebe.entity.TravelerRequest;
 import com.example.localguidebe.entity.User;
-import com.example.localguidebe.enums.RolesEnum;
 import com.example.localguidebe.enums.TravelerRequestStatus;
 import com.example.localguidebe.repository.TravelerRequestRepository;
 import com.example.localguidebe.service.TravelerRequestService;
@@ -74,15 +73,7 @@ public class TravelerRequestServiceImpl implements TravelerRequestService {
       String email, UpdateTravelerRequestDTO updateTravelerRequestDTO, Long travelerRequestId) {
     TravelerRequest travelerRequest = findTravelerRequestById(travelerRequestId);
     if (travelerRequest == null) return null;
-
-    // If user is traveler, they only delete there request
-    User user = userService.findUserByEmail(email);
-    if (user.getRoles().stream().noneMatch(role -> role.getName().equals(RolesEnum.GUIDER))
-        && !updateTravelerRequestDTO.status().equals(TravelerRequestStatus.DELETED)) return null;
-
-    if (!travelerRequest.getTraveler().getEmail().equals(email)
-        && !travelerRequest.getGuide().getEmail().equals(email)) return null;
-
+    if (!travelerRequest.getGuide().getEmail().equals(email)) return null;
     travelerRequest.setStatus(updateTravelerRequestDTO.status());
     return travelerRequestRepository.save(travelerRequest);
   }
