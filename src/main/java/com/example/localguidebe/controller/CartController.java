@@ -36,7 +36,7 @@ public class CartController {
         authentication,
         () -> {
           Cart cart =
-              cartService.getCartWithUnPaidBooKingByEmail(
+              cartService.getCartByEmail(
                   ((CustomUserDetails) authentication.getPrincipal()).getEmail());
           if (cart == null) {
             return ResponseEntity.status(HttpStatus.OK)
@@ -80,30 +80,24 @@ public class CartController {
     return AuthUtils.checkAuthentication(
         authentication,
         () -> {
-          try {
-            Cart updatedCart =
-                cartService.updateBookingInCart(
-                    ((CustomUserDetails) authentication.getPrincipal()).getEmail(),
-                    updateBookingDTO);
-            if (updatedCart == null) {
-              return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                  .body(
-                      new Result(
-                          false,
-                          HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                          "Update booking information failed"));
-            }
-            return ResponseEntity.status(HttpStatus.OK)
+          Cart updatedCart =
+              cartService.updateBookingInCart(
+                  ((CustomUserDetails) authentication.getPrincipal()).getEmail(), updateBookingDTO);
+          if (updatedCart == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(
                     new Result(
-                        true,
-                        HttpStatus.OK.value(),
-                        "Update booking information successfully",
-                        cartToCartDtoConverter.convert(updatedCart, false)));
-          } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new Result(false, HttpStatus.CONFLICT.value(), e.getMessage()));
+                        false,
+                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                        "Update booking information failed"));
           }
+          return ResponseEntity.status(HttpStatus.OK)
+              .body(
+                  new Result(
+                      true,
+                      HttpStatus.OK.value(),
+                      "Update booking information successfully",
+                      cartToCartDtoConverter.convert(updatedCart, false)));
         });
   }
 

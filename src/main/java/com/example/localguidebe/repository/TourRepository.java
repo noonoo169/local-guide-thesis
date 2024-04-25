@@ -44,6 +44,6 @@ public interface TourRepository extends JpaRepository<Tour, Long> {
       @Param("sortBy") String sortBy);
 
   @Query(
-      "SELECT tour FROM Tour tour WHERE tour.status = 'ACCEPT' AND tour.isForSpecificTraveler = false AND tour.isDeleted = false ")
+      "SELECT tour FROM Tour tour WHERE tour.status != 'PENDING' AND tour.isForSpecificTraveler = false AND tour.isDeleted = false ")
   Page<Tour> getListTours(Pageable pageable);
 }

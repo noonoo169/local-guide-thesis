@@ -101,10 +101,9 @@ public class BusyScheduleServiceImpl implements BusyScheduleService {
             .map(LocalDateTime::toLocalDate)
             .collect(Collectors.toList());
 
-    Set<LocalDate> updatedBusyDates = new HashSet<>();
+    Set<LocalDate> updatedBusyDates = new HashSet<>(busyDates);
 
     if (tour.getUnit().equals("day(s)")) {
-      updatedBusyDates.addAll(busyDates);
       for (int count = 1; count < tour.getDuration(); count++) {
         for (LocalDate busyDate : busyDates) {
           updatedBusyDates.add(busyDate.minusDays(count));
