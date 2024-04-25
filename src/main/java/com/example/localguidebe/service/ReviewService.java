@@ -10,7 +10,7 @@ import java.util.List;
 public interface ReviewService {
   Review addReviewForGuide(ReviewRequestDTO reviewRequestDTO, Long guideId, User traveler);
 
-  List<ReviewResponseDTO> addReviewForTour(ReviewRequestDTO reviewRequestDTO, Long tourId, String email);
+  TourDTO addReviewForTour(ReviewRequestDTO reviewRequestDTO, Long tourId, String email);
 
   List<ReviewResponseDTO> getReviewForTour(Long tourId);
 

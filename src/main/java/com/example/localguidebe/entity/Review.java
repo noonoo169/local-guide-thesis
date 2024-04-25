@@ -52,16 +52,14 @@ public class Review {
   @PostUpdate
   @PostRemove
   public void updateGuideOverallRating() {
-    if (this.guide != null) {
-      Double newOverallRating =
-          BigDecimal.valueOf(
-                  guide.getReviewsOfGuide().stream()
-                      .mapToDouble(Review::getRating)
-                      .average()
-                      .orElse(0))
-              .setScale(1, RoundingMode.HALF_UP)
-              .doubleValue();
-      guide.setOverallRating(newOverallRating);
-    }
+    Double newOverallRating =
+        BigDecimal.valueOf(
+                guide.getReviewsOfGuide().stream()
+                    .mapToDouble(Review::getRating)
+                    .average()
+                    .orElse(0))
+            .setScale(1, RoundingMode.HALF_UP)
+            .doubleValue();
+    guide.setOverallRating(newOverallRating);
   }
 }

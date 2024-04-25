@@ -57,7 +57,7 @@ public class ReviewServiceImpl implements ReviewService {
   }
 
   @Override
-  public List<ReviewResponseDTO> addReviewForTour(ReviewRequestDTO reviewRequestDTO, Long tourId, String email) {
+  public TourDTO addReviewForTour(ReviewRequestDTO reviewRequestDTO, Long tourId, String email) {
     User traveler = userRepository.findUserByEmail(email);
 
     Tour tour = tourRepository.findById(tourId).orElseThrow();
@@ -78,11 +78,8 @@ public class ReviewServiceImpl implements ReviewService {
             .mapToInt(Integer::intValue)
             .average()
             .orElse(0.0));
-    tourRepository.save(tour);
 
-    return  tour.getReviews().stream()
-            .map(reviewToReviewResponseDto::convert)
-            .collect(Collectors.toList());
+    return tourToTourDtoConverter.convert(tourRepository.save(tour));
   }
 
   @Override
