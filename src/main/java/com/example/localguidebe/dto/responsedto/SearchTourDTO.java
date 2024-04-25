@@ -6,6 +6,5 @@ import java.util.List;
 
 public record SearchTourDTO (
         List<TourDTO> tourDTOS,
-        Integer totalOfPage,
-        Integer totalOfResult
+        Integer totalOfPage
 ){}

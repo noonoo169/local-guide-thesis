@@ -1,13 +1,13 @@
 package com.example.localguidebe.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import lombok.*;
-import org.hibernate.validator.constraints.URL;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -16,20 +16,18 @@ public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @URL
-    @Column(name = "image_link",nullable = false)
+    @Column(name = "image_link")
     private String imageLink;
-    @NotNull
     @Column(name="associate_name")
     private String associateName;
-    @ManyToOne( fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "associate_id",insertable=false, updatable=false)
     private User user;
-    @ManyToOne( fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "associate_id",insertable=false, updatable=false)
     private Tour tour;
 
-    @ManyToOne( fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "associate_id",insertable=false, updatable=false)
 
     private Location location;

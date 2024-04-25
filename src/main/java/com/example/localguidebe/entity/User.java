@@ -1,13 +1,14 @@
 package com.example.localguidebe.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
+import lombok.*;
+
+
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lombok.*;
 
 @Entity
 @Getter
@@ -15,88 +16,68 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "user")
+@Table(name ="user")
 public class User {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id")
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+    @Column(name = "username")
+    private String username;
+    @Column(name = "password")
+    private String password;
+    @Column(name="email")
+    private String email;
+    @Column(name ="date_of_birht")
+    private Timestamp dateOfBirth;
+    @Column(name ="phone")
+    private String phone;
+    @Column(name = "address")
+    private String address;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+    private Set<Role> roles = new HashSet<>();
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "guide")
+    private List<BusySchedule> busySchedules = new ArrayList<>();
 
-  @NotNull
-  @Column(name = "username")
-  private String username;
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "guide")
+    private List<Tour> tours = new ArrayList<>();
 
-  @NotNull
-  @Column(name = "password")
-  private String password;
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "guide")
+    private List<Review> reviewsOfGuide = new ArrayList<>();
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "traveler")
+    private List<Review> reviewsOfTraveler = new ArrayList<>();
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "traveler")
+    private List<Invoice> invoices = new ArrayList<>();
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
+    private List<Image> images = new ArrayList<>();
 
-  @Column(name = "email")
-  private String email;
+    @Column(columnDefinition = "TEXT")
+    private String biography;
 
-  @Column(name = "date_of_birht")
-  private LocalDateTime dateOfBirth;
+    @Column(columnDefinition = "TEXT")
+    private String credential;
 
-  @Column(name = "phone")
-  private String phone;
+    @Column()
+    private Double overallRating;
 
-  @Column(name = "address")
-  private String address;
-
-  @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(
-      name = "user_role",
-      joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-      inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
-  private Set<Role> roles = new HashSet<>();
-
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "guide")
-  private List<BusySchedule> busySchedules = new ArrayList<>();
-
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "guide")
-  private List<Tour> tours = new ArrayList<>();
-
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "guide")
-  private List<Review> reviewsOfGuide = new ArrayList<>();
-
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "traveler")
-  private List<Review> reviewsOfTraveler = new ArrayList<>();
-
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "traveler")
-  private List<Invoice> invoices = new ArrayList<>();
-
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
-  private List<Image> images = new ArrayList<>();
+    @OneToMany(mappedBy = "guide")
+    List<LanguageSkill> languageSkills = new ArrayList<>();
 
 
-  @Column(columnDefinition = "TEXT")
-  private String biography;
 
-
-  @Column(columnDefinition = "TEXT")
-  private String credential;
-
-   @Column() private Double overallRating;
-
-  @OneToMany(mappedBy = "guide")
-  List<LanguageSkill> languageSkills = new ArrayList<>();
-
-  @Override
-  public String toString() {
-    return "{"
-        + "id:"
-        + id
-        + ", username:"
-        + username
-        + ", password:"
-        + password
-        + ", email:"
-        + email
-        + ", dateOfBirth:"
-        + dateOfBirth
-        + ", phone:"
-        + phone
-        + ", address:"
-        + address
-        + "}";
-  }
+    @Override
+    public String toString() {
+        return "{" +
+                "id:" + id +
+                ", username:" + username +
+                ", password:" + password +
+                ", email:" + email +
+                ", dateOfBirth:" + dateOfBirth +
+                ", phone:" + phone +
+                ", address:" + address  +
+                "}";
+    }
 }

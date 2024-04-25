@@ -7,6 +7,5 @@ import java.util.List;
 public record SearchGuideDTO (
         List<GuideDTO> guides,
         Integer totalOfPage
-
 ) {
 }

@@ -1,14 +1,16 @@
 package com.example.localguidebe.dto;
 
 import com.example.localguidebe.enums.RolesEnum;
-import java.time.LocalDateTime;
+
+import java.sql.Timestamp;
 import java.util.Set;
 
 public record UserDTO(
-    Long id,
+        Long id,
     String email,
     String username,
-    LocalDateTime dateOfBirth,
+    Timestamp dateOfBirth,
     String phone,
     String address,
-    Set<RolesEnum> roles) {}
+    Set<RolesEnum> roles
+){}

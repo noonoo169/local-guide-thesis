@@ -1,13 +1,15 @@
 package com.example.localguidebe.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import lombok.*;
-import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.sql.Timestamp;
 
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -16,11 +18,10 @@ public class BusySchedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
     @Column(name = "busy_date")
-    private LocalDateTime busyDate;
+    private Timestamp busyDate;
 
-    @ManyToOne( fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "guide_id")
     private User guide;
 

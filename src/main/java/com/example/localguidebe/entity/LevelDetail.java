@@ -1,28 +1,31 @@
 package com.example.localguidebe.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.List;
-import lombok.*;
 
 @Getter
-@Builder
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "level_detail")
 public class LevelDetail {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @NotNull @Column private String level;
+    @Column
+    private String level;
 
-  @NotNull
-  @Column(columnDefinition = "TEXT")
-  private String description;
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
-  @OneToMany(mappedBy = "levelDetail",fetch = FetchType.LAZY)
-  List<LanguageSkill> languageSkills = new ArrayList<>();
+    @OneToMany(mappedBy = "levelDetail")
+    List<LanguageSkill> languageSkills = new ArrayList<>();
 }
