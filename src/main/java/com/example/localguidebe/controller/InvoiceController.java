@@ -1,7 +1,6 @@
 package com.example.localguidebe.controller;
 
 import com.example.localguidebe.converter.InvoiceToInvoiceDtoConverter;
-import com.example.localguidebe.dto.InvoiceDTO;
 import com.example.localguidebe.entity.Invoice;
 import com.example.localguidebe.entity.User;
 import com.example.localguidebe.security.service.CustomUserDetails;
@@ -9,7 +8,6 @@ import com.example.localguidebe.service.InvoiceService;
 import com.example.localguidebe.service.UserService;
 import com.example.localguidebe.system.Result;
 import com.example.localguidebe.utils.AuthUtils;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
@@ -70,10 +68,7 @@ public class InvoiceController {
                         true,
                         HttpStatus.OK.value(),
                         "Get invoices successfully",
-                        invoices.stream()
-                            .map(invoiceToInvoiceDtoConverter::convert)
-                            .sorted(Comparator.comparing(InvoiceDTO::createAt).reversed())
-                            .toList()));
+                        invoices.stream().map(invoiceToInvoiceDtoConverter::convert)));
           } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(
