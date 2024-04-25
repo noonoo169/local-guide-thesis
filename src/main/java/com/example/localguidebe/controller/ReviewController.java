@@ -173,41 +173,4 @@ public class ReviewController {
           }
         });
   }
-
-  @DeleteMapping("tour-reviews/{reviewId}")
-  public ResponseEntity<Result> deleteReviewForTour(
-      @PathVariable("reviewId") Long reviewId, Authentication authentication) {
-    return AuthUtils.checkAuthentication(
-        authentication,
-        () -> {
-          if (!reviewService.checkReviewByTraveler(
-              reviewId, ((CustomUserDetails) authentication.getPrincipal()).getEmail())) {
-            return new ResponseEntity<>(
-                new Result(
-                    true,
-                    HttpStatus.CONFLICT.value(),
-                    "You haven't booked a tour yet so you can't review it",
-                    null),
-                HttpStatus.CONFLICT);
-          } else {
-            try {
-              return new ResponseEntity<>(
-                  new Result(
-                      true,
-                      HttpStatus.OK.value(),
-                      "Successfully removed review for tour",
-                      reviewService.deleteReviewForTour(reviewId)),
-                  HttpStatus.OK);
-            } catch (Exception e) {
-              return new ResponseEntity<>(
-                  new Result(
-                      false,
-                      HttpStatus.CONFLICT.value(),
-                      "Reviews for the tour cannot be removed",
-                      null),
-                  HttpStatus.CONFLICT);
-            }
-          }
-        });
-  }
 }

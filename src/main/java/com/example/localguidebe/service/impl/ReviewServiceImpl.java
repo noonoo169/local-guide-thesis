@@ -110,12 +110,4 @@ public class ReviewServiceImpl implements ReviewService {
         .anyMatch(
             review -> review.getTraveler().getEmail().equals(email) && review.getId() == reviewId);
   }
-
-  @Override
-  public List<ReviewResponseDTO> deleteReviewForTour(Long reviewId) {
-    reviewRepository.deleteById(reviewId);
-    return reviewRepository.findAll().stream()
-        .map(reviewToReviewResponseDto::convert)
-        .collect(Collectors.toList());
-  }
 }
