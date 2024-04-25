@@ -1,8 +1,5 @@
 package com.example.localguidebe.security;
 
-import com.example.localguidebe.oauth2.CustomOAuth2UserService;
-import com.example.localguidebe.oauth2.OAuth2AuthenticationFailureHandler;
-import com.example.localguidebe.oauth2.OAuth2AuthenticationSuccessHandler;
 import com.example.localguidebe.security.jwt.JwtAuthEntryPoint;
 import com.example.localguidebe.security.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
@@ -25,10 +22,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfig {
-  private final CustomOAuth2UserService customOauth2UserService;
-
-  private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
-  private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
   @Autowired private final JwtAuthEntryPoint authEntryPoint;
 
@@ -50,17 +43,7 @@ public class SecurityConfig {
         .requestMatchers("/**")
         .permitAll()
         .and()
-        .httpBasic()
-        .and()
-        .oauth2Login(
-            oauth2Login ->
-                oauth2Login
-                    .userInfoEndpoint()
-                    .userService(customOauth2UserService)
-                    .and()
-                    .successHandler(oAuth2AuthenticationSuccessHandler)
-                    .failureHandler(oAuth2AuthenticationFailureHandler));
-    ;
+        .httpBasic();
 
     http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     return http.build();
