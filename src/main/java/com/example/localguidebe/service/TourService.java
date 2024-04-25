@@ -22,7 +22,7 @@ public interface TourService {
       Integer limit,
       String sortBy,
       String order,
-      String searchKey,
+      String searchName,
       Double minPrice,
       Double maxPrice,
       List<Long> categoryId);
