@@ -13,6 +13,4 @@ public class EmailSubject {
   public static final String NEW_TRAVELER_REQUEST = "New Traveler Request";
   public static final String TRAVELER_REQUEST_ACCEPTED = "Your Traveler Request Has Been Accepted";
   public static final String TRAVELER_REQUEST_DENIED = "Your Traveler Request Has Been Denied";
-  public static final String RESET_PASSWORD = "You Have New Request Reset Password";
-
 }
