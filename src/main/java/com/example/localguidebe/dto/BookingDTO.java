@@ -11,5 +11,4 @@ public record BookingDTO(
     Double price,
     BookingStatusEnum status,
     TourInBookingResponseDTO tour,
-    TourDTO  tourDupe,
     GuideDTO guide) {}
