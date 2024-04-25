@@ -1,6 +1,5 @@
 package com.example.localguidebe.repository;
 
-import com.example.localguidebe.dto.ProvinceResponseDTO;
 import com.example.localguidebe.entity.Booking;
 import java.time.LocalDate;
 import java.util.List;
@@ -34,13 +33,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
   @Query("SELECT b FROM Booking b JOIN b.cart cart WHERE  cart.traveler.id = :travelerId AND b.status ='PAID' ")
   List<Booking> getBookingHistory(@Param("travelerId") Long travelerId);
-  @Query("SELECT SUBSTRING_INDEX(t.address, ', ', -1) AS cityProvince, COUNT(b) AS totalBookings " +
-          "FROM Tour t " +
-          "JOIN t.bookings b " +
-          "JOIN t.locations lt " +
-          "GROUP BY cityProvince " +
-          "ORDER BY totalBookings DESC ")
-  List<Object[]> FindForSuggestedTours();
-
 
 }
