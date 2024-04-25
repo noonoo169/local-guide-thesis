@@ -20,7 +20,7 @@ public class AddBookingRequestDtoToBookingDtoConverter {
         .startDate(addBookingRequestDTO.startDate())
         .status(addBookingRequestDTO.status())
         .price(addBookingRequestDTO.price())
-        .tour(tourRepository.findById(addBookingRequestDTO.id()).orElseThrow())
+        .tour(tourRepository.findById(addBookingRequestDTO.tourDTO().getId()).orElseThrow())
         .build();
   }
 }

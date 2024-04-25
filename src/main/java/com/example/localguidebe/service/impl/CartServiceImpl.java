@@ -7,11 +7,9 @@ import com.example.localguidebe.dto.requestdto.AddBookingRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateBookingDTO;
 import com.example.localguidebe.entity.Booking;
 import com.example.localguidebe.entity.Cart;
-import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.enums.BookingStatusEnum;
 import com.example.localguidebe.repository.BookingRepository;
 import com.example.localguidebe.repository.CartRepository;
-import com.example.localguidebe.repository.TourRepository;
 import com.example.localguidebe.repository.UserRepository;
 import com.example.localguidebe.service.BusyScheduleService;
 import com.example.localguidebe.service.CartService;
@@ -35,8 +33,6 @@ public class CartServiceImpl implements CartService {
   private final CartToCartDtoConverter cartToCartDtoConverter;
   private final BusyScheduleService busyScheduleService;
 
-  private final TourRepository tourRepository;
-
   @Autowired
   public CartServiceImpl(
       CartRepository cartRepository,
@@ -44,15 +40,13 @@ public class CartServiceImpl implements CartService {
       UserRepository userRepository,
       AddBookingRequestDtoToBookingDtoConverter addBookingRequestDtoToBookingDtoConverter,
       CartToCartDtoConverter cartToCartDtoConverter,
-      BusyScheduleService busyScheduleService,
-      TourRepository tourRepository) {
+      BusyScheduleService busyScheduleService) {
     this.cartRepository = cartRepository;
     this.bookingRepository = bookingRepository;
     this.userRepository = userRepository;
     this.addBookingRequestDtoToBookingDtoConverter = addBookingRequestDtoToBookingDtoConverter;
     this.cartToCartDtoConverter = cartToCartDtoConverter;
     this.busyScheduleService = busyScheduleService;
-    this.tourRepository = tourRepository;
   }
 
   @Override
@@ -99,7 +93,6 @@ public class CartServiceImpl implements CartService {
 
     List<LocalDateTime> updatedBusyDates = new ArrayList<>();
     Integer count = 0;
-    Tour tour = tourRepository.findById(bookingDTO.id()).orElseThrow();
 
     List<LocalDateTime> bookingDates =
         bookingRepository.findAll().stream()
@@ -109,14 +102,14 @@ public class CartServiceImpl implements CartService {
     updatedBusyDates.addAll(bookingDates);
     if (!bookingDates.stream()
         .anyMatch(bookingDate -> bookingDate.toLocalDate().equals(bookingDTO.startDate()))) {
-      while (count < tour.getDuration()) {
+      while (count < bookingDTO.tourDTO().getDuration()) {
         updatedBusyDates.add(bookingDTO.startDate().plusDays(count));
         count++;
       }
     }
     // Add booking days to guider busy schedule
     busyScheduleService.InsertAndUpdateBusyDates(
-        updatedBusyDates, tour.getGuide().getEmail());
+        updatedBusyDates, bookingDTO.tourDTO().getGuide().email());
     // save booking
     Booking booking =
         bookingRepository.save(addBookingRequestDtoToBookingDtoConverter.convert(bookingDTO));

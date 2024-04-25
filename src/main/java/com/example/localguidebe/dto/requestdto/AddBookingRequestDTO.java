@@ -11,4 +11,5 @@ public record AddBookingRequestDTO(
     Integer numberTravelers,
     Double price,
     BookingStatusEnum status,
-    boolean isDeleted) {}
+    boolean isDeleted,
+    TourDTO tourDTO) {}
