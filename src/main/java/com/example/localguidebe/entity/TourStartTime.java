@@ -18,7 +18,7 @@ import java.sql.Timestamp;
 public class TourStartTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
     @Column(name = "start_time")
     private Time startTime;
     @ManyToOne

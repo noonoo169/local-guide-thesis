@@ -54,16 +54,6 @@ public class User {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
     private List<Image> images = new ArrayList<>();
 
-    @Override
-    public String toString() {
-        return "{" +
-                "id:" + id +
-                ", username:" + username +
-                ", password:" + password +
-                ", email:" + email +
-                ", dateOfBirth:" + dateOfBirth +
-                ", phone:" + phone +
-                ", address:" + address  +
-                "}";
-    }
+
+
 }
