@@ -15,4 +15,4 @@ public record TravelerRequestDTO(
     TravelerRequestStatus status,
     GuideDTO guide,
     UserDTO traveler,
-    TourDTO tour) {}
+    Long tourId) {}
