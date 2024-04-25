@@ -12,5 +12,5 @@ import java.util.Set;
 public interface BusyScheduleService {
     List<BusyScheduleDTO> InsertAndUpdateBusyDates(List<LocalDateTime> busyDates, String email);
     List<BusyScheduleDTO> getBusyScheduleByGuide(String email);
-    Set<LocalDate> getBusyDateByTour(Long tourId);
+    Set<LocalDate> getBusyDateByTour(TourDTO tourDTO);
 }
