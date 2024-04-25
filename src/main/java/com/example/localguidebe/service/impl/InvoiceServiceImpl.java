@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,11 +35,10 @@ public class InvoiceServiceImpl implements InvoiceService {
   @Override
   @Transactional
   public Invoice createBookingInInvoice(List<Long> bookingIds, String email, Double priceTotal) {
+    bookingIds.forEach(bookingRepository::setBookingStatusToPaid);
     Cart cart = cartService.getCartByEmail(email);
     if (cart == null) return null;
-    List<Booking> bookings =
-        new ArrayList<>(
-            cart.getBookings().stream().filter(booking -> !booking.isDeleted()).toList());
+    List<Booking> bookings = new ArrayList<>(cart.getBookings().stream().filter(booking -> !booking.isDeleted()).toList());
     Invoice invoice =
         Invoice.builder()
             .priceTotal(priceTotal)
@@ -50,7 +50,6 @@ public class InvoiceServiceImpl implements InvoiceService {
           booking.setInvoice(invoice);
         });
     invoice.setBookings(bookings);
-    bookingIds.forEach(bookingRepository::setBookingStatusToPaid);
     return invoiceRepository.save(invoice);
   }
 
