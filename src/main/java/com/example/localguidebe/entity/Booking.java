@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.validator.constraints.Range;
 
 @Getter
 @Setter
@@ -27,12 +26,12 @@ public class Booking {
   private LocalDateTime startDate;
 
   @NotNull
-  @Range(min=0, max=50)
+  @Size(min = 0, max = 50)
   @Column(name = "number_travelers")
   private Integer numberTravelers;
 
   @NotNull
-  @Range(min=0, max=100000000)
+  @Size(min = 0, max = 1000000)
   @Column(name = "price")
   private Double price;
 
