@@ -119,30 +119,23 @@ public class ReviewController {
     }
   }
 
-  @GetMapping("guide-reviews/filter/{guideId}")
-  public ResponseEntity<Result> getReviewsForGuide(
-      @PathVariable("guideId") Long guideId,
-      @RequestParam(required = false, defaultValue = "") List<Integer> ratings,
-      @RequestParam(required = false, defaultValue = "Most recent") String sortBy) {
-    try {
-      List<Review> reviews = reviewService.getReviewsOfGuide(guideId, ratings, sortBy);
-      if (reviews.isEmpty()) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-            .body(new Result(true, HttpStatus.NOT_FOUND.value(), "No review for this condition"));
-      }
-      return ResponseEntity.status(HttpStatus.OK)
+  @GetMapping("guide-reviews/{guideId}")
+  // TODO: Add param for filter by rating and sort
+  public ResponseEntity<Result> getReviewsForGuide(@PathVariable("guideId") Long guideId) {
+    List<Review> reviews = reviewService.getReviewsOfGuide(guideId);
+    if (reviews.isEmpty()) {
+      return ResponseEntity.status(HttpStatus.NO_CONTENT)
           .body(
               new Result(
-                  true,
-                  HttpStatus.OK.value(),
-                  "Thank you for giving feedback.",
-                  reviews.stream().map(reviewToReviewDtoConverter::convert)));
-    } catch (Exception e) {
-      return new ResponseEntity<>(
-          new Result(
-              false, HttpStatus.CONFLICT.value(), "Get the failure comment list for guide", null),
-          HttpStatus.CONFLICT);
+                  true, HttpStatus.NO_CONTENT.value(), "This guide has not been reviewed yet."));
     }
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(
+            new Result(
+                true,
+                HttpStatus.OK.value(),
+                "Thank you for giving feedback.",
+                reviews.stream().map(reviewToReviewDtoConverter::convert)));
   }
 
   @PutMapping("tour-reviews/{reviewId}")

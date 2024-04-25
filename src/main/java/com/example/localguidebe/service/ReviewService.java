@@ -1,5 +1,6 @@
 package com.example.localguidebe.service;
 
+import com.example.localguidebe.dto.TourDTO;
 import com.example.localguidebe.dto.requestdto.ReviewRequestDTO;
 import com.example.localguidebe.dto.responsedto.ReviewResponseDTO;
 import com.example.localguidebe.entity.Review;
@@ -9,12 +10,11 @@ import java.util.List;
 public interface ReviewService {
   Review addReviewForGuide(ReviewRequestDTO reviewRequestDTO, Long guideId, User traveler);
 
-  List<ReviewResponseDTO> addReviewForTour(
-      ReviewRequestDTO reviewRequestDTO, Long tourId, String email);
+  List<ReviewResponseDTO> addReviewForTour(ReviewRequestDTO reviewRequestDTO, Long tourId, String email);
 
   List<ReviewResponseDTO> getReviewForTour(Long tourId);
 
-  List<Review> getReviewsOfGuide(Long guideId, List<Integer> ratings, String sortBy);
+  List<Review> getReviewsOfGuide(Long guideId);
 
   List<ReviewResponseDTO> editReviewForTour(Long reviewId, ReviewRequestDTO reviewRequestDTO);
 
