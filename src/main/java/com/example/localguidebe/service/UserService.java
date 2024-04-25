@@ -21,6 +21,4 @@ public interface UserService {
       String order,
       Double ratingFilter,
       String searchValue);
-
-  boolean isTravelerCanAddReviewForGuide(User traveler, Long guideId);
 }
