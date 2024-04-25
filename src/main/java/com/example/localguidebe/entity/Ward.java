@@ -3,11 +3,9 @@ package com.example.localguidebe.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Builder
-@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
