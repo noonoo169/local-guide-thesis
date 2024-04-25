@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface TourService {
-  SearchTourDTO getListTour(Integer page, Integer limit);
+  List<TourDTO> getListTour();
 
   Tour saveTour(TourRequestDTO tourRequestDTO, String email);
 
@@ -53,6 +53,5 @@ public interface TourService {
   TourDTO denyTour(Long tourId);
 
   List<TourDTO> getPendingTour();
-
   Tour findTourById(Long id);
 }

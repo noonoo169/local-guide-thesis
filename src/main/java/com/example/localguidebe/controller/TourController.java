@@ -157,16 +157,11 @@ public class TourController {
   }
 
   @GetMapping("")
-  public ResponseEntity<Result> getListTour(
-      @RequestParam(required = false, defaultValue = "0") Integer page,
-      @RequestParam(required = false, defaultValue = "5") Integer limit) {
+  public ResponseEntity<Result> getListTour() {
     try {
       return new ResponseEntity<>(
           new Result(
-              true,
-              HttpStatus.OK.value(),
-              "Get the list successfully",
-              tourService.getListTour(page, limit)),
+              true, HttpStatus.OK.value(), "Get the list successfully", tourService.getListTour()),
           HttpStatus.OK);
     } catch (Exception e) {
       return new ResponseEntity<>(

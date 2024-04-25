@@ -99,13 +99,11 @@ public class TourServiceImpl implements TourService {
   }
 
   @Override
-  public SearchTourDTO getListTour(Integer page, Integer limit) {
-    Sort sort = Sort.by("overallRating").descending();
-    Pageable paging = PageRequest.of(page, limit, sort);
-    Page<Tour> tourPage = tourRepository.findAll(paging);
-    List<TourDTO> tourDTOS =
-        tourPage.get().map(tourToTourDtoConverter::convert).collect(Collectors.toList());
-    return new SearchTourDTO(tourDTOS, tourPage.getTotalPages(), (int) tourPage.getTotalElements());
+  public List<TourDTO> getListTour() {
+    return tourRepository.findAll().stream()
+        .filter(tour -> tour.getIsDeleted().equals(false))
+        .map(tourToTourDtoConverter::convert)
+        .collect(Collectors.toList());
   }
 
   @Override
