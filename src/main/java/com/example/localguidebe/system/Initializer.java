@@ -52,7 +52,7 @@ public class Initializer implements CommandLineRunner {
         }
         else {
             User user = new User();
-            user.setFullName("admin");
+            user.setUsername("admin");
             user.setPassword(passwordEncoder.encode("admin12345"));
             user.setEmail("admin12345@gmail.com");
             Set<Role> roles = new HashSet<>();
@@ -69,7 +69,7 @@ public class Initializer implements CommandLineRunner {
         }
         else {
             User user1 = new User();
-            user1.setFullName("guide");
+            user1.setUsername("guide");
             user1.setPassword(passwordEncoder.encode("guide12345"));
             user1.setEmail("guide12345@gmail.com");
             Set<Role> roles1 = new HashSet<>();

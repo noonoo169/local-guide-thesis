@@ -114,7 +114,7 @@ public class UserServiceImpl implements UserService {
             .sorted(Comparator.comparing(User::getOverallRating).reversed())
             .filter(
                 guider ->
-                    AddressUtils.removeVietnameseAccents(guider.getFullName())
+                    AddressUtils.removeVietnameseAccents(guider.getUsername())
                         .toLowerCase()
                         .contains(AddressUtils.removeVietnameseAccents(searchValue).toLowerCase()))
             .map(toResultInSearchSuggestionDtoConverter::convert)

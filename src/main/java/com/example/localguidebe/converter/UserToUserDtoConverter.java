@@ -18,7 +18,7 @@ public class UserToUserDtoConverter {
         return new UserDTO(
                 source.getId(),
                 source.getEmail(),
-                source.getFullName(),
+                source.getUsername(),
                 source.getDateOfBirth(),
                 source.getPhone(),
                 source.getAddress(),

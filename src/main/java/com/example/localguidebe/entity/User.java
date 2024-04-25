@@ -22,8 +22,8 @@ public class User {
   @Column(name = "id")
   private Long id;
 
-  @Column(name = "full_name")
-  private String fullName;
+  @Column(name = "username")
+  private String username;
 
 
   @Column(name = "password")
@@ -82,8 +82,8 @@ public class User {
     return "{"
         + "id:"
         + id
-        + ", fullName:"
-        + fullName
+        + ", username:"
+        + username
         + ", password:"
         + password
         + ", email:"

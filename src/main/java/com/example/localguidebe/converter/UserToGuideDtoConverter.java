@@ -25,7 +25,7 @@ public class UserToGuideDtoConverter {
     return new GuideDTO(
         source.getId(),
         source.getEmail(),
-        source.getFullName(),
+        source.getUsername(),
         source.getDateOfBirth(),
         source.getPhone(),
         source.getAddress(),
