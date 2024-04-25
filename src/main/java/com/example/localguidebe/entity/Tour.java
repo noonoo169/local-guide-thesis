@@ -1,6 +1,5 @@
 package com.example.localguidebe.entity;
 
-import com.example.localguidebe.enums.TourStatusEnum;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.util.ArrayList;
@@ -65,10 +64,6 @@ public class Tour {
   private User guide;
 
   @Column private String address;
-
-  @Column(name = "status")
-  @Enumerated(EnumType.STRING)
-  private TourStatusEnum status;
 
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "tour")
   private List<TourStartTime> tourStartTimes = new ArrayList<>();

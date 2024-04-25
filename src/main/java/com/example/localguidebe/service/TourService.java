@@ -40,15 +40,11 @@ public interface TourService {
 
   boolean checkBookingByTraveler(Long tourId, String email);
 
-  boolean checkExistingReviewsByTraveler(Long travelerId, Long tourId);
+  boolean checkExistingReviewsByTraveler(Long travelerId,Long tourId);
 
   void updateRatingForTour(Tour tour);
 
   List<String> getLocationName(List<LocationDTO> locationDTOS);
 
-  List<ReviewResponseDTO> filterReviewForTour(List<Integer> ratings, Long tourId, String sortBy);
-
-  TourDTO acceptTour(Long tourId);
-
-  TourDTO denyTour(Long tourId);
+  List<ReviewResponseDTO> filterReviewForTour(List<Integer> ratings, Long tourId,String sortBy);
 }

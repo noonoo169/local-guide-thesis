@@ -13,7 +13,10 @@ import com.example.localguidebe.dto.responsedto.ReviewResponseDTO;
 import com.example.localguidebe.dto.responsedto.SearchSuggestionResponseDTO;
 import com.example.localguidebe.dto.responsedto.SearchTourDTO;
 import com.example.localguidebe.entity.*;
-import com.example.localguidebe.enums.*;
+import com.example.localguidebe.enums.AssociateName;
+import com.example.localguidebe.enums.BookingStatusEnum;
+import com.example.localguidebe.enums.FolderName;
+import com.example.localguidebe.enums.NotificationTypeEnum;
 import com.example.localguidebe.repository.*;
 import com.example.localguidebe.repository.ImageRepository;
 import com.example.localguidebe.repository.TourRepository;
@@ -420,19 +423,5 @@ public class TourServiceImpl implements TourService {
     return tourRepository.filterReviewForTour(ratings, tourId, sortBy).stream()
         .map(reviewToReviewResponseDto::convert)
         .collect(Collectors.toList());
-  }
-
-  @Override
-  public TourDTO acceptTour(Long tourId) {
-    Tour tour = tourRepository.findById(tourId).orElseThrow();
-    tour.setStatus(TourStatusEnum.ACCEPT);
-    return tourToTourDtoConverter.convert(tourRepository.save(tour));
-  }
-
-  @Override
-  public TourDTO denyTour(Long tourId) {
-    Tour tour = tourRepository.findById(tourId).orElseThrow();
-    tour.setStatus(TourStatusEnum.DENY);
-    return tourToTourDtoConverter.convert(tourRepository.save(tour));
   }
 }

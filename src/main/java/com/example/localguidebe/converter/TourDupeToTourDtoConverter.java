@@ -26,7 +26,6 @@ public class TourDupeToTourDtoConverter {
         tourDupe.getIsDeleted(),
         null,
         JsonUtils.convertJsonToObject(tourDupe.getGuide(), UserDTO.class),
-        tourDupe.getStatus(),
         JsonUtils.convertJsonToList(tourDupe.getTourStartTimes(), String.class),
         JsonUtils.convertJsonToSet(tourDupe.getCategories(), CategoryDTO.class),
         JsonUtils.convertJsonToList(tourDupe.getReviews(), ReviewDTO.class),
