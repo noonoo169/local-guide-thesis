@@ -1,9 +1,12 @@
 package com.example.localguidebe.service;
 
-import com.example.localguidebe.dto.responsedto.*;
+import com.example.localguidebe.dto.responsedto.StatisticalGuideDTO;
+import com.example.localguidebe.dto.responsedto.StatisticalTourDTO;
+
+import java.util.List;
 
 public interface StatisticService {
-    StatisticalGuidePaginationDTO getStatisticalByGuide(Integer page, Integer limit, String order);
+    List<StatisticalGuideDTO> getStatisticalByGuide();
 
     Double getRevenueByGuide(Long guideId);
 
@@ -13,7 +16,7 @@ public interface StatisticService {
 
     Long getTotalTravelerNumberByGuide(Long guideId);
 
-    StatisticalTourPaginationDTO getStatisticalByTour(Integer page, Integer limit, String order);
+    List<StatisticalTourDTO> getStatisticalByTour();
 
     Long getTotalBookingByTour(Long tourId);
 
@@ -23,6 +26,6 @@ public interface StatisticService {
 
     StatisticalGuideDTO getStatisticByPerGuide(Long guideId);
 
-    StatisticOfToursByGuidePaginationDTO getStatisticOfToursByGuide(
-            Long guideId, Integer page, Integer limit, String order);
+    List<StatisticalTourDTO> getStatisticOfToursByGuide(
+            Long guideId);
 }

@@ -18,6 +18,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByRoles_Name(RolesEnum roles_name);
 
-    Page<User> findByRoles_Name(RolesEnum roles_name, Pageable pageable);
-
 }
