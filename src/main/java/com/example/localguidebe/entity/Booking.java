@@ -22,21 +22,21 @@ public class Booking {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-
+  @NotNull
   @Column(name = "start_date")
   private LocalDateTime startDate;
 
-
+  @NotNull
   @Range(min=0, max=50)
   @Column(name = "number_travelers")
   private Integer numberTravelers;
 
-
+  @NotNull
   @Range(min=0, max=100000000)
   @Column(name = "price")
   private Double price;
 
-
+  @NotNull
   @Column(name = "status")
   @Enumerated(EnumType.STRING)
   private BookingStatusEnum status;

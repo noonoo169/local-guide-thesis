@@ -42,7 +42,6 @@ public class TourDTO {
 
     private String itinerary;
     private boolean isDeleted;
-    private String address;
 
     private UserDTO guide;
 
@@ -59,7 +58,7 @@ public class TourDTO {
 //
 //    private List<Booking> bookings = new ArrayList<>();
 //
-    private List<Image> images = new ArrayList<>();
+    private List<ImageDTO> images = new ArrayList<>();
 //
 //    private Set<Location> locations;
 //

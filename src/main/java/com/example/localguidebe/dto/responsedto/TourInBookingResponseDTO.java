@@ -4,6 +4,4 @@ import com.example.localguidebe.dto.ImageDTO;
 import java.util.List;
 
 public record TourInBookingResponseDTO(
-    Long id, String name, Double overallRating
-   // List<ImageDTO> images
-) {}
+    Long id, String name, Double overallRating, List<ImageDTO> images) {}

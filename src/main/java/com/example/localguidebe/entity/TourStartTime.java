@@ -20,7 +20,7 @@ public class TourStartTime {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-
+  @NotNull
   @Column(name = "start_time")
   private Time startTime;
 

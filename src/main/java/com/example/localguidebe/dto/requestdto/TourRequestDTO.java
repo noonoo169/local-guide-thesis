@@ -29,14 +29,14 @@ public class TourRequestDTO {
     private Double pricePerTraveler;
     private Integer limitTraveler;
     private Double extraPrice;
-    private String address;
+    private String province;
     private String itinerary;
     private User guide;
     private List<TourStartTime> tourStartTimes = new ArrayList<>();
     private Set<Category> categories = new HashSet<>();
     private List<Review> reviews = new ArrayList<>();
     private List<Booking> bookings = new ArrayList<>();
-    private List<String> images = new ArrayList<>();
+    private List<Image> images = new ArrayList<>();
     private Set<Location> locations;
     private Location location;
 }

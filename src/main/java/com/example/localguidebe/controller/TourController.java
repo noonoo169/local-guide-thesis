@@ -10,7 +10,6 @@ import com.example.localguidebe.security.service.CustomUserDetails;
 import com.example.localguidebe.service.CategoryService;
 import com.example.localguidebe.service.TourService;
 import com.example.localguidebe.system.Result;
-import com.example.localguidebe.utils.AuthUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,25 +47,20 @@ public class TourController {
   }
 
   @PostMapping("")
-  public ResponseEntity<Result> addTour(
-      Authentication authentication, @RequestBody TourRequestDTO tourRequestDTO) {
-    return AuthUtils.checkAuthentication(
-        authentication,
-        () -> {
-          try {
-            return new ResponseEntity<>(
-                new Result(
-                    true,
-                    HttpStatus.OK.value(),
-                    "tour added successfully",
-                    tourToTourDtoConverter.convert(tourService.saveTour(tourRequestDTO,((CustomUserDetails) authentication.getPrincipal()).getEmail()))),
-                HttpStatus.OK);
-          } catch (Exception e) {
-            return new ResponseEntity<>(
-                new Result(false, HttpStatus.CONFLICT.value(), "Adding tour failed", null),
-                HttpStatus.CONFLICT);
-          }
-        });
+  public ResponseEntity<Result> addTour(@RequestBody TourRequestDTO tourRequestDTO) {
+    try {
+      return new ResponseEntity<>(
+          new Result(
+              true,
+              HttpStatus.OK.value(),
+              "account added successfully",
+              tourToTourDtoConverter.convert(tourService.saveTour(tourRequestDTO))),
+          HttpStatus.OK);
+    } catch (Exception e) {
+      return new ResponseEntity<>(
+          new Result(false, HttpStatus.CONFLICT.value(), "Adding account failed", null),
+          HttpStatus.CONFLICT);
+    }
   }
 
   @GetMapping("/{id}")
@@ -156,7 +150,6 @@ public class TourController {
           HttpStatus.CONFLICT);
     }
   }
-
 
   @DeleteMapping("/{id}")
   public ResponseEntity<Result> deleteTour(@PathVariable("id") Long id) {

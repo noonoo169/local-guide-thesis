@@ -11,7 +11,7 @@ import java.util.List;
 public interface TourService {
   List<TourDTO> getListTour();
 
-  Tour saveTour(TourRequestDTO tourRequestDTO,String email);
+  Tour saveTour(TourRequestDTO tourRequestDTO);
 
   Tour updateTour(UpdateTourRequestDTO updateTourRequestDTO);
 
@@ -26,16 +26,6 @@ public interface TourService {
       Double minPrice,
       Double maxPrice,
       List<Long> categoryId);
-  SearchTourDTO getToursByNameAndAddress(
-          Integer page,
-          Integer limit,
-          String sortBy,
-          String order,
-          List<String> searchNames,
-          List<String> addresses,
-          Double minPrice,
-          Double maxPrice,
-          List<Long> categoryId);
 
   List<TourDTO> deleteTour(Long id);
 

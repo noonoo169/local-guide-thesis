@@ -18,11 +18,11 @@ public class TourToTourInBookingResponseDtoConverter {
     return new TourInBookingResponseDTO(
         source.getId(),
         source.getName(),
-        source.getOverallRating());
-//        source.getImages() != null
-//            ? source.getImages().stream()
-//                .map(imageToImageDtoConverter::convertImageDTO)
-//                .collect(Collectors.toList())
-//            : null);
+        source.getOverallRating(),
+        source.getImages() != null
+            ? source.getImages().stream()
+                .map(imageToImageDtoConverter::convertImageDTO)
+                .collect(Collectors.toList())
+            : null);
   }
 }

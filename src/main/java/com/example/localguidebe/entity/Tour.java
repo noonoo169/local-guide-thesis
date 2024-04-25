@@ -1,6 +1,5 @@
 package com.example.localguidebe.entity;
 
-import com.example.localguidebe.enums.AssociateName;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -25,46 +24,46 @@ public class Tour {
   @Column(name = "name", nullable = false)
   private String name;
 
-
+  @NotNull
   @Column(name = "description", columnDefinition = "TEXT")
   private String description;
 
-
+  @NotNull
   @Column(name = "transportation", columnDefinition = "TEXT")
   private String transportation;
 
-
+  @NotNull
   @Column(name = "include_service", columnDefinition = "TEXT")
   private String includeService;
 
-
+  @NotNull
   @Column(name = "duration")
   private Integer duration;
 
-
+  @NotNull
   @Column(name = "unit")
   private String unit;
 
   @Column(name = "estimated_local_cash_needed", columnDefinition = "TEXT")
   private String estimatedLocalCashNeeded;
 
-
+  @NotNull
   @Column(name = "price_per_traveler")
   private Double pricePerTraveler;
 
-
+  @NotNull
   @Column(name = "limit_traveler")
   private Integer limitTraveler;
 
-
+  @NotNull
   @Column(name = "extra_price")
   private Double extraPrice;
 
+  @NotNull
+  @Column(name = "overall_rating")
+  private Double overallRating;
 
-  @Column(name = "overall_rating",columnDefinition = "double default 0.0")
-  private Double overallRating = 0.0;
-
-
+  @NotNull
   @Column(name = "itinerary", columnDefinition = "TEXT")
   private String itinerary;
 
@@ -75,7 +74,7 @@ public class Tour {
   @JoinColumn(name = "guide_id")
   private User guide;
 
-  @Column private String address;
+  @Column private String province;
 
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "tour")
   private List<TourStartTime> tourStartTimes = new ArrayList<>();
@@ -96,8 +95,8 @@ public class Tour {
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "tour")
   private List<Booking> bookings = new ArrayList<>();
 
-//  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "tour")
-//  private List<Image> images = new ArrayList<>();
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "tour")
+  private List<Image> images = new ArrayList<>();
 
   @ManyToOne
   @JoinColumn(name = "meeting_point_id")
@@ -109,7 +108,7 @@ public class Tour {
       joinColumns = @JoinColumn(name = "tour_id", referencedColumnName = "id"),
       inverseJoinColumns = @JoinColumn(name = "location_id", referencedColumnName = "id"))
   private Set<Location> locations = new HashSet<>();
-//  public List<Image> getImagesOfObject() {
-//    return this.get().stream().filter(image -> image.getAssociateName().equals(AssociateName.TOUR)).toList();
-//  }
+  public List<Image> getImagesOfObject() {
+    return this.getImages().stream().filter(image -> image.getAssociateName().equals("tour")).toList();
+  }
 }

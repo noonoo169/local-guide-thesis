@@ -25,7 +25,7 @@ public class User {
   @Column(name = "username")
   private String username;
 
-
+  @NotNull
   @Column(name = "password")
   private String password;
 
@@ -56,8 +56,8 @@ public class User {
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "traveler")
   private List<Invoice> invoices = new ArrayList<>();
 
-//  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
-//  private List<Image> images = new ArrayList<>();
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
+  private List<Image> images = new ArrayList<>();
 
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
@@ -96,7 +96,7 @@ public class User {
         + address
         + "}";
   }
-//  public List<Image> getImagesOfObject() {
-//    return this.getImages().stream().filter(image -> image.getAssociateName().equals("user")).toList();
-//  }
+  public List<Image> getImagesOfObject() {
+    return this.getImages().stream().filter(image -> image.getAssociateName().equals("user")).toList();
+  }
 }

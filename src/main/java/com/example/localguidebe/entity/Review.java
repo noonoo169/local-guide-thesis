@@ -19,13 +19,13 @@ public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @NotNull
     @Column(name = "comment" ,columnDefinition = "TEXT")
     private String comment;
-
+    @NotNull
     @Column(name = "rating")
     private Integer rating;
-
+    @NotNull
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
