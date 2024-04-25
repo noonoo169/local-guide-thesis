@@ -3,7 +3,6 @@ package com.example.localguidebe.service.impl;
 import com.example.localguidebe.converter.ToResultInSearchSuggestionDtoConverter;
 import com.example.localguidebe.dto.responsedto.ResultInSearchSuggestionDTO;
 import com.example.localguidebe.dto.responsedto.SearchSuggestionResponseDTO;
-import com.example.localguidebe.entity.Review;
 import com.example.localguidebe.entity.Role;
 import com.example.localguidebe.entity.User;
 import com.example.localguidebe.enums.RolesEnum;

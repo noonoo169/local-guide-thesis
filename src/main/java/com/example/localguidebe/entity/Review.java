@@ -1,8 +1,6 @@
 package com.example.localguidebe.entity;
 
 import jakarta.persistence.*;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,17 +45,4 @@ public class Review {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "traveler_id")
   private User traveler;
-
-  @PostPersist
-  public void updateGuideOverallRating() {
-    Double newOverallRating =
-        BigDecimal.valueOf(
-                guide.getReviewsOfGuide().stream()
-                    .mapToDouble(Review::getRating)
-                    .average()
-                    .orElse(0))
-            .setScale(1, RoundingMode.HALF_UP)
-            .doubleValue();
-    guide.setOverallRating(newOverallRating);
-  }
 }

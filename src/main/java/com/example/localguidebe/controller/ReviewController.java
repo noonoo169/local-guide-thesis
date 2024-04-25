@@ -2,7 +2,6 @@ package com.example.localguidebe.controller;
 
 import com.example.localguidebe.converter.ReviewToReviewDtoConverter;
 import com.example.localguidebe.dto.requestdto.ReviewRequestDTO;
-import com.example.localguidebe.entity.Review;
 import com.example.localguidebe.entity.User;
 import com.example.localguidebe.security.service.CustomUserDetails;
 import com.example.localguidebe.service.ReviewService;
@@ -10,7 +9,6 @@ import com.example.localguidebe.service.TourService;
 import com.example.localguidebe.service.UserService;
 import com.example.localguidebe.system.Result;
 import com.example.localguidebe.utils.AuthUtils;
-import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -73,11 +71,7 @@ public class ReviewController {
           if (!tourService.checkBookingByTraveler(
               tourId, ((CustomUserDetails) authentication.getPrincipal()).getEmail())) {
             return new ResponseEntity<>(
-                new Result(
-                    true,
-                    HttpStatus.CONFLICT.value(),
-                    "You haven't booked a tour yet so you can't review it",
-                    null),
+                new Result(true, HttpStatus.CONFLICT.value(), "You haven't booked a tour yet so you can't review it", null),
                 HttpStatus.CONFLICT);
           } else {
             try {
@@ -100,41 +94,24 @@ public class ReviewController {
           }
         });
   }
-
   @GetMapping("tour-reviews/{tourId}")
-  public ResponseEntity<Result> getReviewForTour(@PathVariable("tourId") Long tourId) {
-    try {
-      return new ResponseEntity<>(
-          new Result(
-              false,
-              HttpStatus.OK.value(),
-              "Get the list of reviews of successful tours",
-              reviewService.getReviewForTour(tourId)),
-          HttpStatus.OK);
-    } catch (Exception e) {
-      return new ResponseEntity<>(
-          new Result(
-              false, HttpStatus.CONFLICT.value(), "Get the review list of failed tours", null),
-          HttpStatus.CONFLICT);
-    }
+    public ResponseEntity<Result> getReviewForTour(@PathVariable("tourId") Long tourId){
+      try {
+          return new ResponseEntity<>(
+                  new Result(
+                          false,
+                          HttpStatus.OK.value(),
+                          "Get the list of reviews of successful tours",
+                          reviewService.getReviewForTour(tourId)),
+                  HttpStatus.OK);
+      } catch (Exception e) {
+          return new ResponseEntity<>(
+                  new Result(false, HttpStatus.CONFLICT.value(), "Get the review list of failed tours", null),
+                  HttpStatus.CONFLICT);
+      }
+
+
   }
 
-  @GetMapping("guide-reviews/{guideId}")
-  // TODO: Add param for filter by rating and sort
-  public ResponseEntity<Result> getReviewsForGuide(@PathVariable("guideId") Long guideId) {
-    List<Review> reviews = reviewService.getReviewsOfGuide(guideId);
-    if (reviews == null) {
-      return ResponseEntity.status(HttpStatus.NO_CONTENT)
-          .body(
-              new Result(
-                  true, HttpStatus.NO_CONTENT.value(), "This guide has not been reviewed yet."));
-    }
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(
-            new Result(
-                true,
-                HttpStatus.OK.value(),
-                "Thank you for giving feedback.",
-                reviews.stream().map(reviewToReviewDtoConverter::convert)));
-  }
+
 }

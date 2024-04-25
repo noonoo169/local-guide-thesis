@@ -87,8 +87,4 @@ public class ReviewServiceImpl implements ReviewService {
         .map(reviewToReviewResponseDto::convert)
         .collect(Collectors.toList());
   }
-
-  public List<Review> getReviewsOfGuide(Long guideId) {
-    return reviewRepository.getReviewsByGuideId(guideId);
-  }
 }

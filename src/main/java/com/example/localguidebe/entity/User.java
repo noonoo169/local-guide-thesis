@@ -1,6 +1,7 @@
 package com.example.localguidebe.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -23,6 +24,7 @@ public class User {
 
   @Column(name = "full_name")
   private String fullName;
+
 
   @Column(name = "password")
   private String password;
@@ -54,8 +56,8 @@ public class User {
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "traveler")
   private List<Invoice> invoices = new ArrayList<>();
 
-  //  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
-  //  private List<Image> images = new ArrayList<>();
+//  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
+//  private List<Image> images = new ArrayList<>();
 
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
@@ -72,7 +74,7 @@ public class User {
 
   @Column() private Double overallRating;
 
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "guide")
+  @OneToMany( cascade = CascadeType.ALL, mappedBy = "guide")
   List<LanguageSkill> languageSkills = new ArrayList<>();
 
   @Override
@@ -94,4 +96,7 @@ public class User {
         + address
         + "}";
   }
+//  public List<Image> getImagesOfObject() {
+//    return this.getImages().stream().filter(image -> image.getAssociateName().equals("user")).toList();
+//  }
 }
