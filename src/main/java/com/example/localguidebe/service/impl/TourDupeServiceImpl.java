@@ -3,7 +3,6 @@ package com.example.localguidebe.service.impl;
 import com.example.localguidebe.converter.TourToTourDtoConverter;
 import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.entity.TourDupe;
-import com.example.localguidebe.exception.ConvertTourToTourDupeException;
 import com.example.localguidebe.repository.TourDupeRepository;
 import com.example.localguidebe.repository.TourRepository;
 import com.example.localguidebe.service.TourDupeService;
@@ -30,7 +29,7 @@ public class TourDupeServiceImpl implements TourDupeService {
     try {
       tourDupe = new TourDupe(tourToTourDtoConverter.convert(tour));
     } catch (Exception e) {
-      throw new ConvertTourToTourDupeException(e.getMessage());
+      throw new RuntimeException(e);
     }
     tour.setTourDupe(tourDupeRepository.save(tourDupe));
     tourRepository.save(tour);

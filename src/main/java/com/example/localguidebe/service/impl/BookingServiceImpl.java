@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 public class BookingServiceImpl implements BookingService {
   private final BookingRepository bookingRepository;
   private final BookingToBookingDtoConverter bookingToBookingDtoConverter;
+
   private final UserService userService;
 
   public BookingServiceImpl(
@@ -44,12 +45,5 @@ public class BookingServiceImpl implements BookingService {
   public List<StatisticalBookingDTO> getStatisticalBooking() {
     List<StatisticalBookingDTO> statisticalBookings = bookingRepository.getStatisticalBooking();
     return statisticalBookings;
-  }
-
-  @Override
-  public List<BookingDTO> getBookingsOfGuide(String email) {
-    return bookingRepository.getBookingsOfGuide(email).stream()
-        .map(bookingToBookingDtoConverter::convert)
-        .toList();
   }
 }

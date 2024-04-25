@@ -11,7 +11,7 @@ import com.example.localguidebe.entity.Cart;
 import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.enums.BookingStatusEnum;
 import com.example.localguidebe.enums.TypeBusyDayEnum;
-import com.example.localguidebe.exception.ExceedLimitTravelerOfTourException;
+import com.example.localguidebe.exception.ExceedLimitTravelerOfTour;
 import com.example.localguidebe.repository.BookingRepository;
 import com.example.localguidebe.repository.CartRepository;
 import com.example.localguidebe.repository.TourRepository;
@@ -112,7 +112,7 @@ public class CartServiceImpl implements CartService {
     Integer count = 0;
     Tour tour = tourRepository.findById(bookingDTO.id()).orElseThrow();
     if (tour.getLimitTraveler().compareTo(bookingDTO.numberTravelers()) < 0)
-      throw new ExceedLimitTravelerOfTourException("You exceed limit traveler of this tour");
+      throw new ExceedLimitTravelerOfTour("You exceed limit traveler of this tour");
     // save busy schedules
     if (tour.getUnit().equals("day(s)")) {
       while (count < tour.getDuration()) {

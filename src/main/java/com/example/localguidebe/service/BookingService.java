@@ -11,6 +11,4 @@ public interface BookingService {
   List<ProvinceResponseDTO> FindForSuggestedTours();
 
   List<StatisticalBookingDTO> getStatisticalBooking();
-
-  List<BookingDTO> getBookingsOfGuide(String email);
 }
