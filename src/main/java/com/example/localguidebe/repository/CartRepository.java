@@ -10,8 +10,8 @@ import java.util.Optional;
 
 @Repository
 public interface CartRepository extends JpaRepository<Cart, Long> {
-  @Query("SELECT c FROM Cart c JOIN FETCH c.bookings b WHERE c.traveler.email = :email AND b.status = 'PENDING_PAYMENT'")
-  Optional<Cart> getCartByEmail(@Param("email") String email);
+  @Query("Select c FROM Cart c WHERE c.traveler.email = :email")
+  Cart getCartByEmail(@Param("email") String email);
   @Query("Select c FROM Cart c WHERE c.traveler.email = :email")
   Optional<Cart> getCartByTravelerEmail(@Param("email") String email);
 }

@@ -13,7 +13,6 @@ import com.example.localguidebe.repository.CartRepository;
 import com.example.localguidebe.repository.UserRepository;
 import com.example.localguidebe.service.BusyScheduleService;
 import com.example.localguidebe.service.CartService;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +50,13 @@ public class CartServiceImpl implements CartService {
 
   @Override
   public Cart getCartByEmail(String email) {
-    return cartRepository.getCartByEmail(email).orElse(null);
+    Cart cart = cartRepository.getCartByEmail(email);
+    if (cart == null) return null;
+    cart.setBookings(
+        cart.getBookings().stream()
+            .filter(booking -> booking.getStatus().equals(BookingStatusEnum.PENDING_PAYMENT))
+            .toList());
+    return cart;
   }
 
   @Override
@@ -83,7 +88,8 @@ public class CartServiceImpl implements CartService {
 
     Booking booking = optionalBooking.get();
     booking.setNumberTravelers(updateBookingDTO.numberTravelers());
-    booking.setStartDate(updateBookingDTO.startDate().toLocalDate().atTime(updateBookingDTO.startTime()));
+    // TODO: create API to check available start date
+    booking.setStartDate(updateBookingDTO.startDate());
     bookingRepository.save(booking);
     return cart;
   }
