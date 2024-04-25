@@ -53,5 +53,4 @@ public interface TourService {
   TourDTO denyTour(Long tourId);
 
   List<TourDTO> getPendingTour();
-  Tour findTourById(Long id);
 }
