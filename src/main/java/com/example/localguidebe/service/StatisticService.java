@@ -28,9 +28,7 @@ public interface StatisticService {
   StatisticOfToursByGuidePaginationDTO getStatisticOfToursByGuide(
       Long guideId, Integer page, Integer limit, String order);
 
-  StatisticByMonthDTO getStatisticByMonthForAdmin(Integer year);
+  StatisticByMonthDTO getStatisticByMonth(Integer year);
 
   List<StatisticalGuideDTO> getTopRevenue();
-
-  StatisticByMonthDTO getStatisticByMonthForGuide(Integer year, Long guideId);
 }

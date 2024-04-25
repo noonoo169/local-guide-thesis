@@ -41,10 +41,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
   List<Booking> getBookingHistory(@Param("travelerId") Long travelerId);
 
   @Query(
-      "SELECT b FROM Booking b JOIN b.tour t JOIN t.guide g WHERE g.id =:guideId AND b.status = 'PAID'")
-  List<Booking> getPaidBookingForGuide(Long guideId);
-
-  @Query(
       "SELECT  NEW com.example.localguidebe.dto.ProvinceResponseDTO("
           + "SUBSTRING_INDEX(lt.address, ', ', -2),"
           + " COUNT(*)) "
