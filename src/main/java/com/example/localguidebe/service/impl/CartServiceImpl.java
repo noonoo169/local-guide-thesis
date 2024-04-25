@@ -118,10 +118,8 @@ public class CartServiceImpl implements CartService {
     busyScheduleService.InsertAndUpdateBusyDates(
         updatedBusyDates, tour.getGuide().getEmail());
     // save booking
-    Booking bookingRequest = addBookingRequestDtoToBookingDtoConverter.convert(bookingDTO);
-    bookingRequest.setStatus(BookingStatusEnum.PENDING_PAYMENT);
     Booking booking =
-        bookingRepository.save(bookingRequest);
+        bookingRepository.save(addBookingRequestDtoToBookingDtoConverter.convert(bookingDTO));
     Cart cart = cartRepository.getCartByTravelerEmail(email).orElse(null);
     // save booking to cart
     if (cart != null) {
