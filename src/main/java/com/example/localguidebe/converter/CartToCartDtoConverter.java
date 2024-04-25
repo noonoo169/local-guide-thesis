@@ -13,12 +13,11 @@ public class CartToCartDtoConverter {
     this.bookingToBookingDtoConverter = bookingToBookingDtoConverter;
   }
 
-  public CartDTO convert(Cart source, boolean isDeleted) {
+  public CartDTO convert(Cart source) {
     return new CartDTO(
         source.getId(),
         source.getBookings() != null
             ? source.getBookings().stream()
-                .filter(booking -> booking.isDeleted() == isDeleted)
                 .map(bookingToBookingDtoConverter::convert)
                 .collect(Collectors.toList())
             : null);

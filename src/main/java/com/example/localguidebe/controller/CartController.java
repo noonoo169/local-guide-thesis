@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/carts")
@@ -24,10 +26,7 @@ public class CartController {
   }
 
   @GetMapping("")
-  public ResponseEntity<Result> getTourInCartByUser(
-      Authentication authentication,
-      @RequestParam(value = "isDeleted", required = false, defaultValue = "false")
-          boolean isDeleted) {
+  public ResponseEntity<Result> getTourInCartByUser(Authentication authentication) {
     if (authentication == null || !authentication.isAuthenticated()) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
           .body(new Result(false, HttpStatus.UNAUTHORIZED.value(), "Let's login"));
@@ -48,23 +47,6 @@ public class CartController {
                 true,
                 HttpStatus.OK.value(),
                 "Get cart successfully",
-                cartToCartDtoConverter.convert(cart, isDeleted)));
-  }
-
-  @DeleteMapping("/{id}")
-  public ResponseEntity<Result> deleteBookingInCartByUser(
-      Authentication authentication, @PathVariable Long id) {
-    if (authentication == null || !authentication.isAuthenticated()) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-          .body(new Result(false, HttpStatus.UNAUTHORIZED.value(), "Let's login"));
-    }
-    CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-    boolean isDeleted = cartService.deleteBookingInCartByIdAndByEmail(customUserDetails.getEmail(), id);
-    if (!isDeleted) {
-      return ResponseEntity.status(HttpStatus.OK)
-          .body(new Result(true, HttpStatus.NOT_FOUND.value(), "Can't delete this booking"));
-    }
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(new Result(true, HttpStatus.OK.value(), "Delete booking in cart successfully"));
+                cartToCartDtoConverter.convert(cart)));
   }
 }
