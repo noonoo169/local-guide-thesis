@@ -40,8 +40,6 @@ public interface TourService {
 
   boolean checkBookingByTraveler(Long tourId, String email);
 
-  boolean checkExistingReviewsByTraveler(Long travelerId,Long tourId);
-
   void updateRatingForTour(Tour tour);
 
   List<String> getLocationName(List<LocationDTO> locationDTOS);

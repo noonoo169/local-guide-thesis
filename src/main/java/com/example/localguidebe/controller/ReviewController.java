@@ -79,12 +79,6 @@ public class ReviewController {
                     "You haven't booked a tour yet so you can't review it",
                     null),
                 HttpStatus.CONFLICT);
-          } else if (!tourService.checkExistingReviewsByTraveler(
-              ((CustomUserDetails) authentication.getPrincipal()).getId(), tourId)) {
-            return new ResponseEntity<>(
-                new Result(
-                    true, HttpStatus.CONFLICT.value(), "You have already rated this tour", null),
-                HttpStatus.CONFLICT);
           } else {
             try {
               return new ResponseEntity<>(
