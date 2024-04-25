@@ -1,4 +1,4 @@
-package com.example.localguidebe.dto.coinDTO.coinpayments.response.info;
+package com.example.localguidebe.crypto.model.dto;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;

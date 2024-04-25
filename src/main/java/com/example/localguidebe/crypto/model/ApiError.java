@@ -1,4 +1,4 @@
-package com.example.localguidebe.dto.coinDTO;
+package com.example.localguidebe.crypto.model;
 
 import lombok.Builder;
 import lombok.Getter;

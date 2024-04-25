@@ -1,4 +1,4 @@
-package com.example.localguidebe.enums;
+package com.example.localguidebe.crypto.model;
 
 import lombok.Getter;
 
@@ -7,11 +7,10 @@ public enum Cmd {
     /**
      * Extend this for other Cmd calls
      */
+    create_transaction("create_transaction"),
     DEPOSIT_ADDRESS("get_deposit_address"),
     get_callback_address("get_callback_address"),
-    rates("rates "),
-    create_withdrawal("create_withdrawal"),
-    get_withdrawal_info("get_withdrawal_info");
+    rates("rates ");
 
     /* Name used on the enumeration */
     public final String cmd;

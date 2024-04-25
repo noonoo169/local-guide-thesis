@@ -1,10 +1,7 @@
 package com.example.localguidebe.crypto.client;
 
-import com.example.localguidebe.dto.coinDTO.coinpayments.response.Result.BaseResponse;
-import com.example.localguidebe.dto.coinDTO.coinpayments.response.Result.BillInfoData;
-import com.example.localguidebe.dto.coinDTO.coinpayments.response.Result.CoinInfo;
-import com.example.localguidebe.dto.coinDTO.coinpayments.response.Result.WithdrawalInfo;
-import com.example.localguidebe.dto.coinDTO.coinpayments.response.info.DepositAddress;
+import com.example.localguidebe.crypto.model.coinpayments.response.BaseResponse;
+import com.example.localguidebe.crypto.model.coinpayments.response.DepositAddress;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,13 +15,9 @@ public interface CoinpaymentsClient {
     BaseResponse<DepositAddress> getDepositAddres(@RequestBody String requestBody);
 
     @PostMapping(consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    CoinInfo getRates(@RequestBody String requestBody);
-
+    BaseResponse<Object> getRates(@RequestBody String requestBody);
     @PostMapping(consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    BillInfoData getInfoTransaction(@RequestBody String requestBody);
-
-    @PostMapping(consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    WithdrawalInfo createWithdrawal(@RequestBody String requestBody);
+    BaseResponse<Object> getTransaction(@RequestBody String requestBody);
 
 }
 
