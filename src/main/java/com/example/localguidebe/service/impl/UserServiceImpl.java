@@ -15,8 +15,6 @@ import jakarta.persistence.criteria.JoinType;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,12 +23,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService {
-  Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
-
   private UserRepository userRepository;
 
   private final ToResultInSearchSuggestionDtoConverter toResultInSearchSuggestionDtoConverter;
@@ -100,32 +95,13 @@ public class UserServiceImpl implements UserService {
     return userRepository.findAll(specification, paging);
   }
 
-  @Transactional
   @Override
   public boolean isTravelerCanAddReviewForGuide(User traveler, Long guideId) {
-
-    List<Long> guideIdsInBooking =
-        traveler.getInvoices().stream()
-            .flatMap(invoice -> invoice.getBookings().stream())
-            .filter(booking -> booking.getTour().getGuide().getId().equals(guideId))
-            .map(booking -> booking.getTour().getGuide().getId())
-            .toList();
-    if (guideIdsInBooking.isEmpty()) return false;
-
-    List<Long> guideIdsInReview =
-        traveler.getReviewsOfTraveler().stream()
-            .filter(
-                review -> {
-                  if (review.getGuide() != null && review.getGuide().getId() != null) {
-                    return review.getGuide().getId().equals(guideId);
-                  }
-                  return false;
-                })
-            .map(review -> review.getGuide().getId())
-            .toList();
-    logger.info("guideIdsInReview: " + guideIdsInReview);
-
-    return guideIdsInBooking.size() > guideIdsInReview.size();
+    return traveler.getInvoices().stream()
+        .anyMatch(
+            invoice ->
+                invoice.getBookings().stream()
+                    .anyMatch(booking -> booking.getTour().getGuide().getId().equals(guideId)));
   }
 
   @Override
