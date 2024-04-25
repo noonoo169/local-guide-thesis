@@ -15,9 +15,7 @@ import com.example.localguidebe.repository.BookingRepository;
 import com.example.localguidebe.repository.CartRepository;
 import com.example.localguidebe.repository.TourRepository;
 import com.example.localguidebe.repository.UserRepository;
-import com.example.localguidebe.service.BusyScheduleService;
 import com.example.localguidebe.service.CartService;
-import java.time.LocalDateTime;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,7 +29,6 @@ public class CartServiceImpl implements CartService {
   private final AddBookingRequestDtoToBookingConverter addBookingRequestDtoToBookingDtoConverter;
   private final CartToCartDtoConverter cartToCartDtoConverter;
   private final TourRepository tourRepository;
-  private final BusyScheduleService busyScheduleService;
 
   @Autowired
   public CartServiceImpl(
@@ -40,15 +37,13 @@ public class CartServiceImpl implements CartService {
       UserRepository userRepository,
       AddBookingRequestDtoToBookingConverter addBookingRequestDtoToBookingDtoConverter,
       CartToCartDtoConverter cartToCartDtoConverter,
-      TourRepository tourRepository,
-      BusyScheduleService busyScheduleService) {
+      TourRepository tourRepository) {
     this.cartRepository = cartRepository;
     this.bookingRepository = bookingRepository;
     this.userRepository = userRepository;
     this.addBookingRequestDtoToBookingDtoConverter = addBookingRequestDtoToBookingDtoConverter;
     this.cartToCartDtoConverter = cartToCartDtoConverter;
     this.tourRepository = tourRepository;
-    this.busyScheduleService = busyScheduleService;
   }
 
   @Override
@@ -63,15 +58,11 @@ public class CartServiceImpl implements CartService {
     if (cart == null) {
       return false;
     }
-
-    Optional<Booking> optionalBooking = bookingRepository.findById(bookingId);
-    if (optionalBooking.isEmpty()) {
+    boolean bookingDeleteExist =
+        cart.getBookings().stream().anyMatch(booking -> booking.getId().equals(bookingId));
+    if (!bookingDeleteExist) {
       return false;
     }
-
-    if (!busyScheduleService.updateBusyScheduleBeforeUpdateOrDeleteBooking(
-        null, optionalBooking.get())) return false;
-
     bookingRepository.deleteBookingById(bookingId);
     return true;
   }
@@ -88,14 +79,10 @@ public class CartServiceImpl implements CartService {
             .findFirst();
     if (optionalBooking.isEmpty()) return null;
 
-    LocalDateTime newStartDate =
-        updateBookingDTO.startDate().toLocalDate().atTime(updateBookingDTO.startTime());
-    if (!busyScheduleService.updateBusyScheduleBeforeUpdateOrDeleteBooking(
-        newStartDate, optionalBooking.get())) return null;
-
     Booking booking = optionalBooking.get();
     booking.setNumberTravelers(updateBookingDTO.numberTravelers());
-    booking.setStartDate(newStartDate);
+    booking.setStartDate(
+        updateBookingDTO.startDate().toLocalDate().atTime(updateBookingDTO.startTime()));
     bookingRepository.save(booking);
     return cart;
   }
@@ -112,7 +99,7 @@ public class CartServiceImpl implements CartService {
             .add(
                 BusySchedule.builder()
                     .busyDate(bookingDTO.startDate().plusDays(count))
-                    .typeBusyDay(TypeBusyDayEnum.BOOKED_DAY_BY_DAYS)
+                    .TypeBusyDay(TypeBusyDayEnum.BOOKED_DAY_BY_DAYS)
                     .build());
         count++;
       }
@@ -122,7 +109,7 @@ public class CartServiceImpl implements CartService {
           .add(
               BusySchedule.builder()
                   .busyDate(bookingDTO.startDate())
-                  .typeBusyDay(TypeBusyDayEnum.BOOKED_DAY_BY_HOURS)
+                  .TypeBusyDay(TypeBusyDayEnum.BOOKED_DAY_BY_HOURS)
                   .build());
     }
     tourRepository.save(tour);

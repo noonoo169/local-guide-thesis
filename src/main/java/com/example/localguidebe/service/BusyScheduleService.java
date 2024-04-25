@@ -1,7 +1,6 @@
 package com.example.localguidebe.service;
 
 import com.example.localguidebe.dto.BusyScheduleDTO;
-import com.example.localguidebe.entity.Booking;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,6 +14,4 @@ public interface BusyScheduleService {
   Set<LocalDate> getBusyDateByTour(Long tourId);
 
   List<BusyScheduleDTO> getBusySchedulesAndPreBookedSchedules(String email);
-
-  boolean updateBusyScheduleBeforeUpdateOrDeleteBooking(LocalDateTime newDate, Booking booking);
 }

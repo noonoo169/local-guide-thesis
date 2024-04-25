@@ -1,9 +1,6 @@
 package com.example.localguidebe.repository;
 
 import com.example.localguidebe.entity.BusySchedule;
-import com.example.localguidebe.entity.User;
-import com.example.localguidebe.enums.TypeBusyDayEnum;
-import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,9 +14,6 @@ public interface BusyScheduleRepository extends JpaRepository<BusySchedule, Inte
   List<BusySchedule> findAllByGuideId(@Param("id") Long id);
 
   @Query(
-      "SELECT busySchedule FROM BusySchedule busySchedule WHERE busySchedule.typeBusyDay = 'DATE_SELECTED_BY_GUIDE'")
+      "SELECT busySchedule FROM BusySchedule busySchedule WHERE busySchedule.TypeBusyDay = 'DATE_SELECTED_BY_GUIDE'")
   List<BusySchedule> getBusySchedules();
-
-  BusySchedule findBusyScheduleByBusyDateAndGuideAndTypeBusyDay(
-      LocalDateTime busyDate, User guide, TypeBusyDayEnum typeBusyDayEnum);
 }

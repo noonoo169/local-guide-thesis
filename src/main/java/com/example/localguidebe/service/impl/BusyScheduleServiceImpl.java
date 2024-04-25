@@ -2,7 +2,6 @@ package com.example.localguidebe.service.impl;
 
 import com.example.localguidebe.converter.BusyScheduleToBusyScheduleDtoConverter;
 import com.example.localguidebe.dto.BusyScheduleDTO;
-import com.example.localguidebe.entity.Booking;
 import com.example.localguidebe.entity.BusySchedule;
 import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.entity.User;
@@ -17,15 +16,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class BusyScheduleServiceImpl implements BusyScheduleService {
-  Logger logger = LoggerFactory.getLogger(BusyScheduleServiceImpl.class);
   private final BusyScheduleRepository busyScheduleRepository;
   private final BusyScheduleToBusyScheduleDtoConverter busyScheduleToBusyScheduleDtoConverter;
   private final UserRepository userRepository;
@@ -128,54 +123,5 @@ public class BusyScheduleServiceImpl implements BusyScheduleService {
     return busyScheduleRepository.findAll().stream()
         .map(busyScheduleToBusyScheduleDtoConverter::convert)
         .collect(Collectors.toList());
-  }
-
-  /**
-   * @param newDate: new value of start date include start time , if null, use for delete booking
-   * @param booking: entity before update start date
-   * @return boolean
-   */
-  @Transactional
-  @Override
-  public boolean updateBusyScheduleBeforeUpdateOrDeleteBooking(
-      LocalDateTime newDate, Booking booking) {
-    User guide = booking.getTour().getGuide();
-    List<BusySchedule> newBusySchedules = new ArrayList<>();
-
-    int count = 0;
-    if (booking.getTour().getUnit().equals("day(s)")) {
-      while (count < booking.getTour().getDuration()) {
-        BusySchedule oldBusySchedule =
-            busyScheduleRepository.findBusyScheduleByBusyDateAndGuideAndTypeBusyDay(
-                booking.getStartDate().plusDays(count), guide, TypeBusyDayEnum.BOOKED_DAY_BY_DAYS);
-        busyScheduleRepository.delete(oldBusySchedule);
-        if (newDate != null) {
-          newBusySchedules.add(
-              BusySchedule.builder()
-                  .busyDate(newDate.plusDays(count))
-                  .typeBusyDay(TypeBusyDayEnum.BOOKED_DAY_BY_DAYS)
-                  .guide(guide)
-                  .build());
-        }
-
-        count++;
-      }
-    } else {
-      if (newDate != null) {
-        BusySchedule oldBusySchedule =
-            busyScheduleRepository.findBusyScheduleByBusyDateAndGuideAndTypeBusyDay(
-                booking.getStartDate(), guide, TypeBusyDayEnum.BOOKED_DAY_BY_HOURS);
-        busyScheduleRepository.delete(oldBusySchedule);
-        newBusySchedules.add(
-            BusySchedule.builder()
-                .busyDate(newDate)
-                .typeBusyDay(TypeBusyDayEnum.BOOKED_DAY_BY_HOURS)
-                .guide(guide)
-                .build());
-      }
-    }
-    guide.getBusySchedules().addAll(newBusySchedules);
-    userRepository.save(guide);
-    return true;
   }
 }
