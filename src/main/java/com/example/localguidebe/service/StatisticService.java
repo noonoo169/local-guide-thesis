@@ -1,31 +1,28 @@
 package com.example.localguidebe.service;
 
-import com.example.localguidebe.dto.responsedto.StatisticalGuideDTO;
-import com.example.localguidebe.dto.responsedto.StatisticalTourDTO;
-
-import java.util.List;
+import com.example.localguidebe.dto.responsedto.*;
 
 public interface StatisticService {
-    List<StatisticalGuideDTO> getStatisticalByGuide();
+  StatisticalGuidePaginationDTO getStatisticalByGuide(Integer page, Integer limit, String order);
 
-    Double getRevenueByGuide(Long guideId);
+  Double getRevenueByGuide(Long guideId);
 
-    Double getRevenueByTour(Long tourId);
+  Double getRevenueByTour(Long tourId);
 
-    Long getTotalTravelerNumberByTour(Long tourId);
+  Long getTotalTravelerNumberByTour(Long tourId);
 
-    Long getTotalTravelerNumberByGuide(Long guideId);
+  Long getTotalTravelerNumberByGuide(Long guideId);
 
-    List<StatisticalTourDTO> getStatisticalByTour();
+  StatisticalTourPaginationDTO getStatisticalByTour(Integer page, Integer limit, String order);
 
-    Long getTotalBookingByTour(Long tourId);
+  Long getTotalBookingByTour(Long tourId);
 
-    Long getTotalBookingByGuide(Long guideId);
+  Long getTotalBookingByGuide(Long guideId);
 
-    StatisticalTourDTO getStatisticByPerTour(Long tourId);
+  StatisticalTourDTO getStatisticByPerTour(Long tourId);
 
-    StatisticalGuideDTO getStatisticByPerGuide(Long guideId);
+  StatisticalGuideDTO getStatisticByPerGuide(Long guideId);
 
-    List<StatisticalTourDTO> getStatisticOfToursByGuide(
-            Long guideId);
+  StatisticOfToursByGuidePaginationDTO getStatisticOfToursByGuide(
+      Long guideId, Integer page, Integer limit, String order);
 }
