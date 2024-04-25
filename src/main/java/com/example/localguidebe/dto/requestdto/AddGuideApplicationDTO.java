@@ -1,7 +1,6 @@
 package com.example.localguidebe.dto.requestdto;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public record AddGuideApplicationDTO(
     Long userId,
@@ -14,5 +13,4 @@ public record AddGuideApplicationDTO(
     Boolean isLicensedGuide,
     String transportation,
     Integer yearsOfExperience,
-    String howGuideHearAboutUs,
-    List<String> licenseImages) {}
+    String howGuideHearAboutUs) {}

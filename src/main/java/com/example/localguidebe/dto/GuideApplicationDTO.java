@@ -1,8 +1,6 @@
 package com.example.localguidebe.dto;
 
-import com.example.localguidebe.entity.Image;
 import com.example.localguidebe.enums.GuideApplicationStatus;
-import java.util.List;
 
 public record GuideApplicationDTO(
     Long id,
@@ -12,5 +10,4 @@ public record GuideApplicationDTO(
     String howGuideHearAboutUs,
     GuideApplicationStatus status,
     String reasonDeny,
-    List<Image> images,
     UserDTO user) {}
