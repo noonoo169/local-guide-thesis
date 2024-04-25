@@ -6,12 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LocationToLocationDtoConverter {
-  LocationDTO convert(Location location) {
-    return new LocationDTO(
-        location.getId(),
-        location.getName(),
-        location.getAddress(),
-        location.getLatitude(),
-        location.getLongitude());
-  }
+    LocationDTO convert(Location location){
+        return new LocationDTO(location.getId(),location.getName(),location.getAddress(),location.getLatitude(), location.getLatitude());
+    }
 }
