@@ -9,7 +9,6 @@ public class LocationToLocationDto {
     public LocationDTO convert(Location source) {
         return new LocationDTO(source.getId(),
                 source.getName(),
-                source.getAddress(),
                 source.getLatitude(),
                 source.getLongitude());
     }

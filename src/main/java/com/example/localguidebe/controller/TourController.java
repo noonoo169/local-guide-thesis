@@ -3,24 +3,20 @@ package com.example.localguidebe.controller;
 import com.example.localguidebe.converter.TourToTourDtoConverter;
 import com.example.localguidebe.converter.TourToUpdateTourResponseDtoConverter;
 import com.example.localguidebe.dto.CategoryDTO;
-import com.example.localguidebe.dto.requestdto.InfoLocationDTO;
 import com.example.localguidebe.dto.requestdto.TourRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateTourRequestDTO;
 import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.entity.User;
 import com.example.localguidebe.security.service.CustomUserDetails;
 import com.example.localguidebe.service.CategoryService;
-import com.example.localguidebe.service.GeoCodingService;
 import com.example.localguidebe.service.TourService;
 import com.example.localguidebe.service.UserService;
-import com.example.localguidebe.service.impl.GeoCodingServiceImpl;
 import com.example.localguidebe.system.Result;
 import com.example.localguidebe.utils.AddressUtils;
 import com.example.localguidebe.utils.AuthUtils;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,20 +30,14 @@ public class TourController {
   private TourService tourService;
   private CategoryService categoryService;
   private TourToTourDtoConverter tourToTourDtoConverter;
-  private TourToUpdateTourResponseDtoConverter tourToUpdateTourResponseDtoConverter;
-  private UserService userService;
-
-  private GeoCodingService geoCodingService;
-
-
+  private final TourToUpdateTourResponseDtoConverter tourToUpdateTourResponseDtoConverter;
+  private final UserService userService;
 
   public TourController(
       TourToUpdateTourResponseDtoConverter tourToUpdateTourResponseDtoConverter,
-      UserService userService,GeoCodingService geoCodingService) {
+      UserService userService) {
     this.tourToUpdateTourResponseDtoConverter = tourToUpdateTourResponseDtoConverter;
     this.userService = userService;
-    this.geoCodingService = geoCodingService;
-
   }
 
   @Autowired
@@ -246,4 +236,15 @@ public class TourController {
     }
   }
 
+  @GetMapping("/{id}/tour-start-time-available")
+  public ResponseEntity<Result> getTourStartTimeAvailable(
+      @PathVariable Long id, @RequestParam() LocalDate localDate) {
+    return new ResponseEntity<>(
+        new Result(
+            true,
+            HttpStatus.OK.value(),
+            "Get the list successfully",
+            tourService.getTourStartTimeAvailable(id, localDate)),
+        HttpStatus.OK);
+  }
 }
