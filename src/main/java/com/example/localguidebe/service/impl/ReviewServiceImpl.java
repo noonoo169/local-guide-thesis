@@ -7,16 +7,11 @@ import com.example.localguidebe.dto.responsedto.ReviewResponseDTO;
 import com.example.localguidebe.entity.Review;
 import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.entity.User;
-import com.example.localguidebe.enums.NotificationTypeEnum;
 import com.example.localguidebe.repository.ReviewRepository;
 import com.example.localguidebe.repository.TourRepository;
 import com.example.localguidebe.repository.UserRepository;
-import com.example.localguidebe.service.NotificationService;
 import com.example.localguidebe.service.ReviewService;
 import com.example.localguidebe.service.TourService;
-
-import com.example.localguidebe.system.NotificationMessage;
-
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +29,7 @@ public class ReviewServiceImpl implements ReviewService {
   private final TourRepository tourRepository;
   private final TourToTourDtoConverter tourToTourDtoConverter;
   private final TourService tourService;
-  private final NotificationService notificationService;
+
   private final ReviewToReviewResponseDto reviewToReviewResponseDto;
 
   @Autowired
@@ -44,15 +39,13 @@ public class ReviewServiceImpl implements ReviewService {
       TourRepository tourRepository,
       TourToTourDtoConverter tourToTourDtoConverter,
       ReviewToReviewResponseDto reviewToReviewResponseDto,
-      TourService tourService,
-      NotificationService notificationService) {
+      TourService tourService) {
     this.reviewRepository = reviewRepository;
     this.userRepository = userRepository;
     this.tourRepository = tourRepository;
     this.tourToTourDtoConverter = tourToTourDtoConverter;
     this.reviewToReviewResponseDto = reviewToReviewResponseDto;
     this.tourService = tourService;
-    this.notificationService = notificationService;
   }
 
   @Override
@@ -66,15 +59,7 @@ public class ReviewServiceImpl implements ReviewService {
             .traveler(traveler)
             .createdAt(LocalDateTime.now())
             .build();
-    Review newReview = reviewRepository.save(review);
-    //notification send to guider
-    notificationService.addNotification(
-        guideId,
-        traveler.getId(),
-        guideId,
-        NotificationTypeEnum.ADD_REVIEW_FOR_GUIDE,
-        traveler.getFullName() + NotificationMessage.ADD_REVIEW_FOR_GUIDE);
-    return newReview;
+    return reviewRepository.save(review);
   }
 
   @Override
@@ -93,14 +78,6 @@ public class ReviewServiceImpl implements ReviewService {
     tour.getReviews().add(newReview);
     tourService.updateRatingForTour(tour);
     tourRepository.save(tour);
-
-    //notification send to guider
-    notificationService.addNotification(
-        tour.getGuide().getId(),
-        traveler.getId(),
-        tourId,
-        NotificationTypeEnum.ADD_REVIEW_FOR_TOUR,
-        traveler.getFullName() + NotificationMessage.ADD_REVIEW_FOR_TOUR);
 
     return tour.getReviews().stream()
         .map(reviewToReviewResponseDto::convert)

@@ -16,7 +16,6 @@ import com.example.localguidebe.entity.*;
 import com.example.localguidebe.enums.AssociateName;
 import com.example.localguidebe.enums.BookingStatusEnum;
 import com.example.localguidebe.enums.FolderName;
-import com.example.localguidebe.enums.NotificationTypeEnum;
 import com.example.localguidebe.repository.*;
 import com.example.localguidebe.repository.ImageRepository;
 import com.example.localguidebe.repository.TourRepository;
@@ -25,7 +24,6 @@ import com.example.localguidebe.service.CategoryService;
 import com.example.localguidebe.service.LocationService;
 import com.example.localguidebe.service.TourService;
 import com.example.localguidebe.service.TourStartTimeService;
-import com.example.localguidebe.system.NotificationMessage;
 import com.example.localguidebe.utils.AddressUtils;
 import com.example.localguidebe.utils.CloudinaryUtil;
 import com.google.gson.Gson;
@@ -64,7 +62,6 @@ public class TourServiceImpl implements TourService {
   private final BookingRepository bookingRepository;
   private final ReviewToReviewResponseDto reviewToReviewResponseDto;
   private final Gson gson = new Gson();
-  private final NotificationService notificationService;
 
   @Autowired
   public TourServiceImpl(
@@ -79,8 +76,7 @@ public class TourServiceImpl implements TourService {
       BookingRepository bookingRepository,
       TourToTourDtoConverter tourToTourDtoConverter,
       GeoCodingService geoCodingService,
-      ReviewToReviewResponseDto reviewToReviewResponseDto,
-      NotificationService notificationService) {
+      ReviewToReviewResponseDto reviewToReviewResponseDto) {
     this.tourStartTimeRepository = tourStartTimeRepository;
     this.toResultInSearchSuggestionDtoConverter = toResultInSearchSuggestionDtoConverter;
     this.geoCodingService = geoCodingService;
@@ -93,7 +89,6 @@ public class TourServiceImpl implements TourService {
     this.tourToTourDtoConverter = tourToTourDtoConverter;
     this.bookingRepository = bookingRepository;
     this.reviewToReviewResponseDto = reviewToReviewResponseDto;
-    this.notificationService = notificationService;
   }
 
   @Autowired
@@ -169,13 +164,6 @@ public class TourServiceImpl implements TourService {
               imageTour.setAssociateName(AssociateName.TOUR);
               imageRepository.save(imageTour);
             });
-    assert guide != null;
-    notificationService.addNotification(
-        guide.getId(),
-        null,
-        tour.getId(),
-        NotificationTypeEnum.ADD_TOUR,
-        NotificationMessage.ADD_TOUR);
     return tourRepository.save(tour);
   }
 
@@ -186,41 +174,41 @@ public class TourServiceImpl implements TourService {
     if (optionalTour.isPresent()) {
       Tour tour = optionalTour.get();
       BeanUtils.copyProperties(
-          updateTourRequestDTO, tour, "categories", "tourStartTimes", "meetingPoint", "locations");
+              updateTourRequestDTO, tour, "categories", "tourStartTimes", "meetingPoint", "locations");
 
       // Update tour start time
       if (updateTourRequestDTO.tourStartTimes() != null) {
         tour.getTourStartTimes()
-            .forEach(tourStartTime -> tourStartTimeService.deleteById(tourStartTime.getId()));
+                .forEach(tourStartTime -> tourStartTimeService.deleteById(tourStartTime.getId()));
         tour.getTourStartTimes().clear();
         updateTourRequestDTO
-            .tourStartTimes()
-            .forEach(
-                tourStartTime -> {
-                  tourStartTime.setTour(tour);
-                  tour.getTourStartTimes().add(tourStartTime);
-                });
+                .tourStartTimes()
+                .forEach(
+                        tourStartTime -> {
+                          tourStartTime.setTour(tour);
+                          tour.getTourStartTimes().add(tourStartTime);
+                        });
         logger.info("updated tour start time");
       }
 
       // Update category
       if (updateTourRequestDTO.category_ids() != null) {
         boolean isUpdateCategory =
-            !tour.getCategories().stream()
-                .map(Category::getId)
-                .sorted()
-                .toList()
-                .equals(
-                    updateTourRequestDTO.category_ids().stream()
+                !tour.getCategories().stream()
+                        .map(Category::getId)
                         .sorted()
-                        .collect(Collectors.toList()));
+                        .toList()
+                        .equals(
+                                updateTourRequestDTO.category_ids().stream()
+                                        .sorted()
+                                        .collect(Collectors.toList()));
         if (isUpdateCategory) {
           tour.getCategories().clear();
           updateTourRequestDTO
-              .category_ids()
-              .forEach(
-                  categoryId ->
-                      tour.getCategories().add(categoryService.getCategoryById(categoryId)));
+                  .category_ids()
+                  .forEach(
+                          categoryId ->
+                                  tour.getCategories().add(categoryService.getCategoryById(categoryId)));
 
           logger.info("updated category");
         }
@@ -228,13 +216,13 @@ public class TourServiceImpl implements TourService {
 
       // Update images
       List<Image> tourImages =
-          imageRepository.getImageByAssociateIddAndAssociateName(
-              updateTourRequestDTO.id(), AssociateName.TOUR);
+              imageRepository.getImageByAssociateIddAndAssociateName(
+                      updateTourRequestDTO.id(), AssociateName.TOUR);
       int maxSize = Math.max(tourImages.size(), updateTourRequestDTO.images().size());
       for (int i = 0; i < maxSize; i++) {
         if (i < updateTourRequestDTO.images().size()
-            // If object is Base64 String
-            && !(updateTourRequestDTO.images().get(i) instanceof Image)) {
+                // If object is Base64 String
+                && !(updateTourRequestDTO.images().get(i) instanceof Image)) {
           Image imageTour = new Image();
           String imageBase64 = (String) updateTourRequestDTO.images().get(i);
           try {
@@ -264,19 +252,19 @@ public class TourServiceImpl implements TourService {
       if (updateTourRequestDTO.locations() != null) {
         tour.getLocations().clear();
         updateTourRequestDTO
-            .locations()
-            .forEach(
-                location -> {
-                  if (location.getId() != null)
-                    tour.getLocations().add(locationService.findById(location.getId()));
-                  else
-                    tour.getLocations()
-                        .add(
-                            new Location(
-                                location.getName(),
-                                location.getLatitude(),
-                                location.getLongitude()));
-                });
+                .locations()
+                .forEach(
+                        location -> {
+                          if (location.getId() != null)
+                            tour.getLocations().add(locationService.findById(location.getId()));
+                          else
+                            tour.getLocations()
+                                    .add(
+                                            new Location(
+                                                    location.getName(),
+                                                    location.getLatitude(),
+                                                    location.getLongitude()));
+                        });
         logger.info("updated location");
       }
       return tourRepository.save(tour);
@@ -388,23 +376,23 @@ public class TourServiceImpl implements TourService {
   @Override
   public List<String> getLocationName(List<LocationDTO> locationDTOS) {
     List<String> locationName = new ArrayList<>();
-    locationDTOS.forEach(
-        location ->
-            locationName.add(
-                gson.fromJson(
-                        geoCodingService.getAddress(location.latitude(), location.longitude()),
-                        InfoLocationDTO.class)
-                    .getName()));
+    locationDTOS.stream()
+        .forEach(
+            location ->
+                locationName.add(
+                    gson.fromJson(
+                            geoCodingService.getAddress(location.latitude(), location.longitude()),
+                            InfoLocationDTO.class)
+                        .getName()));
     return locationName;
   }
 
   @Override
-  public List<ReviewResponseDTO> filterReviewForTour(
-      List<Integer> ratings, Long tourId, String sortBy) {
+  public List<ReviewResponseDTO> filterReviewForTour(List<Integer> ratings, Long tourId,String sortBy) {
     if (ratings.size() == 0) {
       ratings = Arrays.asList(1, 2, 3, 4, 5);
     }
-    return tourRepository.filterReviewForTour(ratings, tourId, sortBy).stream()
+    return tourRepository.filterReviewForTour(ratings, tourId,sortBy).stream()
         .map(reviewToReviewResponseDto::convert)
         .collect(Collectors.toList());
   }
