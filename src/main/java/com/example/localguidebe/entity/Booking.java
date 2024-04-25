@@ -2,8 +2,11 @@ package com.example.localguidebe.entity;
 
 import com.example.localguidebe.enums.BookingStatusEnum;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.validator.constraints.Range;
 
 @Getter
