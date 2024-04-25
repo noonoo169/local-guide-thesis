@@ -3,8 +3,6 @@ package com.example.localguidebe.dto.requestdto;
 import com.example.localguidebe.dto.LocationDTO;
 import com.example.localguidebe.dto.TourStartTimeDTO;
 import com.example.localguidebe.entity.*;
-
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -31,7 +29,7 @@ public class TourRequestDTO {
   private String address;
   private String itinerary;
   private User guide;
-  private List<Time> startTimes = new ArrayList<>();
+  private List<TourStartTimeDTO> tourStartTimeDTOS = new ArrayList<>();
   private Set<Category> categories = new HashSet<>();
   private List<Review> reviews = new ArrayList<>();
   private List<Booking> bookings = new ArrayList<>();
