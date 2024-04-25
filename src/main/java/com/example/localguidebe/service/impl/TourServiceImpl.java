@@ -205,12 +205,4 @@ public class TourServiceImpl implements TourService {
         .map(tourToTourDtoConverter::convert)
         .collect(Collectors.toList());
   }
-
-  @Override
-  public List<Tour> getToursOfGuide(String email) {
-    return tourRepository.findAll().stream()
-        .filter(
-            tour -> tour.getIsDeleted().equals(false) && tour.getGuide().getEmail().equals(email))
-        .collect(Collectors.toList());
-  }
 }
