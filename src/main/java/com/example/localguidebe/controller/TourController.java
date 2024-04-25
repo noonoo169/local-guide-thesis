@@ -11,8 +11,6 @@ import com.example.localguidebe.entity.Notification;
 import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.entity.User;
 import com.example.localguidebe.enums.NotificationTypeEnum;
-import com.example.localguidebe.enums.RolesEnum;
-import com.example.localguidebe.enums.TourStatusEnum;
 import com.example.localguidebe.security.service.CustomUserDetails;
 import com.example.localguidebe.service.*;
 import com.example.localguidebe.system.constants.NotificationMessage;
@@ -175,38 +173,6 @@ public class TourController {
           HttpStatus.CONFLICT);
     }
   }
-  @GetMapping("/admin")
-  public ResponseEntity<Result> getListTourForAdmin(
-          @RequestParam(required = false, defaultValue = "0") Integer page,
-          @RequestParam(required = false, defaultValue = "5") Integer limit,Authentication authentication) {
-    return AuthUtils.checkAuthentication(
-            authentication,
-            () -> {
-              try {
-                if(!((CustomUserDetails) authentication.getPrincipal()).getAuthorities().stream().anyMatch(authority -> authority.toString().equals(RolesEnum.ADMIN.toString()))){
-                  return new ResponseEntity<>(
-                          new Result(
-                                  true,
-                                  HttpStatus.CONFLICT.value(),
-                                  "you are not an admin",
-                                  null),
-                          HttpStatus.CONFLICT);
-                }
-                return new ResponseEntity<>(
-                        new Result(
-                                true,
-                                HttpStatus.OK.value(),
-                                "Get the list for admin successfully",
-                                tourService.getListTourForAdmin(page, limit)),
-                        HttpStatus.OK);
-              } catch (Exception e) {
-                return new ResponseEntity<>(
-                        new Result(false, HttpStatus.CONFLICT.value(), "get the failure list for admin", null),
-                        HttpStatus.CONFLICT);
-              }
-            });
-  }
-
 
   @GetMapping("/search")
   public ResponseEntity<Result> searchTour(
