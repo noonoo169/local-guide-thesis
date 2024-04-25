@@ -1,13 +1,14 @@
 package com.example.localguidebe.dto;
 
 import com.example.localguidebe.entity.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.*;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lombok.*;
-
 @Getter
 @Setter
 @AllArgsConstructor
@@ -15,51 +16,52 @@ import lombok.*;
 @Data
 public class TourDTO {
 
-  private Long id;
+    private Long id;
 
-  private String name;
+    private String name;
 
-  private String description;
+    private String description;
 
-  private String transportation;
+    private String transportation;
 
-  private String includeService;
+    private String includeService;
 
-  private Integer duration;
+    private Integer duration;
 
-  private String unit;
+    private String unit;
 
-  private String estimatedLocalCashNeeded;
+    private  String estimatedLocalCashNeeded;
 
-  private Double pricePerTraveler;
+    private Double pricePerTraveler;
 
-  private Integer limitTraveler;
+    private Integer limitTraveler;
 
-  private Double extraPrice;
+    private Double extraPrice;
 
-  private Double overallRating;
+    private Double overallRating;
 
-  private String itinerary;
-  private boolean isDeleted;
-  private String address;
+    private String itinerary;
+    private boolean isDeleted;
+    private String address;
 
-  private UserDTO guide;
+    private UserDTO guide;
 
-  //    //TODO meeting_point_id associate to location
-  //
-  //    private Location province;
+//    //TODO meeting_point_id associate to location
+//
+//    private Location province;
 
-  //    private List<TourStartTime> tourStartTimes = new ArrayList<>();
 
-  private Set<CategoryDTO> categories = new HashSet<>();
+//    private List<TourStartTime> tourStartTimes = new ArrayList<>();
 
-  //    private List<Review> reviews = new ArrayList<>();
-  //
-  //    private List<Booking> bookings = new ArrayList<>();
-  //
-  private List<Image> images = new ArrayList<>();
-  //
-  private Set<LocationDTO> locations;
-  //
-  //    private Location location;
+    private Set<CategoryDTO> categories = new HashSet<>();
+
+//    private List<Review> reviews = new ArrayList<>();
+//
+//    private List<Booking> bookings = new ArrayList<>();
+//
+    private List<Image> images = new ArrayList<>();
+//
+    private Set<LocationDTO> locations;
+//
+//    private Location location;
 }
