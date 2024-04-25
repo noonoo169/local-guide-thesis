@@ -1,12 +1,9 @@
 package com.example.localguidebe.service.impl;
 
-import com.example.localguidebe.converter.ToResultInSearchSuggestionDtoConverter;
 import com.example.localguidebe.converter.TourToTourDtoConverter;
 import com.example.localguidebe.dto.TourDTO;
 import com.example.localguidebe.dto.requestdto.TourRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateTourRequestDTO;
-import com.example.localguidebe.dto.responsedto.ResultInSearchSuggestionDTO;
-import com.example.localguidebe.dto.responsedto.SearchSuggestionResponseDTO;
 import com.example.localguidebe.dto.responsedto.SearchTourDTO;
 import com.example.localguidebe.entity.*;
 import com.example.localguidebe.repository.TourRepository;
@@ -14,8 +11,6 @@ import com.example.localguidebe.service.CategoryService;
 import com.example.localguidebe.service.LocationService;
 import com.example.localguidebe.service.TourService;
 import com.example.localguidebe.service.TourStartTimeService;
-import com.example.localguidebe.utils.AddressUtils;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class TourServiceImpl implements TourService {
   private TourToTourDtoConverter tourToTourDtoConverter;
-  private final ToResultInSearchSuggestionDtoConverter toResultInSearchSuggestionDtoConverter;
 
   @Autowired
   public void setTourToDtoConverter(TourToTourDtoConverter tourToTourDtoConverter) {
@@ -45,11 +39,9 @@ public class TourServiceImpl implements TourService {
 
   @Autowired
   public TourServiceImpl(
-      ToResultInSearchSuggestionDtoConverter toResultInSearchSuggestionDtoConverter,
       CategoryService categoryService,
       TourStartTimeService tourStartTimeService,
       LocationService locationService) {
-    this.toResultInSearchSuggestionDtoConverter = toResultInSearchSuggestionDtoConverter;
     this.categoryService = categoryService;
     this.tourStartTimeService = tourStartTimeService;
     this.locationService = locationService;
@@ -220,31 +212,5 @@ public class TourServiceImpl implements TourService {
         .filter(
             tour -> tour.getIsDeleted().equals(false) && tour.getGuide().getEmail().equals(email))
         .collect(Collectors.toList());
-  }
-
-  @Override
-  public SearchSuggestionResponseDTO getTourAndTourAddresses(String searchValue) {
-    List<Tour> tours = tourRepository.findAll();
-    List<String> addressesFiltered =
-        tours.stream()
-            .map(tour -> AddressUtils.removeVietnameseAccents(tour.getProvince()))
-            .distinct()
-            .filter(
-                address ->
-                    AddressUtils.removeVietnameseAccents(address)
-                        .toLowerCase()
-                        .contains(AddressUtils.removeVietnameseAccents(searchValue).toLowerCase()))
-            .toList();
-    List<ResultInSearchSuggestionDTO> guidersFiltered =
-        tours.stream()
-            .sorted(Comparator.comparing(Tour::getOverallRating).reversed())
-            .filter(
-                tour ->
-                    AddressUtils.removeVietnameseAccents(tour.getName())
-                        .toLowerCase()
-                        .contains(AddressUtils.removeVietnameseAccents(searchValue).toLowerCase()))
-            .map(toResultInSearchSuggestionDtoConverter::convert)
-            .toList();
-    return new SearchSuggestionResponseDTO(addressesFiltered, guidersFiltered);
   }
 }

@@ -108,7 +108,4 @@ public class Tour {
       joinColumns = @JoinColumn(name = "tour_id", referencedColumnName = "id"),
       inverseJoinColumns = @JoinColumn(name = "location_id", referencedColumnName = "id"))
   private Set<Location> locations = new HashSet<>();
-  public List<Image> getImagesOfObject() {
-    return this.getImages().stream().filter(image -> image.getAssociateName().equals("tour")).toList();
-  }
 }
