@@ -1,7 +1,6 @@
 package com.example.localguidebe.service.impl;
 
 
-import com.example.localguidebe.dto.requestdto.TourRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateTourRequestDTO;
 import com.example.localguidebe.entity.Category;
 import com.example.localguidebe.entity.Location;
@@ -62,9 +61,7 @@ public class TourServiceImpl implements TourService {
 
     @Override
     public List<TourDTO> getListTour() {
-
         List<TourDTO> tourDTOS = new ArrayList<>();
-
         List<Tour> tours =tourRepository.findAll();
         for(Tour tour : tours){
             tourDTOS.add(  tourToTourDtoConverter.convert(tour));
@@ -73,12 +70,8 @@ public class TourServiceImpl implements TourService {
     }
 
     @Override
-    public Tour saveTour(TourRequestDTO tourRequestDTO) {
-        Tour newTour = new Tour();
-        BeanUtils.copyProperties(tourRequestDTO, newTour, "categories");
-        tourRequestDTO.getCategories().stream().forEach(category -> newTour.getCategories().add(categoryService.getCategoryById(category.getId())));
-        return tourRepository.save(newTour);
-
+    public Tour saveTour(Tour tour) {
+        return tourRepository.save(tour);
     }
 
     @Transactional

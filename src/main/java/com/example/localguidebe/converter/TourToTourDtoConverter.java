@@ -40,7 +40,9 @@ public class TourToTourDtoConverter {
                 tour.getExtraPrice(),
                 tour.getOverallRating(),
                 tour.getItinerary(),
-                tour.getGuide() != null ?userToUserDtoConverter.convert(tour.getGuide()):null,
+                userToUserDtoConverter.convert(tour.getGuide()),
+
+
                 tour.getCategories() != null ? tour.getCategories().stream().map(categoryToCategoryDtoConverter::convertCategory).collect(Collectors.toSet()):
                         null,
                 tour.getImages() != null ? tour.getImages().stream().map(imageToImageDtoConverter::convertImageDTO).collect(Collectors.toList()):null);

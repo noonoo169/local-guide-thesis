@@ -49,7 +49,10 @@ public class TourController {
     @PostMapping("/add")
     public ResponseEntity<Result> addTour(@RequestBody TourRequestDTO tourRequestDTO){
         try {
-            return new ResponseEntity<>(new Result(true, HttpStatus.OK.value(), "account added successfully",  tourToTourDtoConverter.convert(tourService.saveTour(tourRequestDTO))), HttpStatus.OK);
+            Tour newTour = new Tour();
+            BeanUtils.copyProperties(tourRequestDTO, newTour, "categories");
+            tourRequestDTO.getCategories().stream().forEach(category -> newTour.getCategories().add(categoryService.getCategoryById(category.getId())));
+            return new ResponseEntity<>(new Result(true, HttpStatus.OK.value(), "account added successfully",  tourToTourDtoConverter.convert(tourService.saveTour(newTour))), HttpStatus.OK);
         }catch (Exception e){
             return new ResponseEntity<>(new Result(false, HttpStatus.CONFLICT.value(), "Adding account failed", null), HttpStatus.CONFLICT);
         }
@@ -101,5 +104,4 @@ public class TourController {
             return new ResponseEntity<>(new Result(false, HttpStatus.CONFLICT.value(), "get the failure list", null), HttpStatus.CONFLICT);
         }
     }
-    
 }
