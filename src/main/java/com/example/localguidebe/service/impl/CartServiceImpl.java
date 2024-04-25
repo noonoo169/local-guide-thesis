@@ -1,21 +1,12 @@
 package com.example.localguidebe.service.impl;
 
-import com.example.localguidebe.converter.AddBookingRequestDtoToBookingDtoConverter;
-import com.example.localguidebe.converter.CartToCartDtoConverter;
-import com.example.localguidebe.dto.BookingDTO;
-import com.example.localguidebe.dto.CartDTO;
-import com.example.localguidebe.dto.requestdto.AddBookingRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateBookingDTO;
 import com.example.localguidebe.entity.Booking;
 import com.example.localguidebe.entity.Cart;
-import com.example.localguidebe.entity.User;
 import com.example.localguidebe.repository.BookingRepository;
 import com.example.localguidebe.repository.CartRepository;
-import com.example.localguidebe.repository.UserRepository;
 import com.example.localguidebe.service.CartService;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,22 +16,10 @@ public class CartServiceImpl implements CartService {
   private final CartRepository cartRepository;
   private final BookingRepository bookingRepository;
 
-  private final UserRepository userRepository;
-  private final AddBookingRequestDtoToBookingDtoConverter addBookingRequestDtoToBookingDtoConverter;
-  private final CartToCartDtoConverter cartToCartDtoConverter;
-
   @Autowired
-  public CartServiceImpl(
-      CartRepository cartRepository,
-      BookingRepository bookingRepository,
-      UserRepository userRepository,
-      AddBookingRequestDtoToBookingDtoConverter addBookingRequestDtoToBookingDtoConverter,
-      CartToCartDtoConverter cartToCartDtoConverter) {
+  public CartServiceImpl(CartRepository cartRepository, BookingRepository bookingRepository) {
     this.cartRepository = cartRepository;
     this.bookingRepository = bookingRepository;
-    this.userRepository = userRepository;
-    this.addBookingRequestDtoToBookingDtoConverter = addBookingRequestDtoToBookingDtoConverter;
-    this.cartToCartDtoConverter = cartToCartDtoConverter;
   }
 
   @Override
@@ -82,22 +61,5 @@ public class CartServiceImpl implements CartService {
     booking.setStartDate(updateBookingDTO.startDate());
     bookingRepository.save(booking);
     return cart;
-  }
-
-  @Override
-  public CartDTO addBookingInCart(String email, AddBookingRequestDTO bookingDTO) {
-    Booking booking =bookingRepository.save(
-            addBookingRequestDtoToBookingDtoConverter.convert(bookingDTO));
- Cart cart = cartRepository.getCartByEmail(email).orElse(null);
-    if( cart != null){
-      cart.getBookings().add(booking);
-      return cartToCartDtoConverter.convert(cartRepository.save(cart),false);
-    }
-    else{
-      Cart newCart = new Cart();
-      newCart.getBookings().add(booking);
-      newCart.setTraveler(userRepository.findUserByEmail(email));
-      return cartToCartDtoConverter.convert( cartRepository.save(newCart),false);
-    }
   }
 }
