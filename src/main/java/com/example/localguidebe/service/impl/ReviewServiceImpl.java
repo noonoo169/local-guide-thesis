@@ -71,7 +71,6 @@ public class ReviewServiceImpl implements ReviewService {
             .guide(guide)
             .traveler(traveler)
             .createdAt(LocalDateTime.now())
-            .isEdited(false)
             .build();
     Review newReview = reviewRepository.save(review);
     // notification send to guider
@@ -100,7 +99,6 @@ public class ReviewServiceImpl implements ReviewService {
             .rating(reviewRequestDTO.rating())
             .createdAt(LocalDateTime.now())
             .traveler(traveler)
-            .isEdited(false)
             .build();
     tour.getReviews().add(newReview);
     tourService.updateRatingForTour(tour);
@@ -141,13 +139,11 @@ public class ReviewServiceImpl implements ReviewService {
   }
 
   @Override
-  public List<ReviewResponseDTO> editReviewForTour(Long reviewId, ReviewRequestDTO reviewRequestDTO)
-      throws Exception {
+  public List<ReviewResponseDTO> editReviewForTour(
+      Long reviewId, ReviewRequestDTO reviewRequestDTO) {
     Review review = reviewRepository.findById(reviewId).orElseThrow();
-    if (review.getIsEdited()) throw new Exception();
     review.setRating(reviewRequestDTO.rating());
     review.setComment(reviewRequestDTO.comment());
-    review.setIsEdited(true);
     reviewRepository.save(review);
     tourService.updateRatingForTour(tourRepository.findTourByReviewsId(reviewId).orElseThrow());
     return reviewRepository.findAll().stream()
@@ -180,8 +176,6 @@ public class ReviewServiceImpl implements ReviewService {
     Optional<Review> optionalReview = reviewRepository.findById(reviewId);
     if (optionalReview.isEmpty()) return false;
     Review review = optionalReview.get();
-    if (review.getIsEdited()) return false;
-    review.setIsEdited(true);
     review.setRating(reviewRequestDTO.rating());
     review.setComment(reviewRequestDTO.comment());
     reviewRepository.saveAndFlush(review);

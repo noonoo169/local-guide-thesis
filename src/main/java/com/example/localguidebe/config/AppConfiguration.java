@@ -38,7 +38,6 @@ public class AppConfiguration {
     }
 
     if (activeProfile.equals("prod")) {
-      corsConfiguration.addAllowedOriginPattern("*");
       corsConfiguration.setAllowedOrigins(List.of("https://interns-local-guide.vercel.app/"));
       System.out.println("prod");
     }

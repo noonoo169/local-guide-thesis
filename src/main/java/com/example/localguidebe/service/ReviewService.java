@@ -16,8 +16,7 @@ public interface ReviewService {
 
   List<Review> getReviewsOfGuide(Long guideId, List<Integer> ratings, String sortBy);
 
-  List<ReviewResponseDTO> editReviewForTour(Long reviewId, ReviewRequestDTO reviewRequestDTO)
-      throws Exception;
+  List<ReviewResponseDTO> editReviewForTour(Long reviewId, ReviewRequestDTO reviewRequestDTO);
 
   boolean checkReviewByTraveler(Long reviewId, String email);
 

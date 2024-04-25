@@ -48,9 +48,6 @@ public class Review {
   @JoinColumn(name = "traveler_id")
   private User traveler;
 
-  @Column(columnDefinition = "boolean default false")
-  private Boolean isEdited = Boolean.FALSE;
-
   @PostPersist
   @PostUpdate
   @PostRemove
