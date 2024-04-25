@@ -29,29 +29,12 @@ public class Location {
     private String longitude;
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "location")
     private List<Image> images = new ArrayList<>();
-
-    @ManyToMany(mappedBy = "locations")
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "tour_location",
+            joinColumns = @JoinColumn(name = "location_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "tour_id", referencedColumnName = "id"))
     private Set<Tour> tours = new HashSet<>();
-
     @OneToMany(mappedBy = "province")
     private Set<Tour> tours1 = new HashSet<>();
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (!(o instanceof Location that)) {
-            return false;
-        }
-
-        return getId().equals(that.getId());
-    }
-
-    public Location(String name, String latitude, String longitude) {
-        this.name = name;
-        this.latitude = latitude;
-        this.longitude = longitude;
-    }
 }
