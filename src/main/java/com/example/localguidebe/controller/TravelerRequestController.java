@@ -56,31 +56,6 @@ public class TravelerRequestController {
         });
   }
 
-  @GetMapping("/{travelerRequestId}")
-  public ResponseEntity<Result> getTravelerRequestById(
-      @PathVariable("travelerRequestId") Long travelerRequestId) {
-    try {
-      TravelerRequest travelerRequest =
-          travelerRequestService.findTravelerRequestById(travelerRequestId);
-      if (travelerRequest == null) {
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(new Result(true, HttpStatus.OK.value(), "Not found traveler request"));
-      }
-      return ResponseEntity.status(HttpStatus.OK)
-          .body(
-              new Result(
-                  true,
-                  HttpStatus.OK.value(),
-                  "Get traveler request successfully",
-                  travelerRequestToTravelerRequestDtoConverter.convert(travelerRequest)));
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body(
-              new Result(
-                  true, HttpStatus.INTERNAL_SERVER_ERROR.value(), "Get traveler request failed"));
-    }
-  }
-
   @GetMapping("")
   public ResponseEntity<Result> getTravelerRequests(Authentication authentication) {
     return AuthUtils.checkAuthentication(
