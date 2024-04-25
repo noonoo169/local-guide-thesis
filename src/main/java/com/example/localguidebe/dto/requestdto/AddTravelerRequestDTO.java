@@ -7,7 +7,6 @@ public record AddTravelerRequestDTO(
     List<String> transportation,
     Integer duration,
     String unit,
-    Double maxPricePerPerson,
-    Integer numberOfTravelers,
+    Double maxPrice,
     String destination,
     String message) {}

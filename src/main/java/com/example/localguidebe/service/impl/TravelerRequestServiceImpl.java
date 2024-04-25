@@ -37,23 +37,15 @@ public class TravelerRequestServiceImpl implements TravelerRequestService {
 
   @Override
   public TravelerRequest addTravelerRequest(
-      String travelerEmail, AddTravelerRequestDTO addTravelerRequestDTO) {
-    User traveler = userService.findUserByEmail(travelerEmail);
+      String email, AddTravelerRequestDTO addTravelerRequestDTO) {
+    User traveler = userService.findUserByEmail(email);
     User guide = userService.findById(addTravelerRequestDTO.guideId()).orElse(null);
     if (guide == null) return null;
 
-    // if traveler A adds 1st request for guide B and that is PENDING, can not add 2nd request to that guide
-    if (guide.getTravelerRequestsOfGuide().stream()
-        .anyMatch(
-            travelerRequest ->
-                travelerRequest.getTraveler().getEmail().equals(travelerEmail)
-                    && travelerRequest.getStatus().equals(TravelerRequestStatus.PENDING)))
-      return null;
     TravelerRequest travelerRequest =
         TravelerRequest.builder()
             .destination(addTravelerRequestDTO.destination())
-            .maxPricePerPerson(addTravelerRequestDTO.maxPricePerPerson())
-            .numberOfTravelers(addTravelerRequestDTO.numberOfTravelers())
+            .maxPrice(addTravelerRequestDTO.maxPrice())
             .message(addTravelerRequestDTO.message())
             .transportation(String.join(", ", addTravelerRequestDTO.transportation()))
             .unit(addTravelerRequestDTO.unit())
@@ -89,10 +81,10 @@ public class TravelerRequestServiceImpl implements TravelerRequestService {
     TravelerRequest travelerRequest = findTravelerRequestById(travelerRequestId);
     if (travelerRequest == null) return null;
 
-    // If user is traveler, they only cancel there request
+    // If user is traveler, they only delete there request
     User user = userService.findUserByEmail(email);
     if (user.getRoles().stream().noneMatch(role -> role.getName().equals(RolesEnum.GUIDER))
-        && !updateTravelerRequestDTO.status().equals(TravelerRequestStatus.CANCELED)) return null;
+        && !updateTravelerRequestDTO.status().equals(TravelerRequestStatus.DELETED)) return null;
 
     if (!travelerRequest.getTraveler().getEmail().equals(email)
         && !travelerRequest.getGuide().getEmail().equals(email)) return null;
