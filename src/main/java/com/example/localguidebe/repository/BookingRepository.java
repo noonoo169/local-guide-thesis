@@ -31,7 +31,4 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
   @Query("SELECT b FROM Booking b JOIN b.tour t JOIN t.guide g WHERE g.email = :email")
   List<Booking> getAllBookingByGuider(@Param("email") String email);
 
-  @Query("SELECT b FROM Booking b JOIN b.cart cart WHERE  cart.traveler.id = :travelerId AND b.status ='PAID' ")
-  List<Booking> getBookingHistory(@Param("travelerId") Long travelerId);
-
 }

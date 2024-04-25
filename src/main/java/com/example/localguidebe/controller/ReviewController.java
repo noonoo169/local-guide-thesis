@@ -250,25 +250,4 @@ public class ReviewController {
               .body(new Result(true, HttpStatus.OK.value(), "Update review successful."));
         });
   }
-
-  @GetMapping("/tour-reviews/filter/{tourId}")
-  public ResponseEntity<Result> getTourByFilter(
-      @PathVariable Long tourId,
-      @RequestParam(required = false, defaultValue = "") List<Integer> ratings,
-      @RequestParam(required = false, defaultValue = "Most recent") String sortBy) {
-    try {
-      return new ResponseEntity<>(
-          new Result(
-              true,
-              HttpStatus.OK.value(),
-              "filter the comment list for tour successfully",
-              tourService.filterReviewForTour(ratings, tourId, sortBy)),
-          HttpStatus.OK);
-    } catch (Exception e) {
-      return new ResponseEntity<>(
-          new Result(
-              false, HttpStatus.CONFLICT.value(), "filter the failure comment list for tour", null),
-          HttpStatus.CONFLICT);
-    }
-  }
 }
