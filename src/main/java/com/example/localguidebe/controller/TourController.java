@@ -9,6 +9,7 @@ import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.entity.User;
 import com.example.localguidebe.security.service.CustomUserDetails;
 import com.example.localguidebe.service.CategoryService;
+import com.example.localguidebe.service.GeoCodingService;
 import com.example.localguidebe.service.TourService;
 import com.example.localguidebe.service.UserService;
 import com.example.localguidebe.system.Result;
@@ -16,6 +17,7 @@ import com.example.localguidebe.utils.AddressUtils;
 import com.example.localguidebe.utils.AuthUtils;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,14 +32,18 @@ public class TourController {
   private TourService tourService;
   private CategoryService categoryService;
   private TourToTourDtoConverter tourToTourDtoConverter;
-  private final TourToUpdateTourResponseDtoConverter tourToUpdateTourResponseDtoConverter;
-  private final UserService userService;
+  private TourToUpdateTourResponseDtoConverter tourToUpdateTourResponseDtoConverter;
+  private UserService userService;
+
+  private GeoCodingService geoCodingService;
 
   public TourController(
       TourToUpdateTourResponseDtoConverter tourToUpdateTourResponseDtoConverter,
-      UserService userService) {
+      UserService userService,
+      GeoCodingService geoCodingService) {
     this.tourToUpdateTourResponseDtoConverter = tourToUpdateTourResponseDtoConverter;
     this.userService = userService;
+    this.geoCodingService = geoCodingService;
   }
 
   @Autowired
@@ -164,7 +170,10 @@ public class TourController {
       @RequestParam(required = false, defaultValue = "10000000") Double maxPrice,
       @RequestParam(required = false, defaultValue = "") List<Long> categoryId) {
     if (categoryId.size() == 0) {
-      categoryId.addAll(categoryService.getCategories().stream().map(CategoryDTO::getId).toList());
+      categoryId.addAll(
+          categoryService.getCategories().stream()
+              .map(CategoryDTO::getId)
+              .collect(Collectors.toList()));
     }
 
     try {
@@ -235,26 +244,5 @@ public class TourController {
             "Get the list successfully",
             tourService.getTourStartTimeAvailable(id, localDate)),
         HttpStatus.OK);
-  }
-
-  @GetMapping("/filter/{tourId}")
-  public ResponseEntity<Result> getTourByFilter(
-      @PathVariable Long tourId,
-      @RequestParam(required = false, defaultValue = "") List<Integer> ratings,
-      @RequestParam(required = false, defaultValue = "Most recent") String sortBy) {
-    try {
-      return new ResponseEntity<>(
-          new Result(
-              true,
-              HttpStatus.OK.value(),
-              "filter the comment list for tour successfully",
-              tourService.filterReviewForTour(ratings, tourId, sortBy)),
-          HttpStatus.OK);
-    } catch (Exception e) {
-      return new ResponseEntity<>(
-          new Result(
-              false, HttpStatus.CONFLICT.value(), "filter the failure comment list for tour", null),
-          HttpStatus.CONFLICT);
-    }
   }
 }
