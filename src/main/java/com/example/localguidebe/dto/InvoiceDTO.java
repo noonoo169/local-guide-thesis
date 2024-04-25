@@ -9,7 +9,4 @@ public record InvoiceDTO(
     LocalDateTime createAt,
     Double vndPrice,
     Double conversionRate,
-    String fullName,
-    String phone,
-    String email,
     List<BookingDTO> tours) {}

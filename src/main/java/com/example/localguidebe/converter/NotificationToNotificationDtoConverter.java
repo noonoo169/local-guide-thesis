@@ -20,7 +20,7 @@ public class NotificationToNotificationDtoConverter {
         source.isRead(),
         source.getNotificationType(),
         source.getAssociateId(),
-        source.getSender() == null ? null : userToUserDtoConverter.convert(source.getSender()),
-        source.getReceiver() == null ? null : userToUserDtoConverter.convert(source.getReceiver()));
+        userToUserDtoConverter.convert(source.getSender()),
+        userToUserDtoConverter.convert(source.getReceiver()));
   }
 }

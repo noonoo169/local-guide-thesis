@@ -48,13 +48,10 @@ public class InvoiceServiceImpl implements InvoiceService {
   public Invoice createBookingInInvoice(
       List<Long> bookingIds,
       String email,
-      String travelerEmail,
-      String fullName,
-      String phone,
       Double priceTotal,
       Double priceInVND,
       Double usdVndRate) {
-    Cart cart = cartService.getCartByEmail(travelerEmail);
+    Cart cart = cartService.getCartByEmail(email);
 
     if (cart == null) return null;
     List<Booking> bookings =
@@ -66,9 +63,6 @@ public class InvoiceServiceImpl implements InvoiceService {
             .vndPrice(priceInVND)
             .conversionRate(usdVndRate)
             .createAt(LocalDateTime.now())
-            .fullName(fullName)
-            .phone(phone)
-            .email(email)
             .traveler(cart.getTraveler())
             .build();
     bookings.forEach(
