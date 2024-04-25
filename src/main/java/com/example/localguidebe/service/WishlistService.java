@@ -8,6 +8,4 @@ public interface WishlistService {
   UserDTO addWishlist(Long tourId, Long travelerId);
 
   List<TourDTO> getWishlist(Long travelerId);
-
-  List<TourDTO> deleteTourInWishlist(Long tourId, Long travelerId);
 }
