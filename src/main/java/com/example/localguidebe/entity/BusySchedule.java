@@ -1,6 +1,5 @@
 package com.example.localguidebe.entity;
 
-import com.example.localguidebe.enums.TypeBusyDayEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -20,10 +19,6 @@ public class BusySchedule {
 
     @Column(name = "busy_date")
     private LocalDateTime busyDate;
-
-  @Column
-  @Enumerated(EnumType.STRING)
-  private TypeBusyDayEnum TypeBusyDay;
 
     @ManyToOne( fetch = FetchType.LAZY)
     @JoinColumn(name = "guide_id")
