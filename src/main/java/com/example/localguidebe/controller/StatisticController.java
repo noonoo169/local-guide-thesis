@@ -2,11 +2,12 @@ package com.example.localguidebe.controller;
 
 import com.example.localguidebe.service.StatisticService;
 import com.example.localguidebe.system.Result;
-import com.example.localguidebe.utils.AuthUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/statistic")
@@ -17,7 +18,7 @@ public class StatisticController {
     this.statisticService = statisticService;
   }
 
-  @GetMapping("/guides")
+  @GetMapping("/guide")
   public ResponseEntity<Result> getRevenueByGuide(
       @RequestParam(required = false, defaultValue = "0") Integer page,
       @RequestParam(required = false, defaultValue = "5") Integer limit,
@@ -37,7 +38,7 @@ public class StatisticController {
     }
   }
 
-  @GetMapping("/tours")
+  @GetMapping("/tour")
   public ResponseEntity<Result> getRevenueByTour(
       @RequestParam(required = false, defaultValue = "0") Integer page,
       @RequestParam(required = false, defaultValue = "5") Integer limit,
@@ -55,28 +56,5 @@ public class StatisticController {
           new Result(false, HttpStatus.CONFLICT.value(), "Get statistics of failed tours", null),
           HttpStatus.CONFLICT);
     }
-  }
-
-  @GetMapping("/tour/{TourId}")
-  public ResponseEntity<Result> getRevenueByPerTour(
-      @PathVariable("TourId") Long tourId, Authentication authentication) {
-    return AuthUtils.checkAuthentication(
-        authentication,
-        () -> {
-          try {
-            return new ResponseEntity<>(
-                new Result(
-                    false,
-                    HttpStatus.OK.value(),
-                    "get statistic of per tour successfully",
-                    statisticService.getStatisticByPerTour(tourId)),
-                HttpStatus.OK);
-          } catch (Exception e) {
-            return new ResponseEntity<>(
-                new Result(
-                    false, HttpStatus.CONFLICT.value(), "Get statistics of failed per tour", null),
-                HttpStatus.CONFLICT);
-          }
-        });
   }
 }
