@@ -105,9 +105,4 @@ public class Tour {
 
   @Column(name = "is_for_specific_traveler", columnDefinition = "boolean default false")
   private Boolean isForSpecificTraveler;
-
-  @OneToOne
-  @JoinColumn(name = "tour_dupe_id")
-  private TourDupe tourDupe;
-
 }

@@ -7,14 +7,19 @@ import com.example.localguidebe.enums.InvoiceStatus;
 import com.example.localguidebe.enums.NotificationTypeEnum;
 import com.example.localguidebe.repository.BookingRepository;
 import com.example.localguidebe.repository.InvoiceRepository;
-import com.example.localguidebe.service.*;
+import com.example.localguidebe.service.BusyScheduleService;
+import com.example.localguidebe.service.CartService;
+import com.example.localguidebe.service.InvoiceService;
+import com.example.localguidebe.service.NotificationService;
 import com.example.localguidebe.system.NotificationMessage;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +37,6 @@ public class InvoiceServiceImpl implements InvoiceService {
   private final NotificationToNotificationDtoConverter notificationToNotificationDtoConverter;
   private final TourToTourDtoConverter tourToTourDtoConverter;
   private final BusyScheduleService busyScheduleService;
-  private final TourDupeService tourDupeService;
 
   Logger logger = LoggerFactory.getLogger(InvoiceServiceImpl.class);
 
@@ -45,8 +49,7 @@ public class InvoiceServiceImpl implements InvoiceService {
       SimpMessagingTemplate messagingTemplate,
       NotificationToNotificationDtoConverter notificationToNotificationDtoConverter,
       TourToTourDtoConverter tourToTourDtoConverter,
-      BusyScheduleService busyScheduleService,
-      TourDupeService tourDupeService) {
+      BusyScheduleService busyScheduleService) {
     this.cartService = cartService;
     this.bookingRepository = bookingRepository;
     this.invoiceRepository = invoiceRepository;
@@ -55,7 +58,6 @@ public class InvoiceServiceImpl implements InvoiceService {
     this.notificationToNotificationDtoConverter = notificationToNotificationDtoConverter;
     this.tourToTourDtoConverter = tourToTourDtoConverter;
     this.busyScheduleService = busyScheduleService;
-    this.tourDupeService = tourDupeService;
   }
 
   @Override
@@ -93,7 +95,8 @@ public class InvoiceServiceImpl implements InvoiceService {
         booking -> {
           // add tour dupe
           try {
-            booking.setTourDupe(tourDupeService.getTourDupe(booking.getTour()));
+            TourDupe tourDupe = new TourDupe(tourToTourDtoConverter.convert(booking.getTour()));
+            booking.setTourDupe(tourDupe);
           } catch (Exception e) {
             throw new RuntimeException(e);
           }

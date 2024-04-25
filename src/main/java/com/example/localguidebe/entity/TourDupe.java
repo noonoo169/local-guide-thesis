@@ -4,8 +4,6 @@ import com.example.localguidebe.dto.TourDTO;
 import com.example.localguidebe.enums.TourStatusEnum;
 import com.example.localguidebe.utils.JsonUtils;
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.*;
 
 @Getter
@@ -83,9 +81,6 @@ public class TourDupe {
 
   @Column(name = "is_for_specific_traveler", columnDefinition = "boolean default false")
   private Boolean isForSpecificTraveler = Boolean.FALSE;
-
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "tourDupe")
-  private List<Booking> bookings = new ArrayList<>();
 
   public TourDupe(TourDTO tour) throws Exception {
     this.name = tour.getName();

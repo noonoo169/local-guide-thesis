@@ -48,8 +48,7 @@ public class Booking {
   @JoinColumn(name = "invoice_id")
   private Invoice invoice;
 
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "tour_dupe_id")
   private TourDupe tourDupe;
-
 }
