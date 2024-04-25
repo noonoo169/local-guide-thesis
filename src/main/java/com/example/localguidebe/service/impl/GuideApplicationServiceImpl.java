@@ -64,7 +64,6 @@ public class GuideApplicationServiceImpl implements GuideApplicationService {
       user.setDateOfBirth(addGuideApplicationDTO.dateOfBirth());
       user.setFullName(addGuideApplicationDTO.fullName());
       user.setAddress(addGuideApplicationDTO.address());
-      user.setBiography(addGuideApplicationDTO.biography());
       user = userService.saveUser(user);
     } else {
       if (userService.findUserByEmail(addGuideApplicationDTO.email()) != null) return null;
@@ -108,7 +107,6 @@ public class GuideApplicationServiceImpl implements GuideApplicationService {
     return newGuideApplication;
   }
 
-  @Transactional
   @Override
   public boolean updateGuideApplicationStatus(
       Long id, UpdateGuideApplicationStatus updateGuideApplicationStatus) {

@@ -24,7 +24,6 @@ public class GuideApplicationToGuideApplicationDtoConverter {
         source.getTransportation(),
         source.getYearsOfExperience(),
         source.getHowGuideHearAboutUs(),
-        source.getUser().getBiography(),
         source.getStatus(),
         source.getReasonDeny(),
         imageService.getImageByAssociateIddAndAssociateName(

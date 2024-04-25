@@ -128,7 +128,7 @@ public class GuideApplicationController {
               new Result(
                   true,
                   HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                  "Update guide application failed " + e.getLocalizedMessage()));
+                  "Update guide application failed"));
     }
   }
 
