@@ -5,13 +5,9 @@ import com.example.localguidebe.security.service.CustomUserDetails;
 import com.example.localguidebe.service.InvoiceService;
 import com.example.localguidebe.system.Result;
 import com.example.localguidebe.utils.AuthUtils;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -25,7 +21,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 @RestController
 @RequestMapping("/payment/")
@@ -40,27 +35,12 @@ public class VNPayResource {
 
   private final InvoiceService invoiceService;
   private final InvoiceToInvoiceDtoConverter invoiceToInvoiceDtoConverter;
-  private final RestTemplate restTemplate;
-  private final Gson gson;
 
   @Autowired
   public VNPayResource(
-      InvoiceService invoiceService,
-      InvoiceToInvoiceDtoConverter invoiceToInvoiceDtoConverter,
-      RestTemplate restTemplate,
-      Gson gson) {
+      InvoiceService invoiceService, InvoiceToInvoiceDtoConverter invoiceToInvoiceDtoConverter) {
     this.invoiceService = invoiceService;
     this.invoiceToInvoiceDtoConverter = invoiceToInvoiceDtoConverter;
-    this.restTemplate = restTemplate;
-    this.gson = gson;
-  }
-
-  public Double getUSDtoVNDRate() {
-    String apiUrl = "https://v6.exchangerate-api.com/v6/84e2879a7ba29d1d713949f9/latest/USD";
-    String response = restTemplate.getForObject(apiUrl, String.class);
-    JsonObject jsonObject = gson.fromJson(response, JsonObject.class);
-    JsonObject rates = jsonObject.getAsJsonObject("conversion_rates");
-    return rates.get("VND").getAsDouble();
   }
 
   @GetMapping("payment-callback")
@@ -73,10 +53,9 @@ public class VNPayResource {
     String email = queryParams.get("email");
     List<Long> bookingIds =
         Arrays.stream(queryParams.get("bookingId").split(",")).map(Long::valueOf).toList();
-    Double price = Double.parseDouble(queryParams.get("vnp_Amount")) / 100;
-    Double usdVndRate = Double.parseDouble(queryParams.get("usd_vnd_Rate"));
-    Double priceTotal =
-        BigDecimal.valueOf(price / usdVndRate).setScale(0, RoundingMode.HALF_UP).doubleValue();
+    Double priceTotal = Double.parseDouble(queryParams.get("vnp_Amount")) / 100;
+    logger.info(bookingIds.toString());
+    logger.info(email);
     if (!bookingIds.isEmpty() && email != null) {
       if ("00".equals(vnp_ResponseCode)) {
         logger.info("Giao dịch thành công");
@@ -104,13 +83,7 @@ public class VNPayResource {
           String vnp_Version = "2.1.0";
           String vnp_Command = "pay";
           String orderType = "other";
-
-          Double usdVndRate = getUSDtoVNDRate();
-          BigDecimal amount =
-              BigDecimal.valueOf(price * usdVndRate)
-                  .setScale(0, RoundingMode.HALF_UP)
-                  .multiply(BigDecimal.valueOf(100));
-
+          long amount = price * 100;
           String bankCode = "NCB";
 
           String vnp_TxnRef = Config.getRandomNumber(8);
@@ -119,7 +92,6 @@ public class VNPayResource {
           String vnp_TmnCode = Config.vnp_TmnCode;
 
           Map<String, String> vnp_Params = new HashMap<>();
-
           vnp_Params.put("vnp_Version", vnp_Version);
           vnp_Params.put("vnp_Command", vnp_Command);
           vnp_Params.put("vnp_TmnCode", vnp_TmnCode);
@@ -139,9 +111,7 @@ public class VNPayResource {
                   + "?bookingId="
                   + bookingIds.stream().map(Object::toString).collect(Collectors.joining(","))
                   + "&email="
-                  + email
-                  + "&usd_vnd_Rate="
-                  + usdVndRate;
+                  + email;
 
           vnp_Params.put("vnp_ReturnUrl", returnUrl);
           vnp_Params.put("vnp_IpAddr", vnp_IpAddr);

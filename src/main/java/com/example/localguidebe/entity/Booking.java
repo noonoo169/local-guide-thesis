@@ -15,22 +15,27 @@ import org.hibernate.validator.constraints.Range;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@SQLDelete(sql = "UPDATE booking SET is_deleted=true WHERE id = ?")
 @Table(name = "booking")
 public class Booking {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+
   @Column(name = "start_date")
   private LocalDateTime startDate;
 
-  @Range(min = 0, max = 50)
+
+  @Range(min=0, max=50)
   @Column(name = "number_travelers")
   private Integer numberTravelers;
 
-  @Range(min = 0, max = 100000000)
+
+  @Range(min=0, max=100000000)
   @Column(name = "price")
   private Double price;
+
 
   @Column(name = "status")
   @Enumerated(EnumType.STRING)
@@ -39,7 +44,7 @@ public class Booking {
   @Column(columnDefinition = "boolean default false")
   private boolean isDeleted;
 
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
   @JoinColumn(name = "cart_id")
   private Cart cart;
 

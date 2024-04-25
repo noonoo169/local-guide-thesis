@@ -60,7 +60,6 @@ public class CartServiceImpl implements CartService {
     return cartRepository.getCartByEmail(email).orElse(null);
   }
 
-  @Transactional
   @Override
   public boolean deleteBookingInCartByIdAndByEmail(String email, Long bookingId) {
     Cart cart = getCartByEmail(email);
@@ -72,7 +71,7 @@ public class CartServiceImpl implements CartService {
     if (!bookingDeleteExist) {
       return false;
     }
-    bookingRepository.deleteBookingById(bookingId);
+    bookingRepository.deleteById(bookingId);
     return true;
   }
 
@@ -90,8 +89,7 @@ public class CartServiceImpl implements CartService {
 
     Booking booking = optionalBooking.get();
     booking.setNumberTravelers(updateBookingDTO.numberTravelers());
-    booking.setStartDate(
-        updateBookingDTO.startDate().toLocalDate().atTime(updateBookingDTO.startTime()));
+    booking.setStartDate(updateBookingDTO.startDate().toLocalDate().atTime(updateBookingDTO.startTime()));
     bookingRepository.save(booking);
     return cart;
   }
@@ -117,11 +115,13 @@ public class CartServiceImpl implements CartService {
       }
     }
     // Add booking days to guider busy schedule
-    busyScheduleService.InsertAndUpdateBusyDates(updatedBusyDates, tour.getGuide().getEmail());
+    busyScheduleService.InsertAndUpdateBusyDates(
+        updatedBusyDates, tour.getGuide().getEmail());
     // save booking
     Booking bookingRequest = addBookingRequestDtoToBookingDtoConverter.convert(bookingDTO);
     bookingRequest.setStatus(BookingStatusEnum.PENDING_PAYMENT);
-    Booking booking = bookingRepository.save(bookingRequest);
+    Booking booking =
+        bookingRepository.save(bookingRequest);
     Cart cart = cartRepository.getCartByTravelerEmail(email).orElse(null);
     // save booking to cart
     if (cart != null) {

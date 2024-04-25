@@ -30,7 +30,7 @@ public interface TourService {
 
   List<TourDTO> deleteTour(Long id);
 
-  List<Tour> getToursOfGuide(Long guideId);
+  List<Tour> getToursOfGuide(String email);
 
   SearchSuggestionResponseDTO getTourAndTourLocations(String searchValue);
 
