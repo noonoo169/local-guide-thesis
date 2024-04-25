@@ -3,6 +3,7 @@ package com.example.localguidebe.vnpay;
 import com.example.localguidebe.converter.InvoiceToInvoiceDtoConverter;
 import com.example.localguidebe.entity.Invoice;
 import com.example.localguidebe.entity.User;
+import com.example.localguidebe.enums.InvoiceStatus;
 import com.example.localguidebe.security.service.CustomUserDetails;
 import com.example.localguidebe.service.InvoiceService;
 import com.example.localguidebe.service.UserService;
@@ -94,25 +95,22 @@ public class VNPayResource {
         BigDecimal.valueOf(priceInVND / usdVndRate).setScale(0, RoundingMode.HALF_UP).doubleValue();
     if (!bookingIds.isEmpty() && email != null) {
       if ("00".equals(vnp_ResponseCode)) {
-        Invoice newInvoice =
-            invoiceService.createBookingInInvoice(
-                vnp_TxnRef,
-                bookingIds,
-                email,
-                travelerEmail,
-                fullName,
-                phone,
-                priceInUSD,
-                priceInVND,
-                usdVndRate);
-        if (newInvoice == null) {
-          logger.error("Giao dịch thất bại");
-          response.sendRedirect(frontendHost + "/booking-fail");
-        } else {
-          logger.info("Giao dịch thành công");
-
-          response.sendRedirect(frontendHost + "/booking-success/" + newInvoice.getId());
-        }
+        logger.info("Giao dịch thành công");
+        response.sendRedirect(
+            frontendHost
+                + "/booking-success/"
+                + invoiceService
+                    .createBookingInInvoice(
+                        vnp_TxnRef,
+                        bookingIds,
+                        email,
+                        travelerEmail,
+                        fullName,
+                        phone,
+                        priceInUSD,
+                        priceInVND,
+                        usdVndRate)
+                    .getId());
       } else {
         logger.error("Giao dịch thất bại");
         response.sendRedirect(frontendHost + "/booking-fail");
@@ -284,13 +282,10 @@ public class VNPayResource {
           vnp_Params.addProperty("vnp_Amount", vnp_Amount);
           vnp_Params.addProperty("vnp_OrderInfo", vnp_OrderInfo);
 
-          //          if (vnp_TransactionNo != null && !vnp_TransactionNo.isEmpty()) {
-          //            vnp_Params.addProperty("vnp_TransactionNo", "14351149");
-          //            logger.info("!= null");
-          //          }
-          vnp_Params.addProperty("vnp_TransactionNo", vnp_TransactionNo);
+          if (vnp_TransactionNo != null && !vnp_TransactionNo.isEmpty()) {
+            vnp_Params.addProperty("vnp_TransactionNo", "{get value of vnp_TransactionNo}");
+          }
 
-          logger.info("vnp_TransactionNo" + vnp_Params.get("vnp_TransactionNo"));
           vnp_Params.addProperty("vnp_TransactionDate", vnp_TransactionDate);
           vnp_Params.addProperty("vnp_CreateBy", vnp_CreateBy);
           vnp_Params.addProperty("vnp_CreateDate", vnp_CreateDate);
