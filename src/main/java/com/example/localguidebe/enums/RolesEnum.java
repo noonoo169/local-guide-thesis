@@ -4,8 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum RolesEnum {
-  TRAVELER(1),
-  GUIDER(2),
+  GUIDER(1),
+  TRAVELER(2),
   ADMIN(3);
 
   private final int value;

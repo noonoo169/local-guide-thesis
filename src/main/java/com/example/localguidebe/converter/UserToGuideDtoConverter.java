@@ -31,7 +31,7 @@ public class UserToGuideDtoConverter {
         source.getAddress(),
         source.getBiography(),
         source.getCredential(),
-        source.getOverallRating() == null ? null : source.getOverallRating(),
+        source.getOverallRating(),
         source.getLanguageSkills().stream()
             .map(languageSkillToLanguageSkillDtoConverter::convert)
             .toList(),
