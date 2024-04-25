@@ -103,31 +103,4 @@ public class StatisticController {
           }
         });
   }
-
-  @GetMapping("/guide/tours")
-  public ResponseEntity<Result> getStatisticOfToursByGuide(
-      Authentication authentication,
-      @RequestParam(required = false, defaultValue = "0") Integer page,
-      @RequestParam(required = false, defaultValue = "5") Integer limit,
-      @RequestParam(required = false, defaultValue = "desc") String order) {
-        return AuthUtils.checkAuthentication(
-                authentication,
-                () -> {
-                    try {
-                        return new ResponseEntity<>(
-                                new Result(
-                                        false,
-                                        HttpStatus.OK.value(),
-                                        "get statistic of tours by guide successfully",
-                                        statisticService.getStatisticOfToursByGuide(
-                                                ((CustomUserDetails) authentication.getPrincipal()).getId(),page,limit,order)),
-                                HttpStatus.OK);
-                    } catch (Exception e) {
-                        return new ResponseEntity<>(
-                                new Result(
-                                        false, HttpStatus.CONFLICT.value(), "Get statistics of tours by guide failure", null),
-                                HttpStatus.CONFLICT);
-                    }
-                });
-    }
 }
