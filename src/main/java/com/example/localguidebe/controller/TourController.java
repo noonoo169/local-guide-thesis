@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/tours")
 @CrossOrigin("*")
 public class TourController {
-
   private TourService tourService;
   private CategoryService categoryService;
   private TourToTourDtoConverter tourToTourDtoConverter;
