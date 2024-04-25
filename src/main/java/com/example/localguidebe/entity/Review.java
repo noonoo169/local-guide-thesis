@@ -50,7 +50,6 @@ public class Review {
 
   @PostPersist
   @PostUpdate
-  @PostRemove
   public void updateGuideOverallRating() {
     Double newOverallRating =
         BigDecimal.valueOf(

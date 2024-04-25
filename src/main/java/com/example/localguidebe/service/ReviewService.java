@@ -23,6 +23,4 @@ public interface ReviewService {
   List<ReviewResponseDTO> deleteReviewForTour(Long reviewId);
 
   boolean updateReviewForGuide(ReviewRequestDTO reviewRequestDTO, User traveler, Long reviewId);
-
-  boolean deleteReviewForGuide(User traveler, Long reviewId);
 }
