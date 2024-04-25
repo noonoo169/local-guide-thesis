@@ -67,7 +67,7 @@ public class Tour {
   @Column(name = "itinerary", columnDefinition = "TEXT")
   private String itinerary;
 
-  @Column(name = "is_deleted", columnDefinition = "boolean default false")
+  @Column(name = "is_deleted",columnDefinition = "boolean default false")
   private Boolean isDeleted = Boolean.FALSE;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -98,7 +98,7 @@ public class Tour {
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "tour")
   private List<Image> images = new ArrayList<>();
 
-  @ManyToOne
+  @OneToOne
   @JoinColumn(name = "meeting_point_id")
   private Location meetingPoint;
 
