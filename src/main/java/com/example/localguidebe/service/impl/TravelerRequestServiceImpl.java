@@ -2,12 +2,10 @@ package com.example.localguidebe.service.impl;
 
 import com.example.localguidebe.dto.requestdto.AddTravelerRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateTravelerRequestDTO;
-import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.entity.TravelerRequest;
 import com.example.localguidebe.entity.User;
 import com.example.localguidebe.enums.RolesEnum;
 import com.example.localguidebe.enums.TravelerRequestStatus;
-import com.example.localguidebe.repository.TourRepository;
 import com.example.localguidebe.repository.TravelerRequestRepository;
 import com.example.localguidebe.service.TravelerRequestService;
 import com.example.localguidebe.service.UserService;
@@ -19,15 +17,11 @@ import org.springframework.stereotype.Service;
 public class TravelerRequestServiceImpl implements TravelerRequestService {
   private final TravelerRequestRepository travelerRequestRepository;
   private final UserService userService;
-  private final TourRepository tourRepository;
 
   public TravelerRequestServiceImpl(
-      TravelerRequestRepository travelerRequestRepository,
-      UserService userService,
-      TourRepository tourRepository) {
+      TravelerRequestRepository travelerRequestRepository, UserService userService) {
     this.travelerRequestRepository = travelerRequestRepository;
     this.userService = userService;
-    this.tourRepository = tourRepository;
   }
 
   @Override
@@ -91,17 +85,5 @@ public class TravelerRequestServiceImpl implements TravelerRequestService {
 
     travelerRequest.setStatus(updateTravelerRequestDTO.status());
     return travelerRequestRepository.save(travelerRequest);
-  }
-
-  @Override
-  public void updateStatusAndTourForTravelerRequest(Long requestId, Long tourId) {
-    TravelerRequest travelerRequest = travelerRequestRepository.findById(requestId).orElse(null);
-    Tour travelerRequestTour = tourRepository.findById(tourId).orElseThrow();
-    if (travelerRequest != null && tourId != null) {
-      travelerRequestTour.setIsForSpecificTraveler(true);
-      travelerRequest.setStatus(TravelerRequestStatus.DONE);
-      travelerRequest.setTour(travelerRequestTour);
-    }
-    travelerRequestRepository.save(travelerRequest);
   }
 }
