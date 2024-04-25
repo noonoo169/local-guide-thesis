@@ -136,12 +136,6 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public User deleteUser(User user) {
-    user.setDeleted(true);
-    return userRepository.save(user);
-  }
-
-  @Override
   public SearchSuggestionResponseDTO getGuidesAndGuideAddresses(String searchValue) {
     List<User> guiders = userRepository.findByRoles_Name(RolesEnum.GUIDER);
     List<String> addressesFiltered =

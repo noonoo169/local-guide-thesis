@@ -30,6 +30,4 @@ public interface UserService {
 
   User updatePersonalInformation(
       String email, UpdatePersonalInformationDTO updatePersonalInformationDTO);
-
-  User deleteUser(User user);
 }
