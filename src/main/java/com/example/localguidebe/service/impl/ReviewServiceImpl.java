@@ -1,10 +1,8 @@
 package com.example.localguidebe.service.impl;
 
-import com.example.localguidebe.converter.ReviewToReviewResponseDto;
 import com.example.localguidebe.converter.TourToTourDtoConverter;
 import com.example.localguidebe.dto.TourDTO;
 import com.example.localguidebe.dto.requestdto.ReviewRequestDTO;
-import com.example.localguidebe.dto.responsedto.ReviewResponseDTO;
 import com.example.localguidebe.entity.Review;
 import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.entity.User;
@@ -13,8 +11,6 @@ import com.example.localguidebe.repository.TourRepository;
 import com.example.localguidebe.repository.UserRepository;
 import com.example.localguidebe.service.ReviewService;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,19 +21,15 @@ public class ReviewServiceImpl implements ReviewService {
   private final TourRepository tourRepository;
   private TourToTourDtoConverter tourToTourDtoConverter;
 
-  private ReviewToReviewResponseDto reviewToReviewResponseDto;
-
   public ReviewServiceImpl(
       ReviewRepository reviewRepository,
       UserRepository userRepository,
       TourRepository tourRepository,
-      TourToTourDtoConverter tourToTourDtoConverter,
-      ReviewToReviewResponseDto reviewToReviewResponseDto) {
+      TourToTourDtoConverter tourToTourDtoConverter) {
     this.reviewRepository = reviewRepository;
     this.userRepository = userRepository;
     this.tourRepository = tourRepository;
     this.tourToTourDtoConverter = tourToTourDtoConverter;
-    this.reviewToReviewResponseDto = reviewToReviewResponseDto;
   }
 
   @Override
@@ -78,13 +70,5 @@ public class ReviewServiceImpl implements ReviewService {
             .orElse(0.0));
 
     return tourToTourDtoConverter.convert(tourRepository.save(tour));
-  }
-
-  @Override
-  public List<ReviewResponseDTO> getReviewForTour(Long tourId) {
-    Tour tour = tourRepository.findById(tourId).orElseThrow();
-    return tour.getReviews().stream()
-        .map(reviewToReviewResponseDto::convert)
-        .collect(Collectors.toList());
   }
 }
