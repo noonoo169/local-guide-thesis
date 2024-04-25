@@ -48,6 +48,9 @@ public class Tour {
   @Column(name = "limit_traveler")
   private Integer limitTraveler;
 
+  @Column(name = "extra_price")
+  private Double extraPrice;
+
   @Column(name = "overall_rating", columnDefinition = "double default 0.0")
   private Double overallRating = 0.0;
 

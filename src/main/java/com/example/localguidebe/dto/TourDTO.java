@@ -36,6 +36,8 @@ public class TourDTO {
 
   private Integer limitTraveler;
 
+  private Double extraPrice;
+
   private Double overallRating;
 
   private String itinerary;

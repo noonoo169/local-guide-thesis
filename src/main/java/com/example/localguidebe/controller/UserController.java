@@ -7,7 +7,6 @@ import com.example.localguidebe.dto.responsedto.IsCanReviewResponseDTO;
 import com.example.localguidebe.entity.User;
 import com.example.localguidebe.enums.RolesEnum;
 import com.example.localguidebe.security.service.CustomUserDetails;
-import com.example.localguidebe.service.TourService;
 import com.example.localguidebe.service.UserService;
 import com.example.localguidebe.system.Result;
 import com.example.localguidebe.utils.AuthUtils;
@@ -23,15 +22,10 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
   private final UserService userService;
   private final UserToUserDtoConverter userToUserDtoConverter;
-  private final TourService tourService;
 
-  public UserController(
-      UserService userService,
-      UserToUserDtoConverter userToUserDtoConverter,
-      TourService tourService) {
+  public UserController(UserService userService, UserToUserDtoConverter userToUserDtoConverter) {
     this.userService = userService;
     this.userToUserDtoConverter = userToUserDtoConverter;
-    this.tourService = tourService;
   }
 
   BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
@@ -69,7 +63,7 @@ public class UserController {
         });
   }
 
-  @GetMapping("/is-can-review-guide/{guideId}")
+  @GetMapping("/{guideId}")
   public ResponseEntity<Result> isCanCommentOnGuide(
       Authentication authentication, @PathVariable("guideId") Long guideId) {
     return AuthUtils.checkAuthentication(
@@ -92,34 +86,6 @@ public class UserController {
                         true,
                         HttpStatus.OK.value(),
                         "You can add review for this guide",
-                        new IsCanReviewResponseDTO(true)));
-        });
-  }
-
-  @GetMapping("/is-can-review-tour/{tourId}")
-  public ResponseEntity<Result> isCanCommentOnTour(
-      Authentication authentication, @PathVariable("tourId") Long tourId) {
-    return AuthUtils.checkAuthentication(
-        authentication,
-        () -> {
-          String travelerEmail = ((CustomUserDetails) authentication.getPrincipal()).getEmail();
-          Long travelerId = ((CustomUserDetails) authentication.getPrincipal()).getId();
-          if (!tourService.checkBookingByTraveler(tourId, travelerEmail)
-              || !tourService.checkExistingReviewsByTraveler(travelerId, tourId)) {
-            return ResponseEntity.status(HttpStatus.OK)
-                .body(
-                    new Result(
-                        false,
-                        HttpStatus.OK.value(),
-                        "You can't add review for this tour",
-                        new IsCanReviewResponseDTO(false)));
-          } else
-            return ResponseEntity.status(HttpStatus.OK)
-                .body(
-                    new Result(
-                        true,
-                        HttpStatus.OK.value(),
-                        "You can add review for this tour",
                         new IsCanReviewResponseDTO(true)));
         });
   }

@@ -107,25 +107,19 @@ public class CartController {
     return AuthUtils.checkAuthentication(
         authentication,
         () -> {
-          try {
-            CartDTO addCart =
-                cartService.addBookingInCart(
-                    ((CustomUserDetails) authentication.getPrincipal()).getEmail(),
-                    addBookingRequestDTO);
-            if (addCart != null) {
-              return new ResponseEntity<>(
-                  new Result(
-                      false, HttpStatus.OK.value(), "successfully added tour to cart", addCart),
-                  HttpStatus.OK);
-            } else {
-              return new ResponseEntity<>(
-                  new Result(
-                      false, HttpStatus.CONFLICT.value(), "Adding tour to cart failed", null),
-                  HttpStatus.CONFLICT);
-            }
-          } catch (Exception e) {
+          CartDTO addCart =
+              cartService.addBookingInCart(
+                  ((CustomUserDetails) authentication.getPrincipal()).getEmail(),
+                  addBookingRequestDTO);
+          if (addCart != null) {
             return new ResponseEntity<>(
-                new Result(false, HttpStatus.CONFLICT.value(), e.getMessage(), null),
+                new Result(
+                    false, HttpStatus.OK.value(), "successfully added tour to cart", addCart),
+                HttpStatus.OK);
+          } else {
+
+            return new ResponseEntity<>(
+                new Result(false, HttpStatus.OK.value(), "Adding tour to cart failed", null),
                 HttpStatus.CONFLICT);
           }
         });

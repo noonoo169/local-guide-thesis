@@ -15,5 +15,4 @@ public record AddGuideApplicationDTO(
     String transportation,
     Integer yearsOfExperience,
     String howGuideHearAboutUs,
-    String biography,
     List<String> licenseImages) {}

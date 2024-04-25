@@ -20,6 +20,7 @@ public class TourDupeToTourDtoConverter {
         tourDupe.getEstimatedLocalCashNeeded(),
         tourDupe.getPricePerTraveler(),
         tourDupe.getLimitTraveler(),
+        tourDupe.getExtraPrice(),
         tourDupe.getOverallRating() != null ? tourDupe.getOverallRating() : 0.0,
         tourDupe.getItinerary(),
         tourDupe.getIsDeleted(),
