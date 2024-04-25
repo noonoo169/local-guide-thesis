@@ -1,8 +1,6 @@
 package com.example.localguidebe.repository;
 
 import com.example.localguidebe.dto.ProvinceResponseDTO;
-import com.example.localguidebe.dto.StatisticalBookingDTO;
-import com.example.localguidebe.dto.TourRevenueDTO;
 import com.example.localguidebe.entity.Booking;
 import java.time.LocalDate;
 import java.util.List;
@@ -34,50 +32,15 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
   @Query("SELECT b FROM Booking b JOIN b.tour t JOIN t.guide g WHERE g.email = :email")
   List<Booking> getAllBookingByGuider(@Param("email") String email);
 
-  @Query(
-      "SELECT b FROM Booking b JOIN b.cart cart WHERE  cart.traveler.id = :travelerId AND b.status ='PAID' ")
+  @Query("SELECT b FROM Booking b JOIN b.cart cart WHERE  cart.traveler.id = :travelerId AND b.status ='PAID' ")
   List<Booking> getBookingHistory(@Param("travelerId") Long travelerId);
+  @Query("SELECT SUBSTRING_INDEX(t.address, ', ', -1) AS cityProvince, COUNT(b) AS totalBookings " +
+          "FROM Tour t " +
+          "JOIN t.bookings b " +
+          "JOIN t.locations lt " +
+          "GROUP BY cityProvince " +
+          "ORDER BY totalBookings DESC ")
+  List<Object[]> FindForSuggestedTours();
 
-  @Query(
-      "SELECT  NEW com.example.localguidebe.dto.ProvinceResponseDTO("
-          + "SUBSTRING_INDEX(lt.address, ', ', -2),"
-          + " COUNT(*)) "
-          + "FROM Booking b "
-          + "JOIN b.tour t "
-          + "JOIN t.locations lt "
-          + "WHERE b.status = 'PAID'"
-          + "GROUP BY SUBSTRING_INDEX(lt.address, ', ', -2) "
-          + "ORDER BY COUNT(*) DESC ")
-  List<ProvinceResponseDTO> FindForSuggestedTours();
 
-  @Query(
-      "SELECT NEW com.example.localguidebe.dto.StatisticalBookingDTO("
-          + "SUBSTRING_INDEX(location.address, ', ', -2), "
-          + "SUM(booking.price), "
-          + "COUNT(*)) "
-          + "FROM Booking booking "
-          + "JOIN booking.tour tour "
-          + "JOIN tour.locations location "
-          + "WHERE booking.status = 'PAID'"
-          + "GROUP BY SUBSTRING_INDEX(location.address, ', ', -2)")
-  List<StatisticalBookingDTO> getStatisticalBooking();
-
-  @Query(
-      "SELECT NEW com.example.localguidebe.dto.TourRevenueDTO("
-          + "sum(booking.price) ,booking.tour.id,tour.name , sum(booking.numberTravelers)) "
-          + " FROM Booking booking JOIN booking.tour tour"
-          + " WHERE booking.status ='PAID' "
-          + "GROUP BY booking.tour.id")
-  List<TourRevenueDTO> getRevenueByTour();
-
-  @Query(
-      "SELECT sum(booking.price) FROM Booking booking WHERE booking.tour.id = :tourId AND booking.status = 'PAID'")
-  Double getRevenueByTourId(Long tourId);
-
-  @Query("SELECT tour.id FROM User user JOIN user.tours tour  WHERE user.id = :guideId")
-  List<Long> getTourIdByGuide(Long guideId);
-
-  @Query(
-      "SELECT SUM(booking.numberTravelers) FROM Booking booking WHERE booking.tour.id = :tourId AND booking.status = 'PAID'")
-  Long getTotalTravelerNumberByTour(Long tourId);
 }

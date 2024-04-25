@@ -14,27 +14,24 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/addresses")
 public class AddressController {
-  private final DistrictService districtService;
-  private final WardService wardService;
+  private DistrictService districtService;
+  private WardService wardService;
 
-  private final ProvinceService provinceService;
+  private ProvinceService provinceService;
 
-  private final TourService tourService;
+  private TourService tourService;
 
-  private final BookingService bookingService;
 
   @Autowired
-  public AddressController(
+  public void AddressController(
       DistrictService districtService,
       WardService wardService,
       ProvinceService provinceService,
-      TourService tourService,
-      BookingService bookingService) {
+      TourService tourService) {
     this.districtService = districtService;
     this.wardService = wardService;
     this.provinceService = provinceService;
     this.tourService = tourService;
-    this.bookingService = bookingService;
   }
 
   @GetMapping("/provinces")
@@ -101,23 +98,6 @@ public class AddressController {
               HttpStatus.OK.value(),
               "get name of location successfully",
               tourService.getLocationName(locations)),
-          HttpStatus.OK);
-    } catch (Exception e) {
-      return new ResponseEntity<>(
-          new Result(false, HttpStatus.CONFLICT.value(), "Coordinate name not found", null),
-          HttpStatus.CONFLICT);
-    }
-  }
-
-  @GetMapping("/revenue")
-  public ResponseEntity<Result> getRevenueByAddress() {
-    try {
-      return new ResponseEntity<>(
-          new Result(
-              false,
-              HttpStatus.OK.value(),
-              "get name of location successfully",
-              bookingService.getStatisticalBooking()),
           HttpStatus.OK);
     } catch (Exception e) {
       return new ResponseEntity<>(
