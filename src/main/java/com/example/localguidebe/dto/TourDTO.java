@@ -15,6 +15,7 @@ import lombok.*;
 @NoArgsConstructor
 @Data
 public class TourDTO {
+
   private Long id;
 
   private String name;
@@ -38,9 +39,7 @@ public class TourDTO {
   private Double overallRating;
 
   private String itinerary;
-
   private boolean isDeleted;
-
   private String address;
 
   private UserDTO guide;
@@ -56,6 +55,4 @@ public class TourDTO {
   private List<Image> images = new ArrayList<>();
 
   private List<LocationDTO> locations = new ArrayList<>();
-
-  private Boolean isForSpecificTraveler;
 }

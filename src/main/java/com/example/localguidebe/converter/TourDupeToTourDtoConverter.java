@@ -30,7 +30,6 @@ public class TourDupeToTourDtoConverter {
         JsonUtils.convertJsonToSet(tourDupe.getCategories(), CategoryDTO.class),
         JsonUtils.convertJsonToList(tourDupe.getReviews(), ReviewDTO.class),
         JsonUtils.convertJsonToList(tourDupe.getImages(), Image.class),
-        JsonUtils.convertJsonToList(tourDupe.getLocations(), LocationDTO.class),
-        tourDupe.getIsForSpecificTraveler());
+        JsonUtils.convertJsonToList(tourDupe.getLocations(), LocationDTO.class));
   }
 }

@@ -73,7 +73,6 @@ public class TourToTourDtoConverter {
         tour.getLocations().stream()
             .map(locationToLocationDtoConverter::convert)
             .sorted(Comparator.comparing(LocationDTO::id))
-            .collect(Collectors.toList()),
-        tour.getIsForSpecificTraveler());
+            .collect(Collectors.toList()));
   }
 }
