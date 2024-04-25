@@ -2,7 +2,9 @@ package com.example.localguidebe.entity;
 
 import jakarta.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,6 +37,9 @@ public class Location {
 
   @ManyToMany(mappedBy = "locations", fetch = FetchType.LAZY)
   private List<Tour> tours = new ArrayList<>();
+
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "meetingPoint")
+  private Set<Tour> toursOfMeetingPoint = new HashSet<>();
 
   @Override
   public boolean equals(Object o) {
