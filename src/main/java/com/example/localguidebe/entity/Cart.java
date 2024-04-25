@@ -21,6 +21,6 @@ public class Cart {
   @JoinColumn(name = "traveler_id", nullable = false)
   private User traveler;
 
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "cart")
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "cart")
   private List<Booking> bookings = new ArrayList<>();
 }

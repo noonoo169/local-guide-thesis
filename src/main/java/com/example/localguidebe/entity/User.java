@@ -42,6 +42,13 @@ public class User {
   @Column(name = "address")
   private String address;
 
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "user_role",
+      joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+      inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+  private Set<Role> roles = new HashSet<>();
+
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "guide")
   private List<BusySchedule> busySchedules = new ArrayList<>();
 
@@ -60,20 +67,15 @@ public class User {
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
   private List<Image> images = new ArrayList<>();
 
-  @ManyToMany(fetch = FetchType.EAGER)
-  @JoinTable(
-      name = "user_role",
-      joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-      inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
-  private Set<Role> roles = new HashSet<>();
 
   @Column(columnDefinition = "TEXT")
   private String biography;
 
+
   @Column(columnDefinition = "TEXT")
   private String credential;
 
-  @Column() private Double overallRating;
+   @Column() private Double overallRating;
 
   @OneToMany(mappedBy = "guide")
   List<LanguageSkill> languageSkills = new ArrayList<>();
