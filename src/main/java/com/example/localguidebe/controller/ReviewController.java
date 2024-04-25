@@ -137,40 +137,4 @@ public class ReviewController {
                 "Thank you for giving feedback.",
                 reviews.stream().map(reviewToReviewDtoConverter::convert)));
   }
-
-  @PutMapping("tour-reviews/{reviewId}")
-  public ResponseEntity<Result> editReviewForTour(
-      @PathVariable("reviewId") Long reviewId,
-      Authentication authentication,
-      @RequestBody ReviewRequestDTO reviewRequestDTO) {
-    return AuthUtils.checkAuthentication(
-        authentication,
-        () -> {
-          if (!reviewService.checkReviewByTraveler(
-              reviewId, ((CustomUserDetails) authentication.getPrincipal()).getEmail())) {
-            return new ResponseEntity<>(
-                new Result(
-                    true,
-                    HttpStatus.CONFLICT.value(),
-                    "You haven't booked a tour yet so you can't review it",
-                    null),
-                HttpStatus.CONFLICT);
-          } else {
-            try {
-              return new ResponseEntity<>(
-                  new Result(
-                      true,
-                      HttpStatus.OK.value(),
-                      "Successfully updated the review for the tour",
-                      reviewService.editReviewForTour(reviewId, reviewRequestDTO)),
-                  HttpStatus.OK);
-            } catch (Exception e) {
-              return new ResponseEntity<>(
-                  new Result(
-                      false, HttpStatus.CONFLICT.value(), "failed update review for tour", null),
-                  HttpStatus.CONFLICT);
-            }
-          }
-        });
-  }
 }

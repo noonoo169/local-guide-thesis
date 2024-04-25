@@ -343,6 +343,4 @@ public class TourServiceImpl implements TourService {
                 booking.getTour().getId() == tourId
                     && booking.getCart().getTraveler().getId() == traveler.getId() && booking.getStatus().equals(BookingStatusEnum.PAID));
   }
-
-
 }
