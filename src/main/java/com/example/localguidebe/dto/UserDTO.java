@@ -7,7 +7,7 @@ import java.util.Set;
 public record UserDTO(
     Long id,
     String email,
-    String fullName,
+    String username,
     LocalDateTime dateOfBirth,
     String phone,
     String address,

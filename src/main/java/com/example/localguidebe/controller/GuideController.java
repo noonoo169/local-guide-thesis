@@ -9,7 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/guides")
@@ -45,24 +48,5 @@ public class GuideController {
                     guides.stream().map(userToGuideDtoConverter::convert).toList(),
                     guides.getTotalPages(),
                     guides.getTotalElements())));
-  }
-
-  @GetMapping("/{id}")
-  public ResponseEntity<Result> getGuideId(@PathVariable("id") Long id) {
-    return userService
-        .findById(id)
-        .map(
-            user ->
-                ResponseEntity.status(HttpStatus.OK)
-                    .body(
-                        new Result(
-                            true,
-                            HttpStatus.OK.value(),
-                            "Find guide successfully",
-                            userToGuideDtoConverter.convert(user))))
-        .orElseGet(
-            () ->
-                ResponseEntity.status(HttpStatus.NO_CONTENT)
-                    .body(new Result(true, HttpStatus.NO_CONTENT.value(), "Not found guide")));
   }
 }
