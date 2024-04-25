@@ -239,16 +239,4 @@ public class TourController {
           HttpStatus.CONFLICT);
     }
   }
-
-  @GetMapping("/{id}/tour-start-time-available")
-  public ResponseEntity<Result> getTourStartTimeAvailable(
-      @PathVariable Long id, @RequestParam() LocalDate localDate) {
-    return new ResponseEntity<>(
-        new Result(
-            true,
-            HttpStatus.OK.value(),
-            "Get the list successfully",
-            tourService.getTourStartTimeAvailable(id, localDate)),
-        HttpStatus.OK);
-  }
 }
