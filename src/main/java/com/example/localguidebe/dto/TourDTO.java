@@ -53,7 +53,7 @@ public class TourDTO {
 
   private Set<CategoryDTO> categories = new HashSet<>();
 
-  private List<ReviewDTO> reviewDTOS = new ArrayList<>();
+  //    private List<Review> reviews = new ArrayList<>();
   //
   //    private List<Booking> bookings = new ArrayList<>();
   //

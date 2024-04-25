@@ -35,6 +35,4 @@ public interface TourService {
   SearchSuggestionResponseDTO getTourAndTourLocations(String searchValue);
 
   List<String> getTourStartTimeAvailable(Long tourId, LocalDate localDate);
-
-  boolean checkBookingByTraveler(Long tourId, String email);
 }

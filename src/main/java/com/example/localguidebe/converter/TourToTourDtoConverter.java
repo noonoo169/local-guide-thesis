@@ -16,7 +16,6 @@ public class TourToTourDtoConverter {
   private final CategoryToCategoryDtoConverter categoryToCategoryDtoConverter;
   private final ImageService imageService;
   private final LocationToLocationDtoConverter locationToLocationDtoConverter;
-  private final ReviewToReviewDtoConverter reviewToReviewDtoConverter;
 
   @Autowired
   public TourToTourDtoConverter(
@@ -24,14 +23,12 @@ public class TourToTourDtoConverter {
       UserToUserDtoConverter userToUserDtoConverter,
       CategoryToCategoryDtoConverter categoryToCategoryDtoConverter,
       ImageService imageService,
-      LocationToLocationDtoConverter locationToLocationDtoConverter,
-      ReviewToReviewDtoConverter reviewToReviewDtoConverter) {
+      LocationToLocationDtoConverter locationToLocationDtoConverter) {
     this.imageToImageDtoConverter = imageToImageDtoConverter;
     this.userToUserDtoConverter = userToUserDtoConverter;
     this.categoryToCategoryDtoConverter = categoryToCategoryDtoConverter;
     this.imageService = imageService;
     this.locationToLocationDtoConverter = locationToLocationDtoConverter;
-    this.reviewToReviewDtoConverter = reviewToReviewDtoConverter;
   }
 
   public TourDTO convert(Tour tour) {
@@ -57,9 +54,6 @@ public class TourToTourDtoConverter {
                 .map(categoryToCategoryDtoConverter::convertCategory)
                 .collect(Collectors.toSet())
             : null,
-        tour.getReviews().stream()
-            .map(reviewToReviewDtoConverter::convert)
-            .collect(Collectors.toList()),
         imageService.getImageByAssociateIddAndAssociateName(tour.getId(), AssociateName.TOUR),
         tour.getLocations().stream()
             .map(locationToLocationDtoConverter::convert)
