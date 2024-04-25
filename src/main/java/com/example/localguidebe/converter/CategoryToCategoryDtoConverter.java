@@ -2,16 +2,18 @@ package com.example.localguidebe.converter;
 
 import com.example.localguidebe.dto.CategoryDTO;
 import com.example.localguidebe.entity.Category;
-import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-
-
-@Component
 public class CategoryToCategoryDtoConverter {
-
-    public  CategoryDTO convertCategory(Category category){
-
-        return  new CategoryDTO(category.getId(), category.getName());
+    public static Set<CategoryDTO> convertSetCategory(Set<Category> categories){
+        Set<CategoryDTO> categoryDTOS = new HashSet<>();
+        for(Category category : categories){
+            categoryDTOS.add(new CategoryDTO(category.getId(), category.getName()));
+        }
+        return categoryDTOS;
     }
 }

@@ -6,13 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ImageToImageDtoConverter {
-
-
     public ImageDTO convert(Image source) {
         return new ImageDTO(source.getId(), source.getImageLink());
-    }
-    public ImageDTO convertImageDTO(Image image) {
-        return new ImageDTO(image.getId(), image.getImageLink());
-
     }
 }
