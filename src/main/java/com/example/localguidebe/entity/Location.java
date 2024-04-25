@@ -38,6 +38,10 @@ public class Location {
 
   @Column(name = "address")
   private String address;
+  
+
+//  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "location")
+//  private List<Image> images = new ArrayList<>();
 
   @ManyToMany(mappedBy = "locations", fetch = FetchType.LAZY)
   private Set<Tour> tours = new HashSet<>();

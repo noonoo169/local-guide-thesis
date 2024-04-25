@@ -54,6 +54,9 @@ public class User {
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "traveler")
   private List<Invoice> invoices = new ArrayList<>();
 
+  //  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
+  //  private List<Image> images = new ArrayList<>();
+
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
       name = "user_role",
@@ -71,12 +74,6 @@ public class User {
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "guide")
   List<LanguageSkill> languageSkills = new ArrayList<>();
-
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "traveler")
-  private List<TravelerRequest> travelerRequests = new ArrayList<>();
-
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "guide")
-  private List<TravelerRequest> travelerRequestsOfGuide = new ArrayList<>();
 
   @Override
   public String toString() {
