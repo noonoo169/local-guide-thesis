@@ -14,7 +14,6 @@ import com.example.localguidebe.repository.UserRepository;
 import com.example.localguidebe.service.ReviewService;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
@@ -118,19 +117,5 @@ public class ReviewServiceImpl implements ReviewService {
     return reviewRepository.findAll().stream()
         .map(reviewToReviewResponseDto::convert)
         .collect(Collectors.toList());
-  }
-
-  @Override
-  public boolean updateReviewForGuide(
-      ReviewRequestDTO reviewRequestDTO, User traveler, Long reviewId) {
-    if (traveler.getReviewsOfTraveler().stream()
-        .noneMatch(review -> review.getId().equals(reviewId))) return false;
-    Optional<Review> optionalReview = reviewRepository.findById(reviewId);
-    if (optionalReview.isEmpty()) return false;
-    Review review = optionalReview.get();
-    review.setRating(reviewRequestDTO.rating());
-    review.setComment(reviewRequestDTO.comment());
-    reviewRepository.saveAndFlush(review);
-    return true;
   }
 }
