@@ -130,27 +130,4 @@ public class StatisticController {
                     }
                 });
     }
-    @GetMapping("/month/{year}")
-    public ResponseEntity<Result> getStatisticOfYear(
-            @PathVariable("year") int year,
-            Authentication authentication) {
-    return AuthUtils.checkAuthentication(
-        authentication,
-        () -> {
-          try {
-            return new ResponseEntity<>(
-                new Result(
-                    false,
-                    HttpStatus.OK.value(),
-                    "get statistic of year successfully",
-                    statisticService.getStatisticByMonth(year)),
-                HttpStatus.OK);
-          } catch (Exception e) {
-            return new ResponseEntity<>(
-                new Result(
-                    false, HttpStatus.CONFLICT.value(), "Get statistics of year failure", null),
-                HttpStatus.CONFLICT);
-          }
-        });
-    }
 }
