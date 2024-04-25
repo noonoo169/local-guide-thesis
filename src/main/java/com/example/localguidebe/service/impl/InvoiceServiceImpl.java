@@ -7,19 +7,19 @@ import com.example.localguidebe.enums.InvoiceStatus;
 import com.example.localguidebe.enums.NotificationTypeEnum;
 import com.example.localguidebe.repository.BookingRepository;
 import com.example.localguidebe.repository.InvoiceRepository;
-import com.example.localguidebe.service.BusyScheduleService;
 import com.example.localguidebe.service.CartService;
 import com.example.localguidebe.service.InvoiceService;
 import com.example.localguidebe.service.NotificationService;
 import com.example.localguidebe.system.NotificationMessage;
 
-import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.localguidebe.vnpay.VNPayResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,6 @@ public class InvoiceServiceImpl implements InvoiceService {
   private final SimpMessagingTemplate messagingTemplate;
   private final NotificationToNotificationDtoConverter notificationToNotificationDtoConverter;
   private final TourToTourDtoConverter tourToTourDtoConverter;
-  private final BusyScheduleService busyScheduleService;
 
   Logger logger = LoggerFactory.getLogger(InvoiceServiceImpl.class);
 
@@ -48,8 +47,7 @@ public class InvoiceServiceImpl implements InvoiceService {
       NotificationService notificationService,
       SimpMessagingTemplate messagingTemplate,
       NotificationToNotificationDtoConverter notificationToNotificationDtoConverter,
-      TourToTourDtoConverter tourToTourDtoConverter,
-      BusyScheduleService busyScheduleService) {
+      TourToTourDtoConverter tourToTourDtoConverter) {
     this.cartService = cartService;
     this.bookingRepository = bookingRepository;
     this.invoiceRepository = invoiceRepository;
@@ -57,7 +55,6 @@ public class InvoiceServiceImpl implements InvoiceService {
     this.messagingTemplate = messagingTemplate;
     this.notificationToNotificationDtoConverter = notificationToNotificationDtoConverter;
     this.tourToTourDtoConverter = tourToTourDtoConverter;
-    this.busyScheduleService = busyScheduleService;
   }
 
   @Override
@@ -137,11 +134,6 @@ public class InvoiceServiceImpl implements InvoiceService {
   public Invoice refundInvoice(Invoice invoice, Double refundVndPrice) {
     invoice.setRefundVndPrice(refundVndPrice);
     invoice.setStatus(InvoiceStatus.REFUNDED);
-    invoice
-        .getBookings()
-        .forEach(
-            booking ->
-                busyScheduleService.updateBusyScheduleBeforeUpdateOrDeleteBooking(null, booking));
     return invoiceRepository.save(invoice);
   }
 
@@ -152,9 +144,6 @@ public class InvoiceServiceImpl implements InvoiceService {
 
   @Override
   public Double getRefundAmount(Invoice invoice) {
-    LocalDateTime now = LocalDateTime.now();
-    if (Duration.between(invoice.getCreateAt(), now).toMinutes() < 59) return invoice.getVndPrice();
-
     LocalDateTime minStartDateOfBooking =
         invoice.getBookings().stream()
             .map(Booking::getStartDate)
@@ -163,7 +152,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     if (minStartDateOfBooking == null) return 0.0;
 
     long daysBetween =
-        ChronoUnit.DAYS.between(now.toLocalDate(), minStartDateOfBooking.toLocalDate());
+        ChronoUnit.DAYS.between(LocalDate.now(), minStartDateOfBooking.toLocalDate());
     if (daysBetween > 7) return invoice.getVndPrice();
     else if (daysBetween > 0) return invoice.getVndPrice() / 2;
     else return 0.0;

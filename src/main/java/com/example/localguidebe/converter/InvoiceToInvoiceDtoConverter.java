@@ -22,7 +22,6 @@ public class InvoiceToInvoiceDtoConverter {
         source.getFullName(),
         source.getPhone(),
         source.getEmail(),
-        source.getStatus(),
         source.getBookings().stream().map(bookingToBookingDtoConverter::convert).toList());
   }
 }
