@@ -11,6 +11,7 @@ import com.example.localguidebe.service.CategoryService;
 import com.example.localguidebe.service.LocationService;
 import com.example.localguidebe.service.TourService;
 import com.example.localguidebe.service.TourStartTimeService;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -54,10 +55,14 @@ public class TourServiceImpl implements TourService {
 
   @Override
   public List<TourDTO> getListTour() {
-    return tourRepository.findAll().stream()
-        .filter(tour -> tour.getIsDeleted().equals(false))
-        .map(tourToTourDtoConverter::convert)
-        .collect(Collectors.toList());
+
+    List<TourDTO> tourDTOS = new ArrayList<>();
+
+    List<Tour> tours = tourRepository.findAll();
+    for (Tour tour : tours) {
+      tourDTOS.add(tourToTourDtoConverter.convert(tour));
+    }
+    return tourDTOS;
   }
 
   @Override
@@ -193,16 +198,6 @@ public class TourServiceImpl implements TourService {
         tourRepository.findTours(searchName, minPrice, maxPrice, categoryId, paging);
     List<TourDTO> tourDTOS =
         tourPage.get().map(tourToTourDtoConverter::convert).collect(Collectors.toList());
-    return new SearchTourDTO(tourDTOS, tourPage.getTotalPages(), (int) tourPage.getTotalElements());
-  }
-
-  @Override
-  public List<TourDTO> deleteTour(Long id) {
-    Tour tour = tourRepository.findById(id).orElseThrow();
-    tour.setIsDeleted(true);
-    tourRepository.save(tour);
-    return tourRepository.findAll().stream()
-        .map(tourToTourDtoConverter::convert)
-        .collect(Collectors.toList());
+    return new SearchTourDTO(tourDTOS, tourDTOS.size(), tourPage.getTotalPages());
   }
 }

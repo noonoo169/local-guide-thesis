@@ -41,10 +41,8 @@ public class TourDTO {
     private Double overallRating;
 
     private String itinerary;
-    private boolean isDeleted;
 
     private UserDTO guide;
-
 //    //TODO meeting_point_id associate to location
 //
 //    private Location province;

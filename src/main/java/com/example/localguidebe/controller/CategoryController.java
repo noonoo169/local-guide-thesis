@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/categories")
+@RequestMapping("/category-management")
 public class CategoryController {
     private CategoryService categoryService;
     @Autowired
     public void setCategoryService(CategoryService categoryService){
         this.categoryService = categoryService;
     }
-    @GetMapping("")
+    @GetMapping("categories")
     public ResponseEntity<Result> getAllCategory(){
         try {
             return new ResponseEntity<>(new Result(true, HttpStatus.OK.value(), "get the list successfully",  categoryService.getCategories()), HttpStatus.OK);
