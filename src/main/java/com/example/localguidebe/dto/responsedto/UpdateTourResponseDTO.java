@@ -23,7 +23,7 @@ public record UpdateTourResponseDTO(
         Integer limitTraveler,
         Double extraPrice,
         String itinerary,
-        String province,
+        LocationDTO province,
         List<TourStartTimeDTO> tourStartTimes,
         Set<CategoryDTO> categories,
         List<ImageDTO> images,

@@ -67,14 +67,16 @@ public class Tour {
   @Column(name = "itinerary", columnDefinition = "TEXT")
   private String itinerary;
 
-  @Column(name = "is_deleted")
-  private Boolean isDeleted;
+  @Column(name = "is_active")
+  private Boolean isActive;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "guide_id")
   private User guide;
 
-  @Column private String province;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "province_id")
+  private Location province;
 
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "tour")
   private List<TourStartTime> tourStartTimes = new ArrayList<>();

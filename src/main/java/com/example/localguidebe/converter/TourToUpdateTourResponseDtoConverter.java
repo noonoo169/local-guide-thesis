@@ -37,8 +37,7 @@ public class TourToUpdateTourResponseDtoConverter {
                 source.getLimitTraveler(),
                 source.getExtraPrice(),
                 source.getItinerary(),
-                // TODO : fix province to String here
-                source.getProvince(),
+                locationToLocationDto.convert(source.getProvince()),
                 source.getTourStartTimes().stream().map(tourStartTimeToTourStartTimeDtoConverter::convert).toList(),
                 source.getCategories() != null ?source.getCategories().stream().map(categoryToCategoryDtoConverter::convertCategory).collect(Collectors.toSet()) : null,
                 source.getImages().stream().map(imageToImageDtoConverter::convert).toList(),

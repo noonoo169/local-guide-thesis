@@ -161,17 +161,16 @@ public class TourServiceImpl implements TourService {
       }
 
       // Update province
-      // TODO: Update here because province has change to String type
-      // if (updateTourRequestDTO.province() != null
-      //     && updateTourRequestDTO.province().getId() == null) {
-      //   Location newProvince =
-      //       new Location(
-      //           updateTourRequestDTO.province().getName(),
-      //           updateTourRequestDTO.province().getLatitude(),
-      //           updateTourRequestDTO.province().getLongitude());
-      //   locationService.save(newProvince);
-      //   tour.setProvince(newProvince);
-      // }
+      if (updateTourRequestDTO.province() != null
+          && updateTourRequestDTO.province().getId() == null) {
+        Location newProvince =
+            new Location(
+                updateTourRequestDTO.province().getName(),
+                updateTourRequestDTO.province().getLatitude(),
+                updateTourRequestDTO.province().getLongitude());
+        locationService.save(newProvince);
+        tour.setProvince(newProvince);
+      }
       return tourRepository.save(tour);
     }
     return null;
