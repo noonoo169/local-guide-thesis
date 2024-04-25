@@ -10,7 +10,6 @@ import com.example.localguidebe.enums.RolesEnum;
 import com.example.localguidebe.repository.UserRepository;
 import com.example.localguidebe.service.UserService;
 import com.example.localguidebe.utils.AddressUtils;
-import com.example.localguidebe.utils.JsonUtils;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import java.util.Comparator;
@@ -132,10 +131,7 @@ public class UserServiceImpl implements UserService {
       String email, UpdatePersonalInformationDTO updatePersonalInformationDTO) {
     User user = findUserByEmail(email);
     if (user == null) return null;
-    BeanUtils.copyProperties(
-        updatePersonalInformationDTO,
-        user,
-        JsonUtils.getNullPropertyNames(updatePersonalInformationDTO));
+    BeanUtils.copyProperties(updatePersonalInformationDTO, user);
     return userRepository.save(user);
   }
 
