@@ -22,11 +22,7 @@ public class Notification {
   @Column private String message;
   @Column private LocalDateTime notificationDate;
   @Column private boolean isRead;
-
-  @Column
-  @Enumerated(EnumType.STRING)
-  private NotificationTypeEnum notificationType;
-
+  @Column private NotificationTypeEnum notificationType;
   @Column private Long associateId;
 
   @ManyToOne(fetch = FetchType.LAZY)
