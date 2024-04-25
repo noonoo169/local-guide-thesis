@@ -1,6 +1,5 @@
 package com.example.localguidebe.controller;
 
-import com.example.localguidebe.security.service.CustomUserDetails;
 import com.example.localguidebe.service.StatisticService;
 import com.example.localguidebe.system.Result;
 import com.example.localguidebe.utils.AuthUtils;
@@ -19,7 +18,7 @@ public class StatisticController {
   }
 
   @GetMapping("/guides")
-  public ResponseEntity<Result> getStatisticByGuides(
+  public ResponseEntity<Result> getRevenueByGuide(
       @RequestParam(required = false, defaultValue = "0") Integer page,
       @RequestParam(required = false, defaultValue = "5") Integer limit,
       @RequestParam(required = false, defaultValue = "desc") String order) {
@@ -39,7 +38,7 @@ public class StatisticController {
   }
 
   @GetMapping("/tours")
-  public ResponseEntity<Result> getStatisticByTours(
+  public ResponseEntity<Result> getRevenueByTour(
       @RequestParam(required = false, defaultValue = "0") Integer page,
       @RequestParam(required = false, defaultValue = "5") Integer limit,
       @RequestParam(required = false, defaultValue = "desc") String order) {
@@ -59,7 +58,7 @@ public class StatisticController {
   }
 
   @GetMapping("/tour/{TourId}")
-  public ResponseEntity<Result> getStatisticByPerTour(
+  public ResponseEntity<Result> getRevenueByPerTour(
       @PathVariable("TourId") Long tourId, Authentication authentication) {
     return AuthUtils.checkAuthentication(
         authentication,
@@ -76,29 +75,6 @@ public class StatisticController {
             return new ResponseEntity<>(
                 new Result(
                     false, HttpStatus.CONFLICT.value(), "Get statistics of failed per tour", null),
-                HttpStatus.CONFLICT);
-          }
-        });
-  }
-
-  @GetMapping("/guide")
-  public ResponseEntity<Result> getStatisticByPerGuide(Authentication authentication) {
-    return AuthUtils.checkAuthentication(
-        authentication,
-        () -> {
-          try {
-            return new ResponseEntity<>(
-                new Result(
-                    false,
-                    HttpStatus.OK.value(),
-                    "get statistic of per guide successfully",
-                    statisticService.getStatisticByPerGuide(
-                        ((CustomUserDetails) authentication.getPrincipal()).getId())),
-                HttpStatus.OK);
-          } catch (Exception e) {
-            return new ResponseEntity<>(
-                new Result(
-                    false, HttpStatus.CONFLICT.value(), "Get statistics of failed per guide", null),
                 HttpStatus.CONFLICT);
           }
         });
