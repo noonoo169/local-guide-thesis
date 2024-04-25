@@ -1,11 +1,9 @@
 package com.example.localguidebe.converter;
 
-import com.example.localguidebe.dto.LocationDTO;
 import com.example.localguidebe.dto.TourDTO;
 import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.enums.AssociateName;
 import com.example.localguidebe.service.ImageService;
-import java.util.Comparator;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -65,7 +63,6 @@ public class TourToTourDtoConverter {
         imageService.getImageByAssociateIddAndAssociateName(tour.getId(), AssociateName.TOUR),
         tour.getLocations().stream()
             .map(locationToLocationDtoConverter::convert)
-            .sorted(Comparator.comparing(LocationDTO::id))
-            .collect(Collectors.toList()));
+            .collect(Collectors.toSet()));
   }
 }
