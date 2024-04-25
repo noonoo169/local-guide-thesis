@@ -45,14 +45,21 @@ public class TourDTO {
 
   private UserDTO guide;
 
-  private List<String> startTimes = new ArrayList<>();
+  //    //TODO meeting_point_id associate to location
+  //
+  //    private Location province;
+
+  //    private List<TourStartTime> tourStartTimes = new ArrayList<>();
 
   private Set<CategoryDTO> categories = new HashSet<>();
 
   private List<ReviewDTO> reviewDTOS = new ArrayList<>();
-
+  //
+  //    private List<Booking> bookings = new ArrayList<>();
+  //
   private List<Image> images = new ArrayList<>();
-
+  //
   private List<LocationDTO> locations = new ArrayList<>();
-
+  //
+  //    private Location location;
 }
