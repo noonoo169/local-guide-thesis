@@ -11,9 +11,7 @@ import org.springframework.stereotype.Repository;
 public interface CartRepository extends JpaRepository<Cart, Long> {
   @Query(
       "SELECT c FROM Cart c JOIN FETCH c.bookings b WHERE c.traveler.email = :email AND b.status = 'PENDING_PAYMENT'")
-  Optional<Cart> getCartWithUnPaidBooKingByEmail(@Param("email") String email);
-
-  Optional<Cart> getCartByTravelerEmail(String email);
+  Optional<Cart> getCartByEmail(@Param("email") String email);
 
   @Query(
       "SELECT  Count(cart) FROM Cart cart JOIN cart.bookings b WHERE cart.traveler.id = :travelerId AND b.tour.id = :tourId AND b.status ='PAID'")

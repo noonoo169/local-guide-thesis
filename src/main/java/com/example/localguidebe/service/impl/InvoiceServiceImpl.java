@@ -76,7 +76,9 @@ public class InvoiceServiceImpl implements InvoiceService {
     Cart cart = cartService.getCartByEmail(travelerEmail);
 
     if (cart == null) return null;
-    List<Booking> bookings = new ArrayList<>();
+    List<Booking> bookings =
+        new ArrayList<>(
+            cart.getBookings().stream().filter(booking -> !booking.isDeleted()).toList());
     Invoice invoice =
         Invoice.builder()
             .priceTotal(priceTotal)
@@ -90,12 +92,8 @@ public class InvoiceServiceImpl implements InvoiceService {
             .vnpTxnRef(vnp_TxnRef)
             .status(InvoiceStatus.PAID)
             .build();
-    bookingIds.forEach(
-        bookingId -> {
-          Optional<Booking> optionalBooking = bookingRepository.findById(bookingId);
-          if (optionalBooking.isEmpty()) throw new RuntimeException();
-          Booking booking = optionalBooking.get();
-          bookings.add(booking);
+    bookings.forEach(
+        booking -> {
           // add tour dupe
           try {
             booking.setTourDupe(tourDupeService.getTourDupe(booking.getTour()));
