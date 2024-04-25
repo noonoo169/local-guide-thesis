@@ -7,13 +7,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class BookingToBookingDtoConverter {
   private final TourToTourInBookingResponseDtoConverter tourToTourInBookingResponseDtoConverter;
-  private final UserToGuideDtoConverter userToGuideDtoConverter;
 
   public BookingToBookingDtoConverter(
-      TourToTourInBookingResponseDtoConverter tourToTourInBookingResponseDtoConverter,
-      UserToGuideDtoConverter userToGuideDtoConverter) {
+      TourToTourInBookingResponseDtoConverter tourToTourInBookingResponseDtoConverter) {
     this.tourToTourInBookingResponseDtoConverter = tourToTourInBookingResponseDtoConverter;
-    this.userToGuideDtoConverter = userToGuideDtoConverter;
   }
 
   public BookingDTO convert(Booking source) {
@@ -23,7 +20,6 @@ public class BookingToBookingDtoConverter {
         source.getNumberTravelers(),
         source.getPrice(),
         source.getStatus(),
-        tourToTourInBookingResponseDtoConverter.convert(source.getTour()),
-        userToGuideDtoConverter.convert(source.getTour().getGuide()));
+        tourToTourInBookingResponseDtoConverter.convert(source.getTour()));
   }
 }
