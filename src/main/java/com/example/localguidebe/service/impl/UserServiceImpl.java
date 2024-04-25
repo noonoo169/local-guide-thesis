@@ -11,8 +11,9 @@ import com.example.localguidebe.service.UserService;
 import com.example.localguidebe.utils.AddressUtils;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
-import java.util.Comparator;
-import java.util.List;
+import lombok.val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +21,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -59,30 +64,30 @@ public class UserServiceImpl implements UserService {
       String sortBy,
       String order,
       Double ratingFilter,
-      String searchValue) {
+      String searchName) {
     Sort sort = order.equals("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
     Pageable paging = PageRequest.of(page, limit, sort);
-    Specification<Object> specification =
+    Specification<User> specification =
         Specification.where(
-                (root, query, criteriaBuilder) -> {
-                  Join<User, Role> userRoleJoin = root.join("roles", JoinType.INNER);
-                  return criteriaBuilder.equal(userRoleJoin.get("name"), RolesEnum.GUIDER);
-                })
-            .and(
-                (root, query, criteriaBuilder) ->
-                    criteriaBuilder.or(
-                        criteriaBuilder.like(
-                            criteriaBuilder.lower(root.get("username")),
-                            "%" + searchValue.toLowerCase() + "%"),
-                        criteriaBuilder.like(
-                            criteriaBuilder.lower(root.get("address")),
-                            "%" + searchValue.toLowerCase() + "%")));
+            (root, query, criteriaBuilder) -> {
+              Join<User, Role> userRoleJoin = root.join("roles", JoinType.INNER);
+              return criteriaBuilder.equal(userRoleJoin.get("name"), RolesEnum.GUIDER);
+            });
 
     if (ratingFilter != null) {
       specification =
           specification.and(
               (root, query, criteriaBuilder) ->
                   criteriaBuilder.greaterThanOrEqualTo(root.get("overallRating"), ratingFilter));
+    }
+
+    if (searchName != null && !searchName.isEmpty()) {
+      specification =
+          specification.and(
+              (root, query, criteriaBuilder) ->
+                  criteriaBuilder.like(
+                      criteriaBuilder.lower(root.get("username")),
+                      "%" + searchName.toLowerCase() + "%"));
     }
     return userRepository.findAll(specification, paging);
   }
