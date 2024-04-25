@@ -1,6 +1,5 @@
 package com.example.localguidebe.dto;
 
-import com.example.localguidebe.enums.TravelerRequestStatus;
 import java.util.List;
 
 public record TravelerRequestDTO(
@@ -11,7 +10,6 @@ public record TravelerRequestDTO(
     Double maxPrice,
     String destination,
     String message,
-    TravelerRequestStatus status,
     GuideDTO guide,
     UserDTO traveler,
     Long tourId) {}

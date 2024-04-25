@@ -2,8 +2,6 @@ package com.example.localguidebe.enums;
 
 public enum TravelerRequestStatus {
   PENDING,
-  ACCEPTED,
-  DENIED,
-  DONE,
-  DELETED
+  IN_PROGRESS,
+  DONE
 }
