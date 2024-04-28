@@ -1,13 +1,15 @@
 package com.example.localguidebe.controller;
 
 import com.example.localguidebe.converter.UserToLoginResponseDtoConverter;
+import com.example.localguidebe.dto.fcmdto.DeviceNotificationRequest;
 import com.example.localguidebe.dto.fcmdto.NotificationSubscriptionRequest;
+import com.example.localguidebe.dto.fcmdto.TopicNotificationRequest;
 import com.example.localguidebe.dto.requestdto.LoginRequestDTO;
 import com.example.localguidebe.dto.requestdto.ResetPasswordRequestDTO;
 import com.example.localguidebe.dto.requestdto.UserAuthDTO;
-import com.example.localguidebe.dto.responsedto.ResponseDTO;
 import com.example.localguidebe.entity.User;
 import com.example.localguidebe.enums.RolesEnum;
+import com.example.localguidebe.exception.ExceedLimitTravelerOfTourException;
 import com.example.localguidebe.security.jwt.JwtTokenProvider;
 import com.example.localguidebe.security.service.CustomUserDetails;
 import com.example.localguidebe.service.EmailService;
@@ -15,7 +17,7 @@ import com.example.localguidebe.service.FcmService;
 import com.example.localguidebe.service.RoleService;
 import com.example.localguidebe.service.UserService;
 import com.example.localguidebe.system.Result;
-import com.example.localguidebe.utils.AuthUtils;
+import com.example.localguidebe.utils.JsonUtils;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,35 +30,36 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin("*")
 public class AuthController {
   private final UserService userService;
   private final RoleService roleService;
   private final EmailService emailService;
   private final UserToLoginResponseDtoConverter userToLoginResponseDtoConverter;
   private final FcmService fcmService;
+  private final JwtTokenProvider jwtTokenProvider;
+  private final AuthenticationManager authenticationManager;
+  private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
+  @Autowired
   public AuthController(
       UserService userService,
       RoleService roleService,
       EmailService emailService,
       UserToLoginResponseDtoConverter userToLoginResponseDtoConverter,
-      FcmService fcmService) {
+      FcmService fcmService,
+      JwtTokenProvider jwtTokenProvider,
+      AuthenticationManager authenticationManager) {
     this.userService = userService;
     this.roleService = roleService;
     this.emailService = emailService;
     this.userToLoginResponseDtoConverter = userToLoginResponseDtoConverter;
     this.fcmService = fcmService;
+    this.jwtTokenProvider = jwtTokenProvider;
+    this.authenticationManager = authenticationManager;
   }
-
-  @Autowired public JwtTokenProvider jwtTokenProvider;
-  @Autowired public AuthenticationManager authenticationManager;
-  AuthUtils utilsAuth = new AuthUtils();
-  BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
   @PostMapping("/register")
   public ResponseEntity<Result> registerUser(@RequestBody UserAuthDTO userAuthDTO) {
-    ResponseDTO response;
     if (userService.getAllUser().stream()
         .anyMatch(user -> user.getEmail().equals(userAuthDTO.getEmail()))) {
       return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -72,12 +75,8 @@ public class AuthController {
                 .findFirst()
                 .orElseThrow());
     userService.saveUser(user);
-    String accessToken =
-        utilsAuth.generateAccessToken(
-            userAuthDTO.getEmail(),
-            userAuthDTO.getPassword(),
-            authenticationManager,
-            jwtTokenProvider);
+    String accessToken = jwtTokenProvider.generateToken(userAuthDTO.getEmail());
+
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             new Result(
@@ -187,6 +186,81 @@ public class AuthController {
                   false,
                   HttpStatus.INTERNAL_SERVER_ERROR.value(),
                   "Failed to subscribe device to the topic."));
+    }
+  }
+
+  @PostMapping("/unsubscribe")
+  public ResponseEntity<Result> unSubscribeToTopic(
+          @RequestBody @Valid NotificationSubscriptionRequest request) {
+    try {
+      // Topic name cannot contain '@'
+      request.setTopicName(
+              request.getTopicName().substring(0, request.getTopicName().indexOf("@")));
+      fcmService.unsubscribeDeviceFromTopic(request);
+      return ResponseEntity.status(HttpStatus.OK)
+              .body(
+                      new Result(
+                              true, HttpStatus.OK.value(), "Device unsubscribed to the topic successfully."));
+    } catch (Exception e) {
+      e.printStackTrace();
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+              .body(
+                      new Result(
+                              false,
+                              HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                              "Failed to unsubscribe device to the topic."));
+    }
+  }
+
+  @GetMapping("/send-topic")
+  public ResponseEntity<Result> sendTopic(@RequestParam("topic") String topic) {
+    try {
+      // Topic name cannot contain '@'
+      TopicNotificationRequest topicNotificationRequestOfTraveler =
+          TopicNotificationRequest.builder()
+              .topicName(topic.substring(0, topic.indexOf("@")))
+              .title("Test send to topic")
+              .body(JsonUtils.convertObjectToJson(new NotificationSubscriptionRequest("hi", "hi")))
+              .build();
+      fcmService.sendPushNotificationToTopic(topicNotificationRequestOfTraveler);
+      return ResponseEntity.status(HttpStatus.OK)
+              .body(
+                      new Result(
+                              true, HttpStatus.OK.value(), "send to the topic successfully."));
+    } catch (Exception e) {
+      e.printStackTrace();
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+              .body(
+                      new Result(
+                              false,
+                              HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                              "Failed to send to the topic."));
+    }
+  }
+
+  @GetMapping("/send-device-token")
+  public ResponseEntity<Result> sendDeviceToken(@RequestParam("deviceToken") String deviceToken) {
+    try {
+      // Topic name cannot contain '@'
+      DeviceNotificationRequest deviceNotificationRequest =
+              DeviceNotificationRequest.builder()
+                      .deviceToken(deviceToken)
+                      .title("Test send to device token")
+                      .body(JsonUtils.convertObjectToJson(new NotificationSubscriptionRequest("hi", "hi")))
+                      .build();
+      fcmService.sendNotificationToDevice(deviceNotificationRequest);
+      return ResponseEntity.status(HttpStatus.OK)
+              .body(
+                      new Result(
+                              true, HttpStatus.OK.value(), "send to the device successfully."));
+    } catch (Exception e) {
+      e.printStackTrace();
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+              .body(
+                      new Result(
+                              false,
+                              HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                              "Failed to send to the device."));
     }
   }
 }

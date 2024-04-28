@@ -8,9 +8,10 @@ import com.example.localguidebe.service.FcmService;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.messaging.*;
 import java.time.Duration;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 public class FcmServiceImpl implements FcmService {
   private final FirebaseApp firebaseApp;
 
+  @Autowired
   public FcmServiceImpl(FirebaseApp firebaseApp) {
     this.firebaseApp = firebaseApp;
   }
@@ -51,8 +53,8 @@ public class FcmServiceImpl implements FcmService {
                     .setTitle(request.getTitle())
                     .setBody(request.getBody())
                     .build())
-            .setAndroidConfig(getAndroidConfig(request.getTopicName()))
-            .setApnsConfig(getApnsConfig(request.getTopicName()))
+                        .setAndroidConfig(getAndroidConfig(request.getTopicName()))
+                        .setApnsConfig(getApnsConfig(request.getTopicName()))
             //            .putAllData(request.getData())
             .build();
 
@@ -92,17 +94,29 @@ public class FcmServiceImpl implements FcmService {
   @Override
   public void subscribeDeviceToTopic(NotificationSubscriptionRequest request)
       throws FirebaseMessagingException {
-    FirebaseMessaging.getInstance()
-        .subscribeToTopic(
-            Collections.singletonList(request.getDeviceToken()), request.getTopicName());
+    TopicManagementResponse topicManagementResponse =
+        FirebaseMessaging.getInstance()
+            .subscribeToTopic(
+                Arrays.asList(request.getDeviceToken().split(",")), request.getTopicName());
+    log.warn(
+        "Error: " + topicManagementResponse.getErrors().toString(),
+        topicManagementResponse.getSuccessCount());
+    log.warn("SuccessCount:" + topicManagementResponse.getSuccessCount());
+    log.warn("ErrorCount:" + topicManagementResponse.getFailureCount());
   }
 
   @Override
   public void unsubscribeDeviceFromTopic(NotificationSubscriptionRequest request)
       throws FirebaseMessagingException {
-    FirebaseMessaging.getInstance()
-        .unsubscribeFromTopic(
-            Collections.singletonList(request.getDeviceToken()), request.getTopicName());
+    TopicManagementResponse topicManagementResponse =
+        FirebaseMessaging.getInstance()
+            .unsubscribeFromTopic(
+                Arrays.asList(request.getDeviceToken().split(",")), request.getTopicName());
+    log.warn(
+        "Error: " + topicManagementResponse.getErrors().toString(),
+        topicManagementResponse.getSuccessCount());
+    log.warn("SuccessCount:" + topicManagementResponse.getSuccessCount());
+    log.warn("ErrorCount:" + topicManagementResponse.getFailureCount());
   }
 
   @Override
