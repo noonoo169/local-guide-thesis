@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/guides")
 public class GuideController {
-
   private final UserService userService;
   private final UserToGuideDtoConverter userToGuideDtoConverter;
   private final BookingService bookingService;

@@ -4,6 +4,7 @@ import com.example.localguidebe.security.service.CustomUserDetails;
 import com.example.localguidebe.service.StatisticService;
 import com.example.localguidebe.system.Result;
 import com.example.localguidebe.utils.AuthUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class StatisticController {
   private final StatisticService statisticService;
 
+  @Autowired
   public StatisticController(StatisticService statisticService) {
     this.statisticService = statisticService;
   }

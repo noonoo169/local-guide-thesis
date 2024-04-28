@@ -16,11 +16,8 @@ import org.springframework.web.bind.annotation.*;
 public class AddressController {
   private final DistrictService districtService;
   private final WardService wardService;
-
   private final ProvinceService provinceService;
-
   private final TourService tourService;
-
   private final BookingService bookingService;
 
   @Autowired
