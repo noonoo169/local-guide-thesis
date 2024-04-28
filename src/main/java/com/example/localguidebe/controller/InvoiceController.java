@@ -12,6 +12,8 @@ import com.example.localguidebe.utils.AuthUtils;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -27,6 +29,7 @@ public class InvoiceController {
   private final InvoiceToInvoiceDtoConverter invoiceToInvoiceDtoConverter;
   private final UserService userService;
 
+  @Autowired
   public InvoiceController(
       InvoiceService invoiceService,
       InvoiceToInvoiceDtoConverter invoiceToInvoiceDtoConverter,

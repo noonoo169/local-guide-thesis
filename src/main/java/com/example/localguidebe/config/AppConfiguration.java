@@ -46,7 +46,6 @@ public class AppConfiguration {
 
     if (activeProfile.equals("prod")) {
       corsConfiguration.addAllowedOriginPattern("*");
-      corsConfiguration.setAllowedOrigins(List.of("https://interns-local-guide.vercel.app/"));
       System.out.println("prod");
     }
     corsConfiguration.addAllowedHeader("*");
@@ -82,7 +81,7 @@ public class AppConfiguration {
   @Bean
   public FirebaseApp firebaseApp() throws IOException {
     InputStream serviceAccount =
-        new ClassPathResource("local-guide-notification-firebase-adminsdk-cgx4u-1163d8bc99.json")
+        new ClassPathResource("local-guide-4a72b-firebase-adminsdk-ta.json")
             .getInputStream();
     FirebaseOptions options =
         FirebaseOptions.builder()

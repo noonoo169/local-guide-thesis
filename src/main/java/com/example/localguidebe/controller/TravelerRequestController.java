@@ -9,6 +9,7 @@ import com.example.localguidebe.service.TravelerRequestService;
 import com.example.localguidebe.system.Result;
 import com.example.localguidebe.utils.AuthUtils;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -21,6 +22,7 @@ public class TravelerRequestController {
   private final TravelerRequestToTravelerRequestDtoConverter
       travelerRequestToTravelerRequestDtoConverter;
 
+  @Autowired
   public TravelerRequestController(
       TravelerRequestService travelerRequestService,
       TravelerRequestToTravelerRequestDtoConverter travelerRequestToTravelerRequestDtoConverter) {
