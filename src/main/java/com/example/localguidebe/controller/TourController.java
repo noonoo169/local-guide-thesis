@@ -21,6 +21,7 @@ import com.example.localguidebe.utils.AddressUtils;
 import com.example.localguidebe.utils.AuthUtils;
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -39,6 +40,7 @@ public class TourController {
   private final NotificationService notificationService;
   private final UserToUserDtoConverter userToUserDtoConverter;
 
+  @Autowired
   public TourController(
       TourService tourService,
       CategoryService categoryService,

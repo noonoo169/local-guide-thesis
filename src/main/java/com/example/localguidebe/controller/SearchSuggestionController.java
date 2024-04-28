@@ -3,6 +3,7 @@ package com.example.localguidebe.controller;
 import com.example.localguidebe.service.TourService;
 import com.example.localguidebe.service.UserService;
 import com.example.localguidebe.system.Result;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ public class SearchSuggestionController {
   private final UserService userService;
   private final TourService tourService;
 
+  @Autowired
   public SearchSuggestionController(UserService userService, TourService tourService) {
     this.userService = userService;
     this.tourService = tourService;

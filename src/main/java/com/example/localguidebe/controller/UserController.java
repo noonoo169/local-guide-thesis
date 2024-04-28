@@ -12,6 +12,7 @@ import com.example.localguidebe.service.UserService;
 import com.example.localguidebe.system.Result;
 import com.example.localguidebe.utils.AuthUtils;
 import java.util.Objects;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -23,8 +24,10 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
   private final UserService userService;
   private final UserToUserDtoConverter userToUserDtoConverter;
+  private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
   private final TourService tourService;
 
+  @Autowired
   public UserController(
       UserService userService,
       UserToUserDtoConverter userToUserDtoConverter,
@@ -33,8 +36,6 @@ public class UserController {
     this.userToUserDtoConverter = userToUserDtoConverter;
     this.tourService = tourService;
   }
-
-  BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
   @PutMapping("")
   public ResponseEntity<Result> updatePersonalInformation(
@@ -85,14 +86,14 @@ public class UserController {
                         HttpStatus.OK.value(),
                         "You can't add review for this guide",
                         new IsCanReviewResponseDTO(false)));
-          } else
-            return ResponseEntity.status(HttpStatus.OK)
-                .body(
-                    new Result(
-                        true,
-                        HttpStatus.OK.value(),
-                        "You can add review for this guide",
-                        new IsCanReviewResponseDTO(true)));
+          }
+          return ResponseEntity.status(HttpStatus.OK)
+              .body(
+                  new Result(
+                      true,
+                      HttpStatus.OK.value(),
+                      "You can add review for this guide",
+                      new IsCanReviewResponseDTO(true)));
         });
   }
 
@@ -102,32 +103,25 @@ public class UserController {
     return AuthUtils.checkAuthentication(
         authentication,
         () -> {
+          String travelerEmail = ((CustomUserDetails) authentication.getPrincipal()).getEmail();
+          Long travelerId = ((CustomUserDetails) authentication.getPrincipal()).getId();
+          if (!tourService.checkBookingByTraveler(tourId, travelerEmail)
+              || !tourService.checkExistingReviewsByTraveler(travelerId, tourId)) {
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(
-                            new Result(
-                                    true,
-                                    HttpStatus.OK.value(),
-                                    "You can add review for this tour",
-                                    new IsCanReviewResponseDTO(true)));
-//          String travelerEmail = ((CustomUserDetails) authentication.getPrincipal()).getEmail();
-//          Long travelerId = ((CustomUserDetails) authentication.getPrincipal()).getId();
-//          if (!tourService.checkBookingByTraveler(tourId, travelerEmail)
-//              || !tourService.checkExistingReviewsByTraveler(travelerId, tourId)) {
-//            return ResponseEntity.status(HttpStatus.OK)
-//                .body(
-//                    new Result(
-//                        false,
-//                        HttpStatus.OK.value(),
-//                        "You can't add review for this tour",
-//                        new IsCanReviewResponseDTO(false)));
-//          } else
-//            return ResponseEntity.status(HttpStatus.OK)
-//                .body(
-//                    new Result(
-//                        true,
-//                        HttpStatus.OK.value(),
-//                        "You can add review for this tour",
-//                        new IsCanReviewResponseDTO(true)));
+                .body(
+                    new Result(
+                        false,
+                        HttpStatus.OK.value(),
+                        "You can't add review for this tour",
+                        new IsCanReviewResponseDTO(false)));
+          }
+          return ResponseEntity.status(HttpStatus.OK)
+              .body(
+                  new Result(
+                      true,
+                      HttpStatus.OK.value(),
+                      "You can add review for this tour",
+                      new IsCanReviewResponseDTO(true)));
         });
   }
 
@@ -212,10 +206,9 @@ public class UserController {
         () -> {
           String email = ((CustomUserDetails) authentication.getPrincipal()).getEmail();
           User user = userService.findUserByEmail(email);
-          if (bCryptPasswordEncoder.matches(changePasswordDTO.password(), user.getPassword())) {
-            if (!bCryptPasswordEncoder.matches(
-                changePasswordDTO.newPassword(), user.getPassword())) {
-              user.setPassword(bCryptPasswordEncoder.encode(changePasswordDTO.newPassword()));
+          if (passwordEncoder.matches(changePasswordDTO.password(), user.getPassword())) {
+            if (!passwordEncoder.matches(changePasswordDTO.newPassword(), user.getPassword())) {
+              user.setPassword(passwordEncoder.encode(changePasswordDTO.newPassword()));
               userService.saveUser(user);
               return ResponseEntity.status(HttpStatus.OK)
                   .body(new Result(false, HttpStatus.OK.value(), "Change password successfully"));
