@@ -20,6 +20,7 @@ import com.example.localguidebe.service.*;
 import com.example.localguidebe.system.constants.NotificationMessage;
 import com.example.localguidebe.utils.AddressUtils;
 import com.example.localguidebe.utils.CloudinaryUtil;
+import com.example.localguidebe.utils.DistanceUtils;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -43,7 +44,7 @@ public class TourServiceImpl implements TourService {
   private final ToResultInSearchSuggestionDtoConverter toResultInSearchSuggestionDtoConverter;
   private final TourStartTimeRepository tourStartTimeRepository;
   private final ImageRepository imageRepository;
-  private TourRepository tourRepository;
+  private final TourRepository tourRepository;
   private final CategoryService categoryService;
   private final TourStartTimeService tourStartTimeService;
   private final LocationService locationService;
@@ -60,24 +61,25 @@ public class TourServiceImpl implements TourService {
 
   @Autowired
   public TourServiceImpl(
-      ToResultInSearchSuggestionDtoConverter toResultInSearchSuggestionDtoConverter,
-      TourStartTimeRepository tourStartTimeRepository,
-      CategoryService categoryService,
-      TourStartTimeService tourStartTimeService,
-      LocationService locationService,
-      UserService userService,
-      CloudinaryUtil cloudinaryUtil,
-      ImageRepository imageRepository,
-      BookingRepository bookingRepository,
-      TourToTourDtoConverter tourToTourDtoConverter,
-      GeoCodingService geoCodingService,
-      ReviewToReviewResponseDto reviewToReviewResponseDto,
-      NotificationService notificationService,
-      CartRepository cartRepository,
-      ReviewRepository reviewRepository,
-      TourDupeService tourDupeService) {
+          ToResultInSearchSuggestionDtoConverter toResultInSearchSuggestionDtoConverter,
+          TourStartTimeRepository tourStartTimeRepository,
+          TourRepository tourRepository, CategoryService categoryService,
+          TourStartTimeService tourStartTimeService,
+          LocationService locationService,
+          UserService userService,
+          CloudinaryUtil cloudinaryUtil,
+          ImageRepository imageRepository,
+          BookingRepository bookingRepository,
+          TourToTourDtoConverter tourToTourDtoConverter,
+          GeoCodingService geoCodingService,
+          ReviewToReviewResponseDto reviewToReviewResponseDto,
+          NotificationService notificationService,
+          CartRepository cartRepository,
+          ReviewRepository reviewRepository,
+          TourDupeService tourDupeService) {
     this.tourStartTimeRepository = tourStartTimeRepository;
     this.toResultInSearchSuggestionDtoConverter = toResultInSearchSuggestionDtoConverter;
+    this.tourRepository = tourRepository;
     this.geoCodingService = geoCodingService;
     this.categoryService = categoryService;
     this.tourStartTimeService = tourStartTimeService;
@@ -92,11 +94,6 @@ public class TourServiceImpl implements TourService {
     this.cartRepository = cartRepository;
     this.reviewRepository = reviewRepository;
     this.tourDupeService = tourDupeService;
-  }
-
-  @Autowired
-  public void setTourRepository(TourRepository tourRepository) {
-    this.tourRepository = tourRepository;
   }
 
   @Override
@@ -477,5 +474,40 @@ public class TourServiceImpl implements TourService {
   @Override
   public Tour findTourById(Long id) {
     return tourRepository.findById(id).orElse(null);
+  }
+
+  @Override
+  public SearchTourDTO getListTourByCoordinates(
+      Integer page, Integer limit, Double latitude, Double longitude) {
+    List<TourDTO> sortedTours =
+        tourRepository.findAll().stream()
+            .filter(
+                tour ->
+                    tour.getIsForSpecificTraveler().equals(false)
+                        && tour.getStatus().equals(TourStatusEnum.ACCEPT))
+            .map(tourToTourDtoConverter::convert)
+            .sorted(
+                Comparator.comparing(
+                        (TourDTO tour) -> {
+                          List<Double> distances =
+                              tour.getLocations().stream()
+                                  .map(
+                                      location ->
+                                          DistanceUtils.calculateDistanceVincenty(
+                                              location.latitude(),
+                                              location.longitude(),
+                                              latitude,
+                                              longitude))
+                                  .toList();
+                          return DistanceUtils.getAvgDistance(distances);
+                        })
+                    .thenComparing(TourDTO::getOverallRating))
+            .toList();
+    int totalElements = sortedTours.size();
+    int fromIndex = Math.min(page * limit, totalElements);
+    int toIndex = Math.min((page + 1) * limit, totalElements);
+    List<TourDTO> paginatedTours = sortedTours.subList(fromIndex, toIndex);
+    int totalOfPages = (int) Math.ceil((double) totalElements / limit);
+    return new SearchTourDTO(paginatedTours, totalOfPages, totalElements);
   }
 }

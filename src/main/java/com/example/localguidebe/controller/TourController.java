@@ -8,6 +8,7 @@ import com.example.localguidebe.dto.TourDTO;
 import com.example.localguidebe.dto.UserDTO;
 import com.example.localguidebe.dto.requestdto.TourRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateTourRequestDTO;
+import com.example.localguidebe.dto.responsedto.SearchTourDTO;
 import com.example.localguidebe.entity.Tour;
 import com.example.localguidebe.entity.User;
 import com.example.localguidebe.enums.NotificationTypeEnum;
@@ -191,14 +192,18 @@ public class TourController {
   @GetMapping("")
   public ResponseEntity<Result> getListTour(
       @RequestParam(required = false, defaultValue = "0") Integer page,
-      @RequestParam(required = false, defaultValue = "5") Integer limit) {
+      @RequestParam(required = false, defaultValue = "5") Integer limit,
+      @RequestParam(required = false) Double latitude,
+      @RequestParam(required = false) Double longitude) {
     try {
+      SearchTourDTO tours = null;
+      if (latitude == null || longitude == null) {
+        tours = tourService.getListTour(page, limit);
+      } else {
+        tours = tourService.getListTourByCoordinates(page, limit, latitude, longitude);
+      }
       return new ResponseEntity<>(
-          new Result(
-              true,
-              HttpStatus.OK.value(),
-              "Get the list successfully",
-              tourService.getListTour(page, limit)),
+          new Result(true, HttpStatus.OK.value(), "Get the list successfully", tours),
           HttpStatus.OK);
     } catch (Exception e) {
       return new ResponseEntity<>(
