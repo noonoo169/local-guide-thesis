@@ -1,5 +1,6 @@
 package com.example.localguidebe.entity;
 
+import com.example.localguidebe.dto.ProvinceResponseDTO;
 import com.example.localguidebe.enums.BookingStatusEnum;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -13,6 +14,33 @@ import org.hibernate.validator.constraints.Range;
 @NoArgsConstructor
 @Entity
 @Table(name = "booking")
+@NamedNativeQuery(
+    name = "findTotalBookingsByCityProvince",
+    query =
+        "select \n"
+            + "    substring_index(l.address, ', ', -2) name,\n"
+            + "    count(*) bookedQuantity,\n"
+            + "    i.image_link imageLink\n"
+            + "from\n"
+            + "    booking b\n"
+            + "    join tour t on b.tour_id = t.id\n"
+            + "    join location_tour lt on t.id = lt.tour_id\n"
+            + "    join location l on lt.location_id = l.id\n"
+            + "    join image i on l.address like CONCAT('%', i.province_name, '%')\n"
+            + "where b.status = 'PAID'\n"
+            + "group by name\n"
+            + "order by bookedQuantity desc",
+    resultSetMapping = "province_popular_dto")
+@SqlResultSetMapping(
+    name = "province_popular_dto",
+    classes =
+        @ConstructorResult(
+            targetClass = ProvinceResponseDTO.class,
+            columns = {
+              @ColumnResult(name = "name", type = String.class),
+              @ColumnResult(name = "bookedQuantity", type = Long.class),
+              @ColumnResult(name = "imageLink", type = String.class)
+            }))
 public class Booking {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,5 +79,4 @@ public class Booking {
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JoinColumn(name = "tour_dupe_id")
   private TourDupe tourDupe;
-
 }

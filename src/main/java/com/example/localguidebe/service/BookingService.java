@@ -8,7 +8,7 @@ import java.util.List;
 public interface BookingService {
   List<BookingDTO> getBookingHistory(String email);
 
-  List<ProvinceResponseDTO> FindForSuggestedTours();
+  List<ProvinceResponseDTO> findTotalBookingsByCityProvince();
 
   List<StatisticalBookingDTO> getStatisticalBooking();
 

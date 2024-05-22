@@ -37,8 +37,9 @@ public class BookingServiceImpl implements BookingService {
   }
 
   @Override
-  public List<ProvinceResponseDTO> FindForSuggestedTours() {
-    List<ProvinceResponseDTO> provinceResponseDTOS = bookingRepository.FindForSuggestedTours();
+  public List<ProvinceResponseDTO> findTotalBookingsByCityProvince() {
+    List<ProvinceResponseDTO> provinceResponseDTOS =
+        bookingRepository.findTotalBookingsByCityProvince();
     return provinceResponseDTOS;
   }
 
