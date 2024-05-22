@@ -51,7 +51,7 @@ public class BookingController {
               true,
               HttpStatus.OK.value(),
               "Successfully get the popular province",
-              bookingService.FindForSuggestedTours()),
+              bookingService.findTotalBookingsByCityProvince()),
           HttpStatus.OK);
     } catch (Exception e) {
       return new ResponseEntity<>(

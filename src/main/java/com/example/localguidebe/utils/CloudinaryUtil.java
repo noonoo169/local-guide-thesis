@@ -5,20 +5,21 @@ import com.cloudinary.utils.ObjectUtils;
 import com.example.localguidebe.enums.FolderName;
 import jakarta.annotation.Resource;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 @Component
+@Slf4j
 public class CloudinaryUtil {
-  private static final Logger logger = LoggerFactory.getLogger(CloudinaryUtil.class);
   @Resource private Cloudinary cloudinary;
 
   public String uploadFile(String base64String, FolderName folderName) throws IOException {
@@ -85,7 +86,7 @@ public class CloudinaryUtil {
       String publicId = (String) uploadedFile.get("public_id");
       return cloudinary.url().secure(true).generate(publicId);
     } catch (IOException e) {
-      logger.error("Cannot upload file now - {}", e.getMessage());
+      log.error("Cannot upload file now - {}", e.getMessage());
       return "Cannot upload file now";
     }
   }
@@ -99,5 +100,50 @@ public class CloudinaryUtil {
     } catch (Exception e) {
       return false;
     }
+  }
+
+  public List<String> refreshImageData(String folderPath) {
+    try {
+      List<File> imageFiles = getAllImagesFromFolders(folderPath);
+      log.info(imageFiles.toString());
+      List<String> urls = new ArrayList<>();
+      int count = 187;
+      for (File imageFile : imageFiles) {
+        String base64String = convertToBase64(imageFile);
+        String url = uploadFile(base64String, FolderName.province);
+        String insertValue =
+            "("
+                + count++
+                + ", "
+                + "'province', "
+                + "'"
+                + url
+                + "', "
+                + "NULL, "
+                + imageFile.getName().split("\\.")[1].trim()
+                + ")";
+        urls.add(insertValue);
+      }
+      return urls;
+    } catch (IOException e) {
+      return Collections.singletonList(e.getMessage());
+    }
+  }
+
+  public static List<File> getAllImagesFromFolders(String folderPath) throws IOException {
+    List<File> imageFiles = new ArrayList<>();
+
+    Files.walk(Paths.get(folderPath))
+        .filter(Files::isRegularFile)
+        .map(Path::toFile)
+        .forEach(imageFiles::add);
+    imageFiles.sort(Comparator.comparing(file -> file.getName().split("\\.")[1].trim()));
+
+    return imageFiles;
+  }
+
+  public static String convertToBase64(File file) throws IOException {
+    byte[] fileContent = Files.readAllBytes(file.toPath());
+    return Base64.getEncoder().encodeToString(fileContent);
   }
 }
