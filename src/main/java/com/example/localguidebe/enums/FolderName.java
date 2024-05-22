@@ -4,5 +4,6 @@ public enum FolderName {
   people,
   location,
   tour,
-  guide_application
+  guide_application,
+  province
 }
