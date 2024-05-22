@@ -4,5 +4,6 @@ public enum AssociateName {
   TOUR,
   LOCATION,
   USER,
-  GUIDE_APPLICATION
+  GUIDE_APPLICATION,
+  PROVINCE
 }
