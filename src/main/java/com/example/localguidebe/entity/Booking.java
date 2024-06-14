@@ -28,7 +28,7 @@ import org.hibernate.validator.constraints.Range;
             + "    join location l on lt.location_id = l.id\n"
             + "    join image i on l.address like CONCAT('%', i.province_name, '%')\n"
             + "where b.status = 'PAID'\n"
-            + "group by name\n"
+            + "group by name, imageLink\n"
             + "order by bookedQuantity desc",
     resultSetMapping = "province_popular_dto")
 @SqlResultSetMapping(

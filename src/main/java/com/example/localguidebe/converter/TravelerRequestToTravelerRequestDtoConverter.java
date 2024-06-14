@@ -25,6 +25,7 @@ public class TravelerRequestToTravelerRequestDtoConverter {
         source.getId(),
         List.of(source.getTransportation().split(", ")),
         source.getDuration(),
+        source.getPhone(),
         source.getUnit(),
         source.getMaxPricePerPerson(),
         source.getNumberOfTravelers(),

@@ -6,6 +6,7 @@ import java.util.List;
 public record AddTravelerRequestDTO(
     Long guideId,
     Long travelerRequestId, // can be null
+    String phone,
     List<String> transportation,
     Integer duration,
     String unit,
