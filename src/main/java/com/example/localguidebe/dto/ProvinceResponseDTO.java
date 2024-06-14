@@ -10,5 +10,5 @@ import lombok.*;
 public class ProvinceResponseDTO {
   private String name;
   private Long bookedQuantity;
-  private String imageLink;
+  private String image;
 }

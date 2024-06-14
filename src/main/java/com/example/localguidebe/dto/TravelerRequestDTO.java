@@ -7,6 +7,7 @@ public record TravelerRequestDTO(
     Long id,
     List<String> transportation,
     Integer duration,
+    String phone,
     String unit,
     Double maxPricePerPerson,
     Integer numberOfTravelers,

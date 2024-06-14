@@ -24,6 +24,7 @@ import com.example.localguidebe.utils.DistanceUtils;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -61,22 +62,23 @@ public class TourServiceImpl implements TourService {
 
   @Autowired
   public TourServiceImpl(
-          ToResultInSearchSuggestionDtoConverter toResultInSearchSuggestionDtoConverter,
-          TourStartTimeRepository tourStartTimeRepository,
-          TourRepository tourRepository, CategoryService categoryService,
-          TourStartTimeService tourStartTimeService,
-          LocationService locationService,
-          UserService userService,
-          CloudinaryUtil cloudinaryUtil,
-          ImageRepository imageRepository,
-          BookingRepository bookingRepository,
-          TourToTourDtoConverter tourToTourDtoConverter,
-          GeoCodingService geoCodingService,
-          ReviewToReviewResponseDto reviewToReviewResponseDto,
-          NotificationService notificationService,
-          CartRepository cartRepository,
-          ReviewRepository reviewRepository,
-          TourDupeService tourDupeService) {
+      ToResultInSearchSuggestionDtoConverter toResultInSearchSuggestionDtoConverter,
+      TourStartTimeRepository tourStartTimeRepository,
+      TourRepository tourRepository,
+      CategoryService categoryService,
+      TourStartTimeService tourStartTimeService,
+      LocationService locationService,
+      UserService userService,
+      CloudinaryUtil cloudinaryUtil,
+      ImageRepository imageRepository,
+      BookingRepository bookingRepository,
+      TourToTourDtoConverter tourToTourDtoConverter,
+      GeoCodingService geoCodingService,
+      ReviewToReviewResponseDto reviewToReviewResponseDto,
+      NotificationService notificationService,
+      CartRepository cartRepository,
+      ReviewRepository reviewRepository,
+      TourDupeService tourDupeService) {
     this.tourStartTimeRepository = tourStartTimeRepository;
     this.toResultInSearchSuggestionDtoConverter = toResultInSearchSuggestionDtoConverter;
     this.tourRepository = tourRepository;
@@ -389,7 +391,12 @@ public class TourServiceImpl implements TourService {
         bookingRepository.findStartDateTimesByTourIdAndStartDate(tourId, localDate);
     List<String> tourStartTimesAvailable = new ArrayList<>(tourStartTimes);
     tourStartTimesAvailable.removeAll(startDateTimesInBooKing);
-    return tourStartTimesAvailable;
+
+    return LocalDate.now().equals(localDate)
+        ? tourStartTimesAvailable.stream()
+            .filter(s -> LocalTime.now().isBefore(LocalTime.parse(s)))
+            .toList()
+        : tourStartTimesAvailable;
   }
 
   @Override
