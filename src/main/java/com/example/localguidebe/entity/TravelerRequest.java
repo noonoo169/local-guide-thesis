@@ -34,6 +34,9 @@ public class TravelerRequest {
   @Column(name = "destination")
   private String destination;
 
+  @Column(name = "phone")
+  private String phone;
+
   @Enumerated(EnumType.STRING)
   @Column(name = "status")
   private TravelerRequestStatus status;

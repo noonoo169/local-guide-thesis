@@ -62,6 +62,7 @@ public class TravelerRequestServiceImpl implements TravelerRequestService {
     }
     TravelerRequest travelerRequest =
         TravelerRequest.builder()
+            .phone(addTravelerRequestDTO.phone())
             .destination(addTravelerRequestDTO.destination())
             .maxPricePerPerson(addTravelerRequestDTO.maxPricePerPerson())
             .numberOfTravelers(addTravelerRequestDTO.numberOfTravelers())
