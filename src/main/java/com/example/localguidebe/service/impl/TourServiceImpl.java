@@ -390,15 +390,12 @@ public class TourServiceImpl implements TourService {
     List<String> tourStartTimes = tourStartTimeRepository.findByTourId(tourId);
 
     if (tour.getUnit().equals("day(s)")) {
-      List<String> startDateTimesInBooKing =
-          bookingRepository.findStartDateTimesByTourIdAndStartDate(tourId, localDate);
-
       List<String> tourStartTimesAvailableFinal =
           LocalDate.now().equals(localDate)
-              ? startDateTimesInBooKing.stream()
+              ? tourStartTimes.stream()
                   .filter(s -> LocalTime.now().isBefore(LocalTime.parse(s)))
                   .toList()
-              : startDateTimesInBooKing;
+              : tourStartTimes;
 
       Optional<Integer> optionalRemainingSeatOfTourByDate =
           bookingRepository.getRemainingSeatsOfTourByDate(
@@ -453,16 +450,47 @@ public class TourServiceImpl implements TourService {
                     .findFirst()
                     .get();
             for (int i = 1; i <= remainingSeatByStartDateTimeDTOFiltered.remainingSeats(); i++) {
-              remainingSeatAndStartTimeMap
-                  .computeIfAbsent(i, k -> new ArrayList<>())
-                  .add(
-                      remainingSeatByStartDateTimeDTOFiltered.startDate().toLocalTime().toString());
+              if (LocalDate.now().equals(localDate)) {
+                if (LocalTime.now()
+                    .isBefore(remainingSeatByStartDateTimeDTOFiltered.startDate().toLocalTime())) {
+                  remainingSeatAndStartTimeMap
+                      .computeIfAbsent(i, k -> new ArrayList<>())
+                      .add(
+                          remainingSeatByStartDateTimeDTOFiltered
+                              .startDate()
+                              .toLocalTime()
+                              .toString());
+                }
+              } else {
+                remainingSeatAndStartTimeMap
+                    .computeIfAbsent(i, k -> new ArrayList<>())
+                    .add(
+                        remainingSeatByStartDateTimeDTOFiltered
+                            .startDate()
+                            .toLocalTime()
+                            .toString());
+              }
             }
           } else {
             for (int i = 1; i <= tour.getLimitTraveler(); i++) {
-              remainingSeatAndStartTimeMap
-                  .computeIfAbsent(i, k -> new ArrayList<>())
-                  .add(startDateTime.toLocalTime().toString());
+              if (LocalDate.now().equals(localDate)) {
+                if (LocalTime.now()
+                        .isBefore(startDateTime.toLocalTime())) {
+                  remainingSeatAndStartTimeMap
+                          .computeIfAbsent(i, k -> new ArrayList<>())
+                          .add(
+                                  startDateTime
+                                          .toLocalTime()
+                                          .toString());
+                }
+              } else {
+                remainingSeatAndStartTimeMap
+                        .computeIfAbsent(i, k -> new ArrayList<>())
+                        .add(
+                                startDateTime
+                                        .toLocalTime()
+                                        .toString());
+              }
             }
           }
         });
