@@ -4,14 +4,12 @@ import com.example.localguidebe.converter.ReviewToReviewResponseDto;
 import com.example.localguidebe.converter.ToResultInSearchSuggestionDtoConverter;
 import com.example.localguidebe.converter.TourToTourDtoConverter;
 import com.example.localguidebe.dto.LocationDTO;
+import com.example.localguidebe.dto.RemainingSeatByStartDateTimeDTO;
 import com.example.localguidebe.dto.TourDTO;
 import com.example.localguidebe.dto.requestdto.InfoLocationDTO;
 import com.example.localguidebe.dto.requestdto.TourRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateTourRequestDTO;
-import com.example.localguidebe.dto.responsedto.ResultInSearchSuggestionDTO;
-import com.example.localguidebe.dto.responsedto.ReviewResponseDTO;
-import com.example.localguidebe.dto.responsedto.SearchSuggestionResponseDTO;
-import com.example.localguidebe.dto.responsedto.SearchTourDTO;
+import com.example.localguidebe.dto.responsedto.*;
 import com.example.localguidebe.entity.*;
 import com.example.localguidebe.enums.*;
 import com.example.localguidebe.exception.ConvertTourToTourDupeException;
@@ -24,6 +22,7 @@ import com.example.localguidebe.utils.DistanceUtils;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -385,18 +384,94 @@ public class TourServiceImpl implements TourService {
   }
 
   @Override
-  public List<String> getTourStartTimeAvailable(Long tourId, LocalDate localDate) {
+  public List<AvailableStartTimeResponseDTO> getTourStartTimeAvailable(
+      Long tourId, LocalDate localDate) {
+    Tour tour = findTourById(tourId);
     List<String> tourStartTimes = tourStartTimeRepository.findByTourId(tourId);
-    List<String> startDateTimesInBooKing =
-        bookingRepository.findStartDateTimesByTourIdAndStartDate(tourId, localDate);
-    List<String> tourStartTimesAvailable = new ArrayList<>(tourStartTimes);
-    tourStartTimesAvailable.removeAll(startDateTimesInBooKing);
 
-    return LocalDate.now().equals(localDate)
-        ? tourStartTimesAvailable.stream()
-            .filter(s -> LocalTime.now().isBefore(LocalTime.parse(s)))
-            .toList()
-        : tourStartTimesAvailable;
+    if (tour.getUnit().equals("day(s)")) {
+      List<String> startDateTimesInBooKing =
+          bookingRepository.findStartDateTimesByTourIdAndStartDate(tourId, localDate);
+
+      List<String> tourStartTimesAvailableFinal =
+          LocalDate.now().equals(localDate)
+              ? startDateTimesInBooKing.stream()
+                  .filter(s -> LocalTime.now().isBefore(LocalTime.parse(s)))
+                  .toList()
+              : startDateTimesInBooKing;
+
+      Optional<Integer> optionalRemainingSeatOfTourByDate =
+          bookingRepository.getRemainingSeatsOfTourByDate(
+              tourId, localDate.atTime(LocalTime.parse(tourStartTimes.get(0))));
+      if (tourStartTimesAvailableFinal.isEmpty()) {
+        return List.of();
+      }
+      if (optionalRemainingSeatOfTourByDate.isPresent()
+          && optionalRemainingSeatOfTourByDate.get() == 0) {
+        return List.of();
+      }
+      Integer limitTraveler = tour.getLimitTraveler();
+
+      if (optionalRemainingSeatOfTourByDate.isPresent()) {
+        limitTraveler = tour.getLimitTraveler() - optionalRemainingSeatOfTourByDate.get();
+      }
+
+      List<AvailableStartTimeResponseDTO> availableStartTimeResponseDTOList = new ArrayList<>();
+      for (int i = 0; i < limitTraveler; i++) {
+        availableStartTimeResponseDTOList.add(
+            new AvailableStartTimeResponseDTO(i + 1, List.of(tourStartTimes.get(0))));
+      }
+      return availableStartTimeResponseDTOList;
+    }
+
+    List<AvailableStartTimeResponseDTO> availableStartTimeResponseDTOList = new ArrayList<>();
+
+    Map<Integer, List<String>> remainingSeatAndStartTimeMap = new HashMap<>();
+
+    List<LocalDateTime> startDateTimes = new ArrayList<>();
+
+    for (String tourStartTime : tourStartTimes) {
+      startDateTimes.add(localDate.atTime(LocalTime.parse(tourStartTime)));
+    }
+
+    List<RemainingSeatByStartDateTimeDTO> remainingSeatByStartDateTimeDTOList =
+        bookingRepository.findDateTimes(startDateTimes, tourId);
+
+    List<LocalDateTime> startDateTimeInRemainingSeatByStartDateTimeDTOList =
+        remainingSeatByStartDateTimeDTOList.stream()
+            .map(RemainingSeatByStartDateTimeDTO::startDate)
+            .toList();
+
+    startDateTimes.forEach(
+        startDateTime -> {
+          if (startDateTimeInRemainingSeatByStartDateTimeDTOList.contains(startDateTime)) {
+            RemainingSeatByStartDateTimeDTO remainingSeatByStartDateTimeDTOFiltered =
+                remainingSeatByStartDateTimeDTOList.stream()
+                    .filter(
+                        remainingSeatByStartDateTimeDTO ->
+                            remainingSeatByStartDateTimeDTO.startDate().equals(startDateTime))
+                    .findFirst()
+                    .get();
+            for (int i = 1; i <= remainingSeatByStartDateTimeDTOFiltered.remainingSeats(); i++) {
+              remainingSeatAndStartTimeMap
+                  .computeIfAbsent(i, k -> new ArrayList<>())
+                  .add(
+                      remainingSeatByStartDateTimeDTOFiltered.startDate().toLocalTime().toString());
+            }
+          } else {
+            for (int i = 1; i <= tour.getLimitTraveler(); i++) {
+              remainingSeatAndStartTimeMap
+                  .computeIfAbsent(i, k -> new ArrayList<>())
+                  .add(startDateTime.toLocalTime().toString());
+            }
+          }
+        });
+
+    for (Map.Entry<Integer, List<String>> e : remainingSeatAndStartTimeMap.entrySet()) {
+      availableStartTimeResponseDTOList.add(
+          new AvailableStartTimeResponseDTO(e.getKey(), e.getValue()));
+    }
+    return availableStartTimeResponseDTOList;
   }
 
   @Override

@@ -99,7 +99,7 @@ public class BusyScheduleServiceImpl implements BusyScheduleService {
                 schedule -> schedule.typeBusyDayEnum().equals(TypeBusyDayEnum.BOOKED_DAY_BY_HOURS))
             .map(BusyScheduleDTO::busyDate)
             .map(LocalDateTime::toLocalDate)
-            .collect(Collectors.toList());
+            .toList();
 
     Set<LocalDate> updatedBusyDates = new HashSet<>();
 
@@ -110,6 +110,18 @@ public class BusyScheduleServiceImpl implements BusyScheduleService {
           updatedBusyDates.add(busyDate.minusDays(count));
         }
       }
+      List<LocalDate> startDateInBooking =
+          bookingRepository.getStartDateInBookingByTourId(tourId).stream()
+              .map(LocalDateTime::toLocalDate)
+              .toList();
+      busySchedules.forEach(
+          busyDate -> {
+            if (startDateInBooking.contains(busyDate.busyDate().toLocalDate())) {
+              if (!busyDate.isFullTraveler()) {
+                updatedBusyDates.remove(busyDate.busyDate().toLocalDate());
+              }
+            }
+          });
     } else {
       if (!busyDatesByHours.isEmpty()) {
         busyDates.removeAll(busyDatesByHours);
