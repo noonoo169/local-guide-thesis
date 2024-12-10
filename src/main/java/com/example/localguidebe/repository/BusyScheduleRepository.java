@@ -22,4 +22,14 @@ public interface BusyScheduleRepository extends JpaRepository<BusySchedule, Inte
 
   BusySchedule findBusyScheduleByBusyDateAndGuideAndTypeBusyDay(
       LocalDateTime busyDate, User guide, TypeBusyDayEnum typeBusyDayEnum);
+
+  @Query(
+      value =
+          "select bs.* \n"
+              + "from busy_schedule bs join tour t on bs.guide_id = t.guide_id\n"
+              + "where t.id = ?1 \n"
+              + "\tand bs.busy_date >= ?2 \n"
+              + "    and bs.busy_date <= DATE_ADD(?2, INTERVAL t.duration - 1 DAY);",
+      nativeQuery = true)
+  List<BusySchedule> getBusyDatesByTourAndByDate(Long tourId, LocalDateTime startDate);
 }

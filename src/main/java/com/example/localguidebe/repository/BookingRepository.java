@@ -5,7 +5,11 @@ import com.example.localguidebe.dto.StatisticalBookingDTO;
 import com.example.localguidebe.dto.TourRevenueDTO;
 import com.example.localguidebe.entity.Booking;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+
+import com.example.localguidebe.repository.custom.BookingRepositoryCustom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,7 +19,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface BookingRepository extends JpaRepository<Booking, Long> {
+public interface BookingRepository extends JpaRepository<Booking, Long>, BookingRepositoryCustom {
   /*
   TODO: Consider whether to retrieve paid bookings or all bookings.
         If retrieving all bookings, set a timeout for pending_payment bookings.
@@ -87,4 +91,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
   @Query("SELECT booking FROM Booking booking WHERE booking.status = 'PAID'")
   List<Booking> getPaidBooking();
+
+  @Query("SELECT b.tour.limitTraveler - SUM(b.numberTravelers) FROM Booking b WHERE b.tour.id = :tourId AND b.startDate = :startDate GROUP BY b.tour.id")
+  Optional<Integer> getRemainingSeatsOfTourByDate(Long tourId, LocalDateTime startDate);
+
+  @Query("SELECT b.startDate FROM Booking b WHERE b.tour.id = :tourId")
+  List<LocalDateTime> getStartDateInBookingByTourId(Long tourId);
 }

@@ -4,6 +4,7 @@ import com.example.localguidebe.dto.LocationDTO;
 import com.example.localguidebe.dto.TourDTO;
 import com.example.localguidebe.dto.requestdto.TourRequestDTO;
 import com.example.localguidebe.dto.requestdto.UpdateTourRequestDTO;
+import com.example.localguidebe.dto.responsedto.AvailableStartTimeResponseDTO;
 import com.example.localguidebe.dto.responsedto.ReviewResponseDTO;
 import com.example.localguidebe.dto.responsedto.SearchSuggestionResponseDTO;
 import com.example.localguidebe.dto.responsedto.SearchTourDTO;
@@ -38,7 +39,7 @@ public interface TourService {
 
   SearchSuggestionResponseDTO getTourAndTourLocations(String searchValue);
 
-  List<String> getTourStartTimeAvailable(Long tourId, LocalDate localDate);
+  List<AvailableStartTimeResponseDTO> getTourStartTimeAvailable(Long tourId, LocalDate localDate);
 
   boolean checkBookingByTraveler(Long tourId, String email);
 

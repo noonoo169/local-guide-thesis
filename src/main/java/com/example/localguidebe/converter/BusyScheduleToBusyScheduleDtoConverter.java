@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 public class BusyScheduleToBusyScheduleDtoConverter {
   public BusyScheduleDTO convert(BusySchedule busySchedule) {
     return new BusyScheduleDTO(
-        busySchedule.getId(), busySchedule.getBusyDate(), busySchedule.getTypeBusyDay());
+        busySchedule.getId(),
+        busySchedule.getBusyDate(),
+        busySchedule.getTypeBusyDay(),
+        busySchedule.getIsFullTraveler());
   }
 }

@@ -25,6 +25,9 @@ public class BusySchedule {
   @Enumerated(EnumType.STRING)
   private TypeBusyDayEnum typeBusyDay;
 
+  @Column(name = "is_full_traveler", columnDefinition = "boolean default false")
+  private Boolean isFullTraveler = Boolean.FALSE;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "guide_id")
   private User guide;
